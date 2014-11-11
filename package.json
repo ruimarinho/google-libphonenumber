@@ -1,0 +1,42 @@
+{
+  "name": "google-libphonenumber",
+  "version": "0.0.0",
+  "description": "Google's phone number handling library ported to node.js",
+  "keywords": [
+    "wrapper",
+    "libphonenumber",
+    "phonenumber",
+    "phone",
+    "number",
+    "e164",
+    "standardize",
+    "international"
+  ],
+  "author": {
+    "name": "Rui Marinho",
+    "email": "rui.marinho@seegno.com",
+    "url": "http://seegno.com"
+  },
+  "homepage": "http://code.google.com/p/libphonenumber/",
+  "bugs": "https://github.com/seegno/google-libphonenumber/issues",
+  "license": "MIT",
+  "repository": {
+    "type": "git",
+    "url": "https://github.com/seegno/google-libphonenumber.git"
+  },
+  "scripts": {
+    "changelog": "./node_modules/.bin/github-changes -o seegno -r google-libphonenumber -a --only-pulls --use-commit-body --title 'Changelog' --date-format '/ YYYY-MM-DD'",
+    "test": "NODE_ENV=test ./node_modules/.bin/mocha test/*_test.js"
+  },
+  "dependencies": {
+    "seegno-closure-library": "20140725.0.5"
+  },
+  "devDependencies": {
+    "github-changes": "0.0.14",
+    "mocha": "^2.0.1",
+    "should": "^4.0.4"
+  },
+  "engines": {
+    "node": ">= 0.8"
+  }
+}
