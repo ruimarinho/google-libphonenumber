@@ -1,7 +1,7 @@
 {
   "name": "google-libphonenumber",
-  "version": "0.0.0",
-  "description": "Google's phone number handling library ported to node.js",
+  "version": "0.1.0",
+  "description": "A lightweight wrapper for Google's libphonenumber.",
   "keywords": [
     "wrapper",
     "libphonenumber",
@@ -17,7 +17,7 @@
     "email": "rui.marinho@seegno.com",
     "url": "http://seegno.com"
   },
-  "homepage": "http://code.google.com/p/libphonenumber/",
+  "homepage": "http://seegno.github.io/google-libphonenumber/",
   "bugs": "https://github.com/seegno/google-libphonenumber/issues",
   "license": "MIT",
   "repository": {
