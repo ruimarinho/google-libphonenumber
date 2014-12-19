@@ -25,7 +25,7 @@
     "url": "https://github.com/seegno/google-libphonenumber.git"
   },
   "scripts": {
-    "changelog": "./node_modules/.bin/github-changes -o seegno -r google-libphonenumber -a --only-pulls --use-commit-body --title 'Changelog' --date-format '/ YYYY-MM-DD'",
+    "changelog": "./node_modules/.bin/github-changes --owner seegno --repository google-libphonenumber --auth --only-pulls --use-commit-body --title 'Changelog' --date-format '/ YYYY-MM-DD'",
     "test": "NODE_ENV=test ./node_modules/.bin/mocha test/*_test.js"
   },
   "dependencies": {
