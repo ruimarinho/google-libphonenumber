@@ -32,7 +32,7 @@
     "seegno-closure-library": "20140725.0.5"
   },
   "devDependencies": {
-    "github-changes": "0.0.14",
+    "github-changes": "0.0.16",
     "mocha": "^2.0.1",
     "should": "^4.0.4"
   },
