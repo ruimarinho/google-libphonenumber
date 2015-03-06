@@ -1,6 +1,6 @@
 # google-libphonenumber
 
-A lightweight wrapper for Google's [libphonenumber](https://code.google.com/p/libphonenumber/), a library to parse, format, store and validate international phone numbers.
+A lightweight wrapper for Google's [libphonenumber](https://code.google.com/p/libphonenumber/) - a library to parse, format, store and validate international phone numbers.
 
 ## Status
 
@@ -21,26 +21,32 @@ Here's a simple example on how to format a US-based number in the international 
 
 ```js
 var PNF = require('google-libphonenumber').PhoneNumberFormat;
+
+// Grab the `phoneUtil` instance.
 var phoneUtil = require('google-libphonenumber').phoneUtil;
+
+// Or call it yourself, just like in the original examples.
+// var phoneUtil = require('google-libphonenumber').PhoneNumberUtil.getInstance();
+
 var phoneNumber = phoneUtil.parse('202-456-1414', 'US');
 
-// Result is +1 202-456-1414
-console.log('Result is', phoneUtil.format(phoneNumber, PNF.INTERNATIONAL));
+phoneUtil.format(phoneNumber, PNF.INTERNATIONAL);
+// => +1 202-456-1414
 ```
 
 ## Notes
 
 ### Differencies from other forks
 
-* Added built-in integration with `google-closure`'s own node.js wrapper.
-* Added a simplified update process to keep `libphonenumber` more up-to-date.
-* Added all exported classes from `libphonenumber` to the module's exports.
-* Moved `google-closure` to the vendor space to facilitate version tracking and control.
-* Updated the dependency management system to require `libphonenumber` dependencies directly from  `google-closure`.
+* Uses a super modern version of `google-closure` repackaged for npm which does not pollute the global namespace (it runs in a sandbox instead).
+* Relies on a simplified update process to keep the underlying `libphonenumber` library always up-to-date.
+* All classes available from `libphonenumber` are exported (and that's it).
+* Leverages own Google's Closure Library dependency management system to load dependencies.
+* Dependencies are generated automatically through Google's Closure Library binary tools (no guessing!).
 
 ### Updating package dependencies
 
-Learn more [updating package dependencies](https://github.com/seegno/google-libphonenumber/wiki/Updating-Package-Dependencies).
+Learn more about [updating package dependencies](https://github.com/seegno/google-libphonenumber/wiki/Updating-Package-Dependencies).
 
 ### Errors
 
@@ -62,7 +68,7 @@ The exceptional work on `libphonenumber` was made possible by these [committers 
 
 ## Licenses
 
-MIT (package) and Apache License 2.0 ([libphonenumber](https://github.com/googlei18n/libphonenumber/blob/master/LICENSE)).
+This package is licensed under MIT. The bundled [libphonenumber](https://github.com/googlei18n/libphonenumber/blob/master/LICENSE) library is licensed under Apache 2.0.
 
 [npm-image]: https://img.shields.io/npm/v/google-libphonenumber.svg?style=flat-square
 [npm-url]: https://npmjs.org/package/google-libphonenumber
