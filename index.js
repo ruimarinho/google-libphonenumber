@@ -3,33 +3,37 @@
  * Module dependencies.
  */
 
-require('seegno-closure-library/closure/goog/bootstrap/nodejs');
-require('./lib/closure/goog/deps');
+var closure = require('seegno-closure-library');
+var path = require('path');
 
 /**
- * Require `PhoneNumberUtil` from `goog`.
+ * Load `libphonenumber` dependencies.
  */
 
-goog.require('i18n.phonenumbers.PhoneNumberUtil');
+closure.loadScript(path.join(__dirname, 'lib/closure/goog/deps.js'));
 
 /**
- * Export `goog.global.i18n.phonenumbers`.
+ * Require `PhoneNumberUtil` dependency.
  */
 
-module.exports = goog.global.i18n.phonenumbers;
+closure.require('i18n.phonenumbers.PhoneNumberUtil');
 
 /**
- * Patch string-based errors.
+ * Retrieve `i18n.phonenumbers` namespace object.
  */
 
-Object.keys(goog.global.i18n.phonenumbers.PhoneNumberUtil.prototype).forEach(function(key) {
-  var originalFn = goog.global.i18n.phonenumbers.PhoneNumberUtil.prototype[key];
+var phoneNumbers = closure.getObjectByName('i18n.phonenumbers');
 
-  goog.global.i18n.phonenumbers.PhoneNumberUtil.prototype[key] = function() {
-    var result;
+/**
+ * Patch string-based errors to throw proper a `Error` instead.
+ */
 
+Object.keys(phoneNumbers.PhoneNumberUtil.prototype).forEach(function(key) {
+  var originalFn = phoneNumbers.PhoneNumberUtil.prototype[key];
+
+  phoneNumbers.PhoneNumberUtil.prototype[key] = function() {
     try {
-      result = originalFn.apply(this, arguments);
+      return originalFn.apply(this, arguments);
     } catch (e) {
       if ('string' !== typeof e) {
         throw e;
@@ -37,13 +41,17 @@ Object.keys(goog.global.i18n.phonenumbers.PhoneNumberUtil.prototype).forEach(fun
 
       throw new Error(e);
     }
-
-    return result;
   };
 });
 
 /**
- * Export `PhoneNumberUtil` instance.
+ * Export `i18n.phonenumbers` namespace.
  */
 
-module.exports.phoneUtil = goog.global.i18n.phonenumbers.PhoneNumberUtil.getInstance();
+module.exports = phoneNumbers;
+
+/**
+ * Export an instance of `PhoneNumberUtil`.
+ */
+
+module.exports.phoneUtil = phoneNumbers.PhoneNumberUtil.getInstance();

@@ -41,7 +41,7 @@
     "test": "NODE_ENV=test ./node_modules/.bin/mocha test/*_test.js"
   },
   "dependencies": {
-    "seegno-closure-library": "20140725.0.5"
+    "seegno-closure-library": "20150306.0.0"
   },
   "devDependencies": {
     "github-changes": "0.0.16",

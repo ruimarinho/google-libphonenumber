@@ -24,8 +24,5 @@
   "jquery": true,
   "expr": true,
   "mocha": true,
-  "noyield": true,
-  "globals": {
-    "goog": true
-  }
+  "noyield": true
 }
