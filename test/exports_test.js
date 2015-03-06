@@ -10,7 +10,7 @@ var libphonenumber = require('..');
  */
 
 describe('Exports', function () {
-  it('should export all provided modules', function() {
+  it('should export all provided classes', function() {
     Object.keys(libphonenumber).should.eql([
       'NumberFormat',
       'PhoneMetadata',
@@ -27,6 +27,6 @@ describe('Exports', function () {
   });
 
   it('should export an instance of `PhoneNumberUtil`', function() {
-    libphonenumber.phoneUtil.should.be.instanceOf(libphonenumber.PhoneNumberUtil);
+    (libphonenumber.phoneUtil instanceof libphonenumber.PhoneNumberUtil).should.be.true;
   });
 });

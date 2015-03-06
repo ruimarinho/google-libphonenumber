@@ -3,14 +3,17 @@
   "version": "0.1.2",
   "description": "A lightweight wrapper for Google's libphonenumber.",
   "keywords": [
-    "wrapper",
-    "libphonenumber",
-    "phonenumber",
-    "phone",
-    "number",
     "e164",
+    "format",
+    "formatting",
+    "international",
+    "libphonenumber",
+    "number",
+    "phone",
+    "phonenumber",
+    "rfc3966",
     "standardize",
-    "international"
+    "wrapper"
   ],
   "author": {
     "name": "Rui Marinho",
@@ -19,7 +22,16 @@
   },
   "homepage": "http://seegno.github.io/google-libphonenumber/",
   "bugs": "https://github.com/seegno/google-libphonenumber/issues",
-  "license": "MIT",
+  "licenses": [
+    {
+      "type": "MIT",
+      "url": "https://github.com/seegno/google-libphonenumber/raw/master/LICENSE"
+    },
+    {
+      "type": "Apache 2.0",
+      "url": "http://www.apache.org/licenses/LICENSE-2.0.html"
+    }
+  ],
   "repository": {
     "type": "git",
     "url": "https://github.com/seegno/google-libphonenumber.git"
@@ -29,7 +41,7 @@
     "test": "NODE_ENV=test ./node_modules/.bin/mocha test/*_test.js"
   },
   "dependencies": {
-    "seegno-closure-library": "20140725.0.5"
+    "seegno-closure-library": "20150306.0.1"
   },
   "devDependencies": {
     "github-changes": "0.0.16",
@@ -37,6 +49,6 @@
     "should": "^4.0.4"
   },
   "engines": {
-    "node": ">= 0.8"
+    "node": ">= 0.10"
   }
 }
