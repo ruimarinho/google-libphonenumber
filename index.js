@@ -10,7 +10,7 @@ var path = require('path');
  * Load `libphonenumber` dependencies.
  */
 
-closure.loadScript(path.join(__dirname, 'lib/closure/goog/deps.js'));
+closure.loadScript(path.join(__dirname, 'lib/closure/goog/deps.js'), path.relative(closure.basePath, __dirname));
 
 /**
  * Require `PhoneNumberUtil` dependency.
