@@ -3,14 +3,17 @@
   "version": "0.1.2",
   "description": "A lightweight wrapper for Google's libphonenumber.",
   "keywords": [
-    "wrapper",
-    "libphonenumber",
-    "phonenumber",
-    "phone",
-    "number",
     "e164",
+    "format",
+    "formatting",
+    "international",
+    "libphonenumber",
+    "number",
+    "phone",
+    "phonenumber",
+    "rfc3966",
     "standardize",
-    "international"
+    "wrapper"
   ],
   "author": {
     "name": "Rui Marinho",
