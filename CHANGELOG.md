@@ -1,5 +1,8 @@
 ## Changelog
 
+### 0.2.1 / 2015-03-25
+- [#7](https://github.com/seegno/google-libphonenumber/pull/7) Update libphonenumber@7.0.4 (@ruimarinho)
+
 ### 0.2.0 / 2015-03-06
 - [#5](https://github.com/seegno/google-libphonenumber/pull/5) Update libphonenumber@7.0.3 (@ruimarinho)
 
