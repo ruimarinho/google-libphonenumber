@@ -19,6 +19,12 @@ closure.loadScript(path.join(__dirname, 'lib/closure/goog/deps.js'), path.relati
 closure.require('i18n.phonenumbers.PhoneNumberUtil');
 
 /**
+ * Require `AsYouTypeFormatter` dependency.
+ */
+
+closure.require('i18n.phonenumbers.AsYouTypeFormatter');
+
+/**
  * Retrieve `i18n.phonenumbers` namespace object.
  */
 
