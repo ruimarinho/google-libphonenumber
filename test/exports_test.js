@@ -11,17 +11,18 @@ var libphonenumber = require('..');
 
 describe('Exports', function () {
   it('should export all provided classes', function() {
-    Object.keys(libphonenumber).should.eql([
+    Object.keys(libphonenumber).sort().should.eql([
+      'AsYouTypeFormatter',
+      'Error',
       'NumberFormat',
       'PhoneMetadata',
       'PhoneMetadataCollection',
-      'PhoneNumberDesc',
       'PhoneNumber',
-      'metadata',
-      'Error',
+      'PhoneNumberDesc',
       'PhoneNumberFormat',
       'PhoneNumberType',
       'PhoneNumberUtil',
+      'metadata',
       'phoneUtil'
       ]);
   });

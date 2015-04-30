@@ -34,6 +34,39 @@ phoneUtil.format(phoneNumber, PNF.INTERNATIONAL);
 // => +1 202-456-1414
 ```
 
+### Using the "As You Type" Formatter
+
+```js
+var AsYouTypeFormatter = require('google-libphonenumber').AsYouTypeFormatter;
+var formatter = new AsYouTypeFormatter('US');
+
+formatter.inputDigit('6');
+// => 6
+
+formatter.inputDigit('5');
+// => 65
+
+formatter.inputDigit('0');
+// => 650
+
+formatter.inputDigit('2');
+// => 650-2
+
+formatter.inputDigit('5');
+// => 650-25
+
+formatter.inputDigit('3');
+// => 650-253
+
+formatter.inputDigit('2');
+// => 650-2532
+
+formatter.inputDigit('2');
+// => (650) 253-22
+
+formatter.clear();
+```
+
 ## Notes
 
 ### Differencies from other forks
