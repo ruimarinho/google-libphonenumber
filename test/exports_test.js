@@ -1,16 +1,17 @@
+'use strict';
 
 /**
  * Module dependencies.
  */
 
-var libphonenumber = require('..');
+const libphonenumber = require('..');
 
 /**
  * Test `exports`.
  */
 
-describe('Exports', function () {
-  it('should export all provided classes', function() {
+describe('Exports', () => {
+  it('should export all known objects', () => {
     Object.keys(libphonenumber).sort().should.eql([
       'AsYouTypeFormatter',
       'Error',
@@ -22,12 +23,11 @@ describe('Exports', function () {
       'PhoneNumberFormat',
       'PhoneNumberType',
       'PhoneNumberUtil',
-      'metadata',
-      'phoneUtil'
+      'metadata'
       ]);
   });
 
-  it('should export an instance of `PhoneNumberUtil`', function() {
-    (libphonenumber.phoneUtil instanceof libphonenumber.PhoneNumberUtil).should.be.true;
+  it('should export an instance of `PhoneNumberUtil`', () => {
+    (libphonenumber.PhoneNumberUtil.getInstance() instanceof libphonenumber.PhoneNumberUtil).should.be.true();
   });
 });

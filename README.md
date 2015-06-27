@@ -1,6 +1,7 @@
 # google-libphonenumber
 
-A lightweight wrapper for Google's [libphonenumber](https://code.google.com/p/libphonenumber/) - a library to parse, format, store and validate international phone numbers.
+A browserify-compatible wrapper for Google's [libphonenumber](https://code.google.com/p/libphonenumber/), a library to parse, format, store and validate international phone numbers.
+Zero dependencies, always up-to-date.
 
 ## Status
 
@@ -12,7 +13,7 @@ A lightweight wrapper for Google's [libphonenumber](https://code.google.com/p/li
 Install the package via `npm`:
 
 ```sh
-npm install --save google-libphonenumber
+npm install google-libphonenumber --save
 ```
 
 ## Usage
@@ -20,70 +21,51 @@ npm install --save google-libphonenumber
 Here's a simple example on how to format a US-based number in the international phone number format:
 
 ```js
+// Require `PhoneNumberFormat`.
 var PNF = require('google-libphonenumber').PhoneNumberFormat;
 
-// Grab the `phoneUtil` instance.
-var phoneUtil = require('google-libphonenumber').phoneUtil;
+// Get an instance of `PhoneNumberUtil`.
+var phoneUtil = require('google-libphonenumber').PhoneNumberUtil.getInstance();
 
-// Or call it yourself, just like in the original examples.
-// var phoneUtil = require('google-libphonenumber').PhoneNumberUtil.getInstance();
-
+// Parse number with country code.
 var phoneNumber = phoneUtil.parse('202-456-1414', 'US');
 
-phoneUtil.format(phoneNumber, PNF.INTERNATIONAL);
+// Print number in the international format.
+console.log(phoneUtil.format(phoneNumber, PNF.INTERNATIONAL));
 // => +1 202-456-1414
 ```
 
-### Using the "As You Type" Formatter
+#### Using the "As You Type" Formatter
 
 ```js
+// Require `AsYouTypeFormatter`.
 var AsYouTypeFormatter = require('google-libphonenumber').AsYouTypeFormatter;
 var formatter = new AsYouTypeFormatter('US');
 
-formatter.inputDigit('6');
-// => 6
-
-formatter.inputDigit('5');
-// => 65
-
-formatter.inputDigit('0');
-// => 650
-
-formatter.inputDigit('2');
-// => 650-2
-
-formatter.inputDigit('5');
-// => 650-25
-
-formatter.inputDigit('3');
-// => 650-253
-
-formatter.inputDigit('2');
-// => 650-2532
-
-formatter.inputDigit('2');
-// => (650) 253-22
+console.log(formatter.inputDigit('6')); // => 6
+console.log(formatter.inputDigit('5')); // => 65
+console.log(formatter.inputDigit('0')); // => 650
+console.log(formatter.inputDigit('2')); // => 650-2
+console.log(formatter.inputDigit('5')); // => 650-25
+console.log(formatter.inputDigit('3')); // => 650-253
+console.log(formatter.inputDigit('2')); // => 650-2532
+console.log(formatter.inputDigit('2')); // => (650) 253-22
 
 formatter.clear();
 ```
 
 ## Notes
 
-### Differencies from other forks
+### Differences from other forks
 
-* Uses a super modern version of `google-closure` repackaged for npm which does not pollute the global namespace (it runs in a sandbox instead).
-* Relies on a simplified update process to keep the underlying `libphonenumber` library always up-to-date.
-* All classes available from `libphonenumber` are exported (and that's it).
-* Leverages own Google's Closure Library dependency management system to load dependencies.
-* Dependencies are generated automatically through Google's Closure Library binary tools (no guessing!).
+* All classes available from `libphonenumber` are exported as-is. No magic methods.
+* Always based on the latest `google-closure` library version available from Google with performance and bug fixes.
+* Relies on a simplified and [well documented update process](https://github.com/seegno/google-libphonenumber/blob/master/bin/update) to keep the underlying `libphonenumber` library always up-to-date.
+* Throws errors instead of strings.
 
-### Updating package dependencies
+#### Errors
 
-Learn more about [updating package dependencies](https://github.com/seegno/google-libphonenumber/wiki/Updating-Package-Dependencies).
-
-### Errors
-
-The javascript port of `libphonenumber` throws errors as string, e.g. `throw "Invalid country code"`. As Guillermo Rauch puts it, [a string is not an error](http://www.devthought.com/2011/12/22/a-string-is-not-an-error/) so, in an attempt to avoid future issues when developing an application, this module converts all string-based errors that occur on the `PhoneNumberUtil` class to instances of `Error`.
+The javascript port of the original `libphonenumber` library throws errors as string, e.g. `throw "Invalid country code"` and, as Guillermo Rauch puts it, [a string is not an error](http://www.devthought.com/2011/12/22/a-string-is-not-an-error/). However, the `libphonenumber` team has refused change this behaviour due to breaking changes, so a patch is applied on top of the source files to make sure that stacktraces are available and useful.
 
 ## Tests
 
@@ -93,9 +75,7 @@ A small subset of tests guarantees that the main library functions are working a
 npm test
 ```
 
-## Acknowledgements
-
-The original library wrapper was created by [Socialcam](https://github.com/Socialcam/node-libphonenumber) who first got it working on node.js and then improved by [mattbornski](https://github.com/mattbornski/libphonenumber). This package would not exist without the work of these previous contributions.
+## Acknowledgments
 
 The exceptional work on `libphonenumber` was made possible by these [committers and contributors](https://github.com/googlei18n/libphonenumber/graphs/contributors).
 
