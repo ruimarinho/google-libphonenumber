@@ -1,8 +1,23 @@
 {
   "name": "google-libphonenumber",
-  "version": "0.2.2",
-  "description": "A lightweight wrapper for Google's libphonenumber.",
+  "version": "1.0.0",
+  "description": "A browserify-compatible wrapper for Google's libphonenumber.",
+  "author": {
+    "name": "Rui Marinho",
+    "email": "rui.marinho@seegno.com",
+    "url": "http://seegno.com"
+  },
+  "license": "MIT",
+  "homepage": "http://seegno.github.io/google-libphonenumber/",
+  "bugs": "https://github.com/seegno/google-libphonenumber/issues",
+  "repository": {
+    "type": "git",
+    "url": "https://github.com/seegno/google-libphonenumber.git"
+  },
+  "main": "./dist/libphonenumber.js",
+  "browser": "./dist/browser/libphonenumber.js",
   "keywords": [
+    "browserify",
     "e164",
     "format",
     "formatting",
@@ -15,38 +30,28 @@
     "standardize",
     "wrapper"
   ],
-  "author": {
-    "name": "Rui Marinho",
-    "email": "rui.marinho@seegno.com",
-    "url": "http://seegno.com"
-  },
-  "homepage": "http://seegno.github.io/google-libphonenumber/",
-  "bugs": "https://github.com/seegno/google-libphonenumber/issues",
-  "licenses": [
-    {
-      "type": "MIT",
-      "url": "https://github.com/seegno/google-libphonenumber/raw/master/LICENSE"
-    },
-    {
-      "type": "Apache 2.0",
-      "url": "http://www.apache.org/licenses/LICENSE-2.0.html"
-    }
-  ],
-  "repository": {
-    "type": "git",
-    "url": "https://github.com/seegno/google-libphonenumber.git"
+  "options": {
+    "mocha": "--compilers js:babel/register --require should test"
   },
   "scripts": {
-    "changelog": "./node_modules/.bin/github-changes --owner seegno --repository google-libphonenumber --auth --only-pulls --use-commit-body --title 'Changelog' --date-format '/ YYYY-MM-DD'",
-    "test": "NODE_ENV=test ./node_modules/.bin/mocha test/*_test.js"
-  },
-  "dependencies": {
-    "seegno-closure-library": "20150306.0.1"
+    "update": "./bin/update.sh",
+    "build": "./bin/build.sh",
+    "changelog": "github_changelog_generator --no-issues",
+    "lint": "eslint src/index.js test",
+    "prepublish": "npm run lint && npm test && npm run build",
+    "testonly": "./node_modules/.bin/mocha $npm_package_options_mocha",
+    "test": "npm run build && npm run testonly"
   },
   "devDependencies": {
-    "github-changes": "0.0.16",
-    "mocha": "^2.0.1",
-    "should": "^4.0.4"
+    "babel": "^5.6.14",
+    "babel-eslint": "^3.1.23",
+    "browserify": "^10.2.0",
+    "eslint": "^0.24.1",
+    "eslint-plugin-babel": "^1.1.0",
+    "minifyify": "^7.0.0",
+    "mocha": "^2.2.5",
+    "seegno-closure-library": "^20150306.0.1",
+    "should": "^7.0.1"
   },
   "engines": {
     "node": ">= 0.10"

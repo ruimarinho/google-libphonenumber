@@ -1,0 +1,17 @@
+<!DOCTYPE html>
+<html>
+<head>
+  <title>libphonenumber browserify test</title>
+  <script src="../dist/browser/libphonenumber.js"></script>
+  <script>
+    var phoneUtil = libphonenumber.PhoneNumberUtil.getInstance();
+    var PNF = libphonenumber.PhoneNumberFormat;
+    var phoneNumber = phoneUtil.parseAndKeepRawInput('912345678', 'PT');
+
+    console.log(phoneUtil.format(phoneNumber, PNF.E164));
+  </script>
+</head>
+<body>
+  <h3>libphonenumber browserify test</h3>
+</body>
+</html>
