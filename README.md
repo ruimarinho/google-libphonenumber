@@ -60,7 +60,7 @@ formatter.clear();
 
 * All classes available from `libphonenumber` are exported as-is. No magic methods.
 * Always based on the latest `google-closure` library version available from Google with performance and bug fixes.
-* Relies on a simplified and [well documented update process](https://github.com/seegno/google-libphonenumber/blob/master/bin/update) to keep the underlying `libphonenumber` library always up-to-date.
+* Relies on a simplified and [well documented update process](https://github.com/seegno/google-libphonenumber/blob/master/bin/update.sh) to keep the underlying `libphonenumber` library always up-to-date.
 * Throws errors instead of strings.
 
 #### Errors
