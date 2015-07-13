@@ -38,7 +38,7 @@
     "build": "./bin/build.sh",
     "changelog": "github_changelog_generator --no-issues",
     "lint": "eslint src/index.js test",
-    "prepublish": "npm run lint && npm test && npm run build",
+    "prepublish": "npm run lint && npm run build && npm run testonly",
     "testonly": "./node_modules/.bin/mocha $npm_package_options_mocha",
     "test": "npm run build && npm run testonly"
   },

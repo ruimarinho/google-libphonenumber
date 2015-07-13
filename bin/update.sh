@@ -11,7 +11,7 @@ if [ -z "$1" ]; then
 fi
 
 # Remove previous src dir.
-find src/ ! -iregex 'src/index.js' | xargs rm
+find src -depth 1 ! -iregex 'src/index.js' | xargs rm -rf
 
 # Prepare a new branch for this update.
 git checkout -b support/update-libphonenumber-${1//\./\-}
@@ -26,13 +26,8 @@ echo "Applying patches..."
 
 curl -L -s https://patch-diff.githubusercontent.com/raw/googlei18n/libphonenumber/pull/690.patch | git apply -p4 --directory=src
 
-# Build distribution file.
-sh $PWD/build
-
-# Make sure all tests are  passing.
-echo "Running tests..."
-
-npm test
+# Build distribution files.
+npm run build
 
 echo "Done!"
 
