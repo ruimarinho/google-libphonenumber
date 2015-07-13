@@ -1,5 +1,15 @@
 # Change Log
 
+## [1.0.1](https://github.com/seegno/google-libphonenumber/tree/1.0.1) (2015-07-14)
+
+[Full Changelog](https://github.com/seegno/google-libphonenumber/compare/1.0.0...1.0.1)
+
+**Merged pull requests:**
+
+- Fix update script link [\#16](https://github.com/seegno/google-libphonenumber/pull/16) ([ruimarinho](https://github.com/ruimarinho))
+
+- Remove build step from update script [\#15](https://github.com/seegno/google-libphonenumber/pull/15) ([ruimarinho](https://github.com/ruimarinho))
+
 ## [1.0.0](https://github.com/seegno/google-libphonenumber/tree/1.0.0) (2015-07-13)
 
 [Full Changelog](https://github.com/seegno/google-libphonenumber/compare/0.2.2...1.0.0)
