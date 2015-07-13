@@ -1,17 +1,55 @@
-## Changelog
+# Change Log
 
-### 0.2.2 / 2015-04-30
-- [#11](https://github.com/seegno/google-libphonenumber/pull/11) Add basic update script (@ruimarinho)
-- [#10](https://github.com/seegno/google-libphonenumber/pull/10) Update libphonenumber@7.0.5 (@ruimarinho)
+## [1.0.0](https://github.com/seegno/google-libphonenumber/tree/1.0.0) (2015-07-13)
 
-### 0.2.1 / 2015-03-25
-- [#7](https://github.com/seegno/google-libphonenumber/pull/7) Update libphonenumber@7.0.4 (@ruimarinho)
+[Full Changelog](https://github.com/seegno/google-libphonenumber/compare/0.2.2...1.0.0)
 
-### 0.2.0 / 2015-03-06
-- [#5](https://github.com/seegno/google-libphonenumber/pull/5) Update libphonenumber@7.0.3 (@ruimarinho)
+**Merged pull requests:**
 
-### 0.1.2 / 2015-01-31
-- [#3](https://github.com/seegno/google-libphonenumber/pull/3) Update libphonenumber@7.0.2 (@ruimarinho)
+- Rewrite with support for browserify [\#14](https://github.com/seegno/google-libphonenumber/pull/14) ([ruimarinho](https://github.com/ruimarinho))
 
-### 0.1.1 / 2014-12-19
-- [#1](https://github.com/seegno/google-libphonenumber/pull/1) Update libphonenumber@7.0.1 (@ruimarinho)
+- Add support for the as you type formatter [\#12](https://github.com/seegno/google-libphonenumber/pull/12) ([ruimarinho](https://github.com/ruimarinho))
+
+## [0.2.2](https://github.com/seegno/google-libphonenumber/tree/0.2.2) (2015-04-30)
+
+[Full Changelog](https://github.com/seegno/google-libphonenumber/compare/0.2.1...0.2.2)
+
+**Merged pull requests:**
+
+- Add basic update script [\#11](https://github.com/seegno/google-libphonenumber/pull/11) ([ruimarinho](https://github.com/ruimarinho))
+
+- Update libphonenumber@7.0.5 [\#10](https://github.com/seegno/google-libphonenumber/pull/10) ([ruimarinho](https://github.com/ruimarinho))
+
+## [0.2.1](https://github.com/seegno/google-libphonenumber/tree/0.2.1) (2015-03-25)
+
+[Full Changelog](https://github.com/seegno/google-libphonenumber/compare/0.2.0...0.2.1)
+
+**Merged pull requests:**
+
+- Update libphonenumber@7.0.4 [\#7](https://github.com/seegno/google-libphonenumber/pull/7) ([ruimarinho](https://github.com/ruimarinho))
+
+## [0.2.0](https://github.com/seegno/google-libphonenumber/tree/0.2.0) (2015-03-06)
+
+[Full Changelog](https://github.com/seegno/google-libphonenumber/compare/0.1.2...0.2.0)
+
+**Merged pull requests:**
+
+- Update libphonenumber@7.0.3 [\#5](https://github.com/seegno/google-libphonenumber/pull/5) ([ruimarinho](https://github.com/ruimarinho))
+
+## [0.1.2](https://github.com/seegno/google-libphonenumber/tree/0.1.2) (2015-01-31)
+
+[Full Changelog](https://github.com/seegno/google-libphonenumber/compare/0.1.1...0.1.2)
+
+**Merged pull requests:**
+
+- Update libphonenumber@7.0.2 [\#3](https://github.com/seegno/google-libphonenumber/pull/3) ([ruimarinho](https://github.com/ruimarinho))
+
+## [0.1.1](https://github.com/seegno/google-libphonenumber/tree/0.1.1) (2014-12-19)
+
+[Full Changelog](https://github.com/seegno/google-libphonenumber/compare/0.1.0...0.1.1)
+
+**Merged pull requests:**
+
+- Update libphonenumber@7.0.1 [\#1](https://github.com/seegno/google-libphonenumber/pull/1) ([ruimarinho](https://github.com/ruimarinho))
+
+## [0.1.0](https://github.com/seegno/google-libphonenumber/tree/0.1.0) (2014-11-12)
