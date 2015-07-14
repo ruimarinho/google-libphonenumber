@@ -4722,5 +4722,5 @@ i18n.phonenumbers.AsYouTypeFormatter.prototype.inputDigitHelper_ = function(a) {
   this.currentFormattingPattern_ = "";
   return this.accruedInput_.toString();
 };
-module.exports = i18n.phonenumbers;
+module.exports = i18n.phonenumbers["default"] = i18n.phonenumbers.libphonenumber = i18n.phonenumbers;
 
