@@ -1,6 +1,14 @@
 # Change Log
 
-## [1.0.1](https://github.com/seegno/google-libphonenumber/tree/1.0.1) (2015-07-14)
+## [1.0.2](https://github.com/seegno/google-libphonenumber/tree/1.0.2) (2015-07-14)
+
+[Full Changelog](https://github.com/seegno/google-libphonenumber/compare/1.0.1...1.0.2)
+
+**Merged pull requests:**
+
+- Update libphonenumber@7.0.8 [\#18](https://github.com/seegno/google-libphonenumber/pull/18) ([ruimarinho](https://github.com/ruimarinho))
+
+## [1.0.1](https://github.com/seegno/google-libphonenumber/tree/1.0.1) (2015-07-13)
 
 [Full Changelog](https://github.com/seegno/google-libphonenumber/compare/1.0.0...1.0.1)
 
