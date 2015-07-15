@@ -8,7 +8,7 @@ goog.require('i18n.phonenumbers.PhoneNumberUtil');
 goog.require('i18n.phonenumbers.AsYouTypeFormatter');
 
 /**
- * Export `i18n.phonenumbers`.
+ * Export `libphonenumber`.
  */
 
-module.exports = i18n.phonenumbers;
+module.exports = i18n.phonenumbers.default = i18n.phonenumbers.libphonenumber = i18n.phonenumbers;

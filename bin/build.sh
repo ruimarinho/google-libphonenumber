@@ -32,10 +32,10 @@ echo "Browserifying..."
 
 mkdir -p dist/browser
 
-./node_modules/.bin/browserify dist/libphonenumber.js \-\-standalone libphonenumber -o dist/browser/libphonenumber.js
+./node_modules/.bin/browserify dist/libphonenumber.js --standalone libphonenumber --no-browser-field --outfile dist/browser/libphonenumber.js
 
 echo "Minifying..."
 
-./node_modules/.bin/browserify dist/libphonenumber.js \-\-standalone libphonenumber -p \[minifyify --no-map\] -o dist/browser/libphonenumber.min.js
+./node_modules/.bin/browserify dist/libphonenumber.js --standalone libphonenumber --plugin \[minifyify --no-map\] --outfile dist/browser/libphonenumber.min.js
 
 echo "Build completed!"

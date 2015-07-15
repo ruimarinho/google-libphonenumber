@@ -23,6 +23,8 @@ describe('Exports', () => {
       'PhoneNumberFormat',
       'PhoneNumberType',
       'PhoneNumberUtil',
+      'default',
+      'libphonenumber',
       'metadata'
       ]);
   });
