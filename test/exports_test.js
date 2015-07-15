@@ -4,7 +4,7 @@
  * Module dependencies.
  */
 
-const libphonenumber = require('..');
+import { libphonenumber } from '..';
 
 /**
  * Test `exports`.
