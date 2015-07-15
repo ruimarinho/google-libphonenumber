@@ -1,5 +1,15 @@
 # Change Log
 
+## [1.0.3](https://github.com/seegno/google-libphonenumber/tree/1.0.3) (2015-07-16)
+
+[Full Changelog](https://github.com/seegno/google-libphonenumber/compare/1.0.2...1.0.3)
+
+**Merged pull requests:**
+
+- Update tests to ES6 [\#20](https://github.com/seegno/google-libphonenumber/pull/20) ([ruimarinho](https://github.com/ruimarinho))
+
+- Add default export shim [\#19](https://github.com/seegno/google-libphonenumber/pull/19) ([ruimarinho](https://github.com/ruimarinho))
+
 ## [1.0.2](https://github.com/seegno/google-libphonenumber/tree/1.0.2) (2015-07-14)
 
 [Full Changelog](https://github.com/seegno/google-libphonenumber/compare/1.0.1...1.0.2)
