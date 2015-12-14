@@ -15,7 +15,7 @@ const phoneUtil = PhoneNumberUtil.getInstance();
  * Test `PhoneUtil`.
  */
 
-describe('PhoneUtil', function() {
+describe('PhoneUtil', () => {
   const validNumbers = [
     '202-456-1414',
     '(202) 456-1414',
@@ -27,9 +27,9 @@ describe('PhoneUtil', function() {
     '1 202-456-1414'
   ];
 
-  describe('International Format', function() {
-    it('should format a number in the international format', function() {
-      validNumbers.forEach(function(value) {
+  describe('International Format', () => {
+    it('should format a number in the international format', () => {
+      validNumbers.forEach((value) => {
         const phoneNumber = phoneUtil.parseAndKeepRawInput(value, 'US');
 
         phoneUtil.format(phoneNumber, PNF.INTERNATIONAL).should.equal('+1 202-456-1414');
@@ -37,9 +37,9 @@ describe('PhoneUtil', function() {
     });
   });
 
-  describe('E164 Format', function() {
-    it('should format a number in the E164 format', function() {
-      validNumbers.forEach(function(value) {
+  describe('E164 Format', () => {
+    it('should format a number in the E164 format', () => {
+      validNumbers.forEach((value) => {
         const phoneNumber = phoneUtil.parseAndKeepRawInput(value, 'US');
 
         phoneUtil.format(phoneNumber, PNF.E164).should.equal('+12024561414');
@@ -47,9 +47,9 @@ describe('PhoneUtil', function() {
     });
   });
 
-  describe('National Format', function() {
-    it('should format a number in the national format', function() {
-      validNumbers.forEach(function(value) {
+  describe('National Format', () => {
+    it('should format a number in the national format', () => {
+      validNumbers.forEach((value) => {
         const phoneNumber = phoneUtil.parseAndKeepRawInput(value, 'US');
 
         phoneUtil.format(phoneNumber, PNF.NATIONAL).should.equal('(202) 456-1414');
@@ -57,9 +57,9 @@ describe('PhoneUtil', function() {
     });
   });
 
-  describe('RFC3966 Format', function() {
-    it('should format a number in the RFC3966 format', function() {
-      validNumbers.forEach(function(value) {
+  describe('RFC3966 Format', () => {
+    it('should format a number in the RFC3966 format', () => {
+      validNumbers.forEach((value) => {
         const phoneNumber = phoneUtil.parseAndKeepRawInput(value, 'US');
 
         phoneUtil.format(phoneNumber, PNF.RFC3966).should.equal('tel:+1-202-456-1414');
@@ -67,16 +67,16 @@ describe('PhoneUtil', function() {
     });
   });
 
-  describe('Phone Number Type', function() {
-    it('should return a valid phone number type', function() {
+  describe('Phone Number Type', () => {
+    it('should return a valid phone number type', () => {
       const phoneNumber = phoneUtil.parseAndKeepRawInput(validNumbers[0], 'US');
 
       phoneUtil.getNumberType(phoneNumber).should.equal(PNT.FIXED_LINE_OR_MOBILE);
     });
   });
 
-  describe('Malformatted Number', function() {
-    it('should throw an error when attempting to format a malformatted number', function() {
+  describe('Malformatted Number', () => {
+    it('should throw an error when attempting to format a malformatted number', () => {
       try {
         phoneUtil.parseAndKeepRawInput('111111111111111111111', 'US');
 
@@ -87,7 +87,7 @@ describe('PhoneUtil', function() {
       }
     });
 
-    it('should return a reason for an invalid number', function() {
+    it('should return a reason for an invalid number', () => {
       const number = phoneUtil.parseAndKeepRawInput('123456', 'US');
 
       phoneUtil.isPossibleNumber(number).should.be.false();
