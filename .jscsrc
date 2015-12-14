@@ -1,0 +1,4 @@
+plugins:
+  - jscs-config-seegno
+
+preset: seegno
