@@ -1,5 +1,13 @@
 # Change Log
 
+## [1.0.8](https://github.com/seegno/google-libphonenumber/tree/1.0.8) (2015-12-15)
+[Full Changelog](https://github.com/seegno/google-libphonenumber/compare/1.0.7...1.0.8)
+
+**Merged pull requests:**
+
+- Update libphonenumber@7.1.1 [\#32](https://github.com/seegno/google-libphonenumber/pull/32) ([ruimarinho](https://github.com/ruimarinho))
+- Add node 5 to Travis [\#29](https://github.com/seegno/google-libphonenumber/pull/29) ([scop](https://github.com/scop))
+
 ## [1.0.7](https://github.com/seegno/google-libphonenumber/tree/1.0.7) (2015-10-08)
 [Full Changelog](https://github.com/seegno/google-libphonenumber/compare/1.0.6...1.0.7)
 
