@@ -7,15 +7,15 @@
     "email": "rui.marinho@seegno.com",
     "url": "http://seegno.com"
   },
-  "license": "MIT",
+  "license": "SEE LICENSE IN LICENSE",
   "homepage": "http://seegno.github.io/google-libphonenumber/",
   "bugs": "https://github.com/seegno/google-libphonenumber/issues",
   "repository": {
     "type": "git",
     "url": "https://github.com/seegno/google-libphonenumber.git"
   },
-  "main": "./dist/libphonenumber.js",
-  "browser": "./dist/browser/libphonenumber.js",
+  "main": "dist/libphonenumber.js",
+  "browser": "dist/browser/libphonenumber.js",
   "keywords": [
     "browserify",
     "e164",
@@ -34,19 +34,19 @@
     "mocha": "--compilers js:babel-register --require should test"
   },
   "scripts": {
-    "update": "./bin/update.sh",
-    "build": "./bin/build.sh",
+    "build": "bin/build.sh",
     "changelog": "github_changelog_generator --no-issues --header-label='# Changelog'",
     "lint": "eslint src/index.js test && jscs src/index.js test",
-    "prepublish": "npm run lint && npm run build && npm run testonly",
-    "testonly": "./node_modules/.bin/mocha $npm_package_options_mocha",
-    "test": "npm run build && npm run testonly"
+    "prepublish": "npm run build",
+    "test": "BROWSERIFY=false npm run build && npm run testonly",
+    "testonly": "mocha $npm_package_options_mocha",
+    "update": "bin/update.sh"
   },
   "devDependencies": {
     "babel-eslint": "^4.1.6",
     "babel-preset-es2015": "^6.3.13",
     "babel-register": "^6.3.13",
-    "browserify": "^12.0.1",
+    "browserify": "^13.0.0",
     "eslint": "^1.10.3",
     "eslint-config-seegno": "^1.2.0",
     "eslint-plugin-babel": "^3.0.0",
@@ -54,10 +54,9 @@
     "jscs-config-seegno": "^1.1.0",
     "minifyify": "^7.0.0",
     "mocha": "^2.2.5",
-    "seegno-closure-library": "^20150306.0.1",
     "should": "^8.0.1"
   },
   "engines": {
-    "node": ">= 0.10"
+    "node": ">=0.10"
   }
 }
