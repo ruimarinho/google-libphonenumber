@@ -1,5 +1,7 @@
 #!/bin/bash
 
+PATH=./node_modules/.bin/:$PATH
+
 # Clean previous distribution build.
 rm -rf dist/*
 
@@ -28,14 +30,16 @@ else
   ant build
 fi
 
-echo "Browserifying..."
+if [ "${BROWSERIFY:-true}" == "true" ]; then
+  echo "Browserifying..."
 
-mkdir -p dist/browser
+  mkdir -p dist/browser
 
-./node_modules/.bin/browserify dist/libphonenumber.js --standalone libphonenumber --no-browser-field --outfile dist/browser/libphonenumber.js
+  browserify dist/libphonenumber.js --standalone libphonenumber --no-browser-field --outfile dist/browser/libphonenumber.js
 
-echo "Minifying..."
+  echo "Minifying..."
 
-./node_modules/.bin/browserify dist/libphonenumber.js --standalone libphonenumber --plugin \[minifyify --no-map\] --outfile dist/browser/libphonenumber.min.js
+  browserify dist/libphonenumber.js --standalone libphonenumber --plugin \[minifyify --no-map\] --outfile dist/browser/libphonenumber.min.js
+fi
 
 echo "Build completed!"

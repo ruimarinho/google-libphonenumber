@@ -1,3 +1,6 @@
 {
+  "ignore": [
+    "dist/*"
+  ],
   "presets": ["es2015"]
 }
