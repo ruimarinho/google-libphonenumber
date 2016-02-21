@@ -4,17 +4,17 @@
  * Module dependencies.
  */
 
-import { AsYouTypeFormatter } from '..';
+var AsYouTypeFormatter = require('..').AsYouTypeFormatter;
 
 /**
  * Test `AsYouTypeFormatter`.
  */
 
-describe('AsYouTypeFormatter', () => {
-  it('should format numbers as typed', () => {
-    const formatter = new AsYouTypeFormatter('PT');
-    const phoneNumber = '912345678';
-    const sequence = [
+describe('AsYouTypeFormatter', function() {
+  it('should format numbers as typed', function() {
+    var formatter = new AsYouTypeFormatter('PT');
+    var phoneNumber = '912345678';
+    var sequence = [
       '9',
       '91',
       '912',
@@ -26,7 +26,7 @@ describe('AsYouTypeFormatter', () => {
       '912 345 678'
     ];
 
-    for (let i = 0; i < phoneNumber.length; ++i) {
+    for (var i = 0; i < phoneNumber.length; ++i) {
       formatter.inputDigit(phoneNumber.charAt(i)).should.equal(sequence[i]);
     }
   });

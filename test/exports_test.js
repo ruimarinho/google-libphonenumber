@@ -4,14 +4,14 @@
  * Module dependencies.
  */
 
-import { libphonenumber } from '..';
+var libphonenumber = require('..');
 
 /**
  * Test `exports`.
  */
 
-describe('Exports', () => {
-  it('should export all known objects', () => {
+describe('Exports', function() {
+  it('should export all known objects', function() {
     Object.keys(libphonenumber).sort().should.eql([
       'AsYouTypeFormatter',
       'Error',
@@ -29,7 +29,7 @@ describe('Exports', () => {
       ]);
   });
 
-  it('should export an instance of `PhoneNumberUtil`', () => {
+  it('should export an instance of `PhoneNumberUtil`', function() {
     (libphonenumber.PhoneNumberUtil.getInstance() instanceof libphonenumber.PhoneNumberUtil).should.be.true();
   });
 });

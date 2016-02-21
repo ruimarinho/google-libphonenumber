@@ -31,7 +31,7 @@
     "wrapper"
   ],
   "options": {
-    "mocha": "--compilers js:babel-register --require should test"
+    "mocha": "--require should test"
   },
   "scripts": {
     "build": "bin/build.sh",
@@ -44,8 +44,6 @@
   },
   "devDependencies": {
     "babel-eslint": "^4.1.6",
-    "babel-preset-es2015": "^6.3.13",
-    "babel-register": "^6.3.13",
     "browserify": "^13.0.0",
     "eslint": "^1.10.3",
     "eslint-config-seegno": "^1.2.0",
