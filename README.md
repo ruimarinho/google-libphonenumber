@@ -75,6 +75,12 @@ A small subset of tests guarantees that the main library functions are working a
 npm test
 ```
 
+## Release
+
+```sh
+npm version [<newversion> | major | minor | patch] --no-git-tag-version
+```
+
 ## Acknowledgments
 
 The exceptional work on `libphonenumber` was made possible by these [committers and contributors](https://github.com/googlei18n/libphonenumber/graphs/contributors).

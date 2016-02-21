@@ -38,9 +38,11 @@
     "changelog": "github_changelog_generator --no-issues --header-label='# Changelog'",
     "lint": "eslint src/index.js test && jscs src/index.js test",
     "prepublish": "npm run build",
+    "postversion": "git commit -m \"Release $npm_package_version\" && git tag -a $npm_package_version -m \"Release $npm_package_version\"",
     "test": "BROWSERIFY=false npm run build && npm run testonly",
     "testonly": "mocha $npm_package_options_mocha",
-    "update": "bin/update.sh"
+    "update": "bin/update.sh",
+    "version": "npm run changelog -- --future-release=$npm_package_version && sed -i '' -e :a -e '$d;N;2,3ba' -e 'P;D' CHANGELOG.md && npm run build && git add -A CHANGELOG.md dist package.json"
   },
   "devDependencies": {
     "babel-eslint": "^4.1.6",
