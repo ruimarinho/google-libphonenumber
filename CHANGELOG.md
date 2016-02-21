@@ -1,5 +1,15 @@
 # Changelog
 
+## [1.0.13](https://github.com/seegno/google-libphonenumber/tree/1.0.13) (2016-02-21)
+[Full Changelog](https://github.com/seegno/google-libphonenumber/compare/1.0.12...1.0.13)
+
+**Merged pull requests:**
+
+- Add support for automated release process [\#44](https://github.com/seegno/google-libphonenumber/pull/44) ([ruimarinho](https://github.com/ruimarinho))
+- Remove babel [\#43](https://github.com/seegno/google-libphonenumber/pull/43) ([ruimarinho](https://github.com/ruimarinho))
+- Remove version from bower.json as it is ignored [\#42](https://github.com/seegno/google-libphonenumber/pull/42) ([ruimarinho](https://github.com/ruimarinho))
+- Update libphonenumber@7.2.5 [\#41](https://github.com/seegno/google-libphonenumber/pull/41) ([ruimarinho](https://github.com/ruimarinho))
+
 ## [1.0.12](https://github.com/seegno/google-libphonenumber/tree/1.0.12) (2016-02-03)
 [Full Changelog](https://github.com/seegno/google-libphonenumber/compare/1.0.11...1.0.12)
 
