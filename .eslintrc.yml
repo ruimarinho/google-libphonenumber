@@ -1,0 +1,11 @@
+extends: seegno
+
+globals: {
+  goog: true,
+  i18n: true
+}
+
+rules:
+  no-var: 0
+  vars-on-top: 0
+  prefer-arrow-callback: 0
