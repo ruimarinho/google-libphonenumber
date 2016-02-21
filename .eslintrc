@@ -1,6 +1,0 @@
-extends: seegno
-
-globals: {
-  goog: true,
-  i18n: true
-}
