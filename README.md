@@ -78,7 +78,7 @@ npm test
 ## Release
 
 ```sh
-npm version [<newversion> | major | minor | patch] --no-git-tag-version
+npm version [<newversion> | major | minor | patch] -m "Release %s"
 ```
 
 ## Acknowledgments
