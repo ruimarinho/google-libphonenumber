@@ -26,14 +26,10 @@ echo "Applying patches..."
 
 curl -L -s https://patch-diff.githubusercontent.com/raw/googlei18n/libphonenumber/pull/690.patch | git apply -p4 --directory=src
 
-# Build distribution files.
-npm run build
-
 echo "Done!"
 
 # Add the modified files to git.
 git add $PWD/../src/
-git add $PWD/../dist/
 
 # Commit with the standard message.
 git commit -m "Update libphonenumber@$1"
