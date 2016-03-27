@@ -35,7 +35,7 @@
   },
   "scripts": {
     "build": "bin/build.sh",
-    "changelog": "github_changelog_generator --no-issues --header-label='# Changelog' --future-release=$npm_config_future_release && sed -i '' -e :a -e '$d;N;2,3ba' -e 'P;D' CHANGELOG.md",
+    "changelog": "github_changelog_generator --no-issues --header-label='# Changelog' --future-release=v$npm_config_future_release && sed -i '' -e :a -e '$d;N;2,3ba' -e 'P;D' CHANGELOG.md",
     "lint": "eslint src/index.js test && jscs src/index.js test",
     "prepublish": "npm run build",
     "test": "BROWSERIFY=false npm run build && npm run testonly",
