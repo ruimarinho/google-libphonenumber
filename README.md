@@ -1,6 +1,6 @@
 # google-libphonenumber
 
-A browserify-compatible wrapper for Google's [libphonenumber](https://code.google.com/p/libphonenumber/), a library to parse, format, store and validate international phone numbers.
+A browserify-compatible wrapper for Google's [libphonenumber](https://github.com/googlei18n/libphonenumber), a library to parse, format, store and validate international phone numbers.
 Zero dependencies, always up-to-date.
 
 ## Status
