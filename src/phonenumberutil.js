@@ -176,6 +176,22 @@ i18n.phonenumbers.PhoneNumberUtil.MOBILE_TOKEN_MAPPINGS_ = {
 
 
 /**
+ * Set of country calling codes that have geographically assigned mobile
+ * numbers. This may not be complete; we add calling codes case by case, as we
+ * find geographical mobile numbers or hear from user reports.
+ *
+ * @const
+ * @type {!Array.<number>}
+ * @private
+ */
+i18n.phonenumbers.PhoneNumberUtil.GEO_MOBILE_COUNTRIES_ = [
+  52,  // Mexico
+  54,  // Argentina
+  55  // Brazil
+];
+
+
+/**
  * The PLUS_SIGN signifies the international prefix.
  *
  * @const
@@ -1371,10 +1387,13 @@ i18n.phonenumbers.PhoneNumberUtil.prototype.isNumberGeographical =
     function(phoneNumber) {
   /** @type {i18n.phonenumbers.PhoneNumberType} */
   var numberType = this.getNumberType(phoneNumber);
-  // TODO: Include mobile phone numbers from countries like Indonesia, which
-  // has some mobile numbers that are geographical.
+
   return numberType == i18n.phonenumbers.PhoneNumberType.FIXED_LINE ||
-      numberType == i18n.phonenumbers.PhoneNumberType.FIXED_LINE_OR_MOBILE;
+      numberType == i18n.phonenumbers.PhoneNumberType.FIXED_LINE_OR_MOBILE ||
+      (goog.array.contains(
+          i18n.phonenumbers.PhoneNumberUtil.GEO_MOBILE_COUNTRIES_,
+          phoneNumber.getCountryCodeOrDefault()) &&
+       numberType == i18n.phonenumbers.PhoneNumberType.MOBILE);
 };
 
 
@@ -3663,11 +3682,20 @@ i18n.phonenumbers.PhoneNumberUtil.prototype.checkRegionForParsing_ = function(
 
 
 /**
- * Parses a string and returns it in proto buffer format. This method will throw
- * a {@link i18n.phonenumbers.Error} if the number is not considered to be a
- * possible number. Note that validation of whether the number is actually a
- * valid number for a particular region is not performed. This can be done
- * separately with {@link #isValidNumber}.
+ * Parses a string and returns it as a phone number in proto buffer format. The
+ * method is quite lenient and looks for a number in the input text (raw input)
+ * and does not check whether the string is definitely only a phone number. To
+ * do this, it ignores punctuation and white-space, as well as any text before
+ * the number (e.g. a leading “Tel: ”) and trims the non-number bits.  It will
+ * accept a number in any format (E164, national, international etc), assuming
+ * it can be interpreted with the defaultRegion supplied. It also attempts to
+ * convert any alpha characters into digits if it thinks this is a vanity number
+ * of the type "1800 MICROSOFT".
+ *
+ * This method will throw a {@link i18n.phonenumbers.Error} if the number is not
+ * considered to be a possible number. Note that validation of whether the
+ * number is actually a valid number for a particular region is not performed.
+ * This can be done separately with {@link #isValidNumber}.
  *
  * @param {?string} numberToParse number that we are attempting to parse. This
  *     can contain formatting such as +, ( and -, as well as a phone number
@@ -3681,8 +3709,9 @@ i18n.phonenumbers.PhoneNumberUtil.prototype.checkRegionForParsing_ = function(
  * @return {i18n.phonenumbers.PhoneNumber} a phone number proto buffer filled
  *     with the parsed number.
  * @throws {Error} if the string is not considered to be a
- *     viable phone number or if no default region was supplied and the number
- *     is not in international format (does not start with +).
+ *     viable phone number (e.g. too few or too many digits) or if no default
+ *     region was supplied and the number is not in international format (does
+ *     not start with +).
  */
 i18n.phonenumbers.PhoneNumberUtil.prototype.parse = function(numberToParse,
                                                              defaultRegion) {
