@@ -1,5 +1,17 @@
 # Changelog
 
+## [v1.0.17](https://github.com/seegno/google-libphonenumber/tree/v1.0.17) (2016-04-10)
+[Full Changelog](https://github.com/seegno/google-libphonenumber/compare/v1.0.16...v1.0.17)
+
+**Merged pull requests:**
+
+- Remove trailing whitespace from patch [\#58](https://github.com/seegno/google-libphonenumber/pull/58) ([ruimarinho](https://github.com/ruimarinho))
+- Update libphonenumber@7.3.0 [\#57](https://github.com/seegno/google-libphonenumber/pull/57) ([ruimarinho](https://github.com/ruimarinho))
+- Add .eslintignore [\#56](https://github.com/seegno/google-libphonenumber/pull/56) ([ruimarinho](https://github.com/ruimarinho))
+- Update patch hash for 7.3.0+ [\#55](https://github.com/seegno/google-libphonenumber/pull/55) ([ruimarinho](https://github.com/ruimarinho))
+- Update patch that converts strings to errors for 7.3.0+ [\#54](https://github.com/seegno/google-libphonenumber/pull/54) ([ruimarinho](https://github.com/ruimarinho))
+- Update libphonenumber link [\#53](https://github.com/seegno/google-libphonenumber/pull/53) ([giggsey](https://github.com/giggsey))
+
 ## [v1.0.16](https://github.com/seegno/google-libphonenumber/tree/v1.0.16) (2016-03-27)
 [Full Changelog](https://github.com/seegno/google-libphonenumber/compare/v1.0.15...v1.0.16)
 
