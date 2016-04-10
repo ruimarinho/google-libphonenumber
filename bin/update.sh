@@ -24,7 +24,7 @@ curl -L -s https://github.com/googlei18n/libphonenumber/archive/libphonenumber-$
 # Apply custom patch to convert strings to proper errors.
 echo "Applying patches..."
 
-curl -L -s https://patch-diff.githubusercontent.com/raw/googlei18n/libphonenumber/pull/690.patch | git apply -p4 --directory=src
+curl -L -s https://gist.githubusercontent.com/ruimarinho/d52c0cdde7e4fcd1d589da06b77ed954/raw/6b3d50fed6fc492e331ad916c043af92ab4096da/error.patch | git apply
 
 echo "Done!"
 
