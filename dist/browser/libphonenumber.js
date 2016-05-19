@@ -114,7 +114,7 @@ goog.addDependency = function(a, b, c, d) {
     var f = goog.dependencies_;
     d && "boolean" !== typeof d || (d = d ? {module:"goog"} : {});
     for (var g = 0;e = b[g];g++) {
-      f.nameToPath[e] = a, f.pathIsModule[a] = "goog" == d.module;
+      f.nameToPath[e] = a, f.loadFlags[a] = d;
     }
     for (d = 0;b = c[d];d++) {
       a in f.requires || (f.requires[a] = {}), f.requires[a][b] = !0;
@@ -162,7 +162,9 @@ goog.LOAD_MODULE_USING_EVAL = !0;
 goog.SEAL_MODULE_EXPORTS = goog.DEBUG;
 goog.loadedModules_ = {};
 goog.DEPENDENCIES_ENABLED = !COMPILED && goog.ENABLE_DEBUG_LOADER;
-goog.DEPENDENCIES_ENABLED && (goog.dependencies_ = {pathIsModule:{}, nameToPath:{}, requires:{}, visited:{}, written:{}, deferred:{}}, goog.inHtmlDocument_ = function() {
+goog.ALWAYS_TRANSPILE = !1;
+goog.NEVER_TRANSPILE = !1;
+goog.DEPENDENCIES_ENABLED && (goog.dependencies_ = {loadFlags:{}, nameToPath:{}, requires:{}, visited:{}, written:{}, deferred:{}}, goog.inHtmlDocument_ = function() {
   var a = goog.global.document;
   return null != a && "write" in a;
 }, goog.findBasePath_ = function() {
@@ -181,8 +183,8 @@ goog.DEPENDENCIES_ENABLED && (goog.dependencies_ = {pathIsModule:{}, nameToPath:
   }
 }, goog.importScript_ = function(a, b) {
   (goog.global.CLOSURE_IMPORT_SCRIPT || goog.writeScriptTag_)(a, b) && (goog.dependencies_.written[a] = !0);
-}, goog.IS_OLD_IE_ = !(goog.global.atob || !goog.global.document || !goog.global.document.all), goog.importModule_ = function(a) {
-  goog.importScript_("", 'goog.retrieveAndExecModule_("' + a + '");') && (goog.dependencies_.written[a] = !0);
+}, goog.IS_OLD_IE_ = !(goog.global.atob || !goog.global.document || !goog.global.document.all), goog.importProcessedScript_ = function(a, b, c) {
+  goog.importScript_("", 'goog.retrieveAndExec_("' + a + '", ' + b + ", " + c + ");");
 }, goog.queuedModules_ = [], goog.wrapModule_ = function(a, b) {
   return goog.LOAD_MODULE_USING_EVAL && goog.isDef(goog.global.JSON) ? "goog.loadModule(" + goog.global.JSON.stringify(b + "\n//# sourceURL=" + a + "\n") + ");" : 'goog.loadModule(function(exports) {"use strict";' + b + "\n;return exports});\n//# sourceURL=" + a + "\n";
 }, goog.loadQueuedModules_ = function() {
@@ -197,7 +199,8 @@ goog.DEPENDENCIES_ENABLED && (goog.dependencies_ = {pathIsModule:{}, nameToPath:
 }, goog.maybeProcessDeferredDep_ = function(a) {
   goog.isDeferredModule_(a) && goog.allDepsAreAvailable_(a) && (a = goog.getPathFromDeps_(a), goog.maybeProcessDeferredPath_(goog.basePath + a));
 }, goog.isDeferredModule_ = function(a) {
-  return (a = goog.getPathFromDeps_(a)) && goog.dependencies_.pathIsModule[a] ? goog.basePath + a in goog.dependencies_.deferred : !1;
+  var b = (a = goog.getPathFromDeps_(a)) && goog.dependencies_.loadFlags[a] || {};
+  return a && ("goog" == b.module || goog.needsTranspile_(b.lang)) ? goog.basePath + a in goog.dependencies_.deferred : !1;
 }, goog.allDepsAreAvailable_ = function(a) {
   if ((a = goog.getPathFromDeps_(a)) && a in goog.dependencies_.requires) {
     for (var b in goog.dependencies_.requires[a]) {
@@ -214,7 +217,7 @@ goog.DEPENDENCIES_ENABLED && (goog.dependencies_ = {pathIsModule:{}, nameToPath:
     goog.globalEval(b);
   }
 }, goog.loadModuleFromUrl = function(a) {
-  goog.retrieveAndExecModule_(a);
+  goog.retrieveAndExec_(a, !0, !1);
 }, goog.loadModule = function(a) {
   var b = goog.moduleLoaderState_;
   try {
@@ -259,12 +262,36 @@ goog.DEPENDENCIES_ENABLED && (goog.dependencies_ = {pathIsModule:{}, nameToPath:
       }
       throw Error('Cannot write "' + a + '" after document load');
     }
-    var d = goog.IS_OLD_IE_;
-    void 0 === b ? d ? (d = " onreadystatechange='goog.onScriptLoad_(this, " + ++goog.lastNonModuleScriptIndex_ + ")' ", c.write('<script type="text/javascript" src="' + a + '"' + d + ">\x3c/script>")) : goog.ENABLE_CHROME_APP_SAFE_SCRIPT_LOADING ? goog.appendScriptSrcNode_(a) : goog.writeScriptSrcNode_(a) : c.write('<script type="text/javascript">' + b + "\x3c/script>");
+    if (void 0 === b) {
+      if (goog.IS_OLD_IE_) {
+        var d = " onreadystatechange='goog.onScriptLoad_(this, " + ++goog.lastNonModuleScriptIndex_ + ")' ";
+        c.write('<script type="text/javascript" src="' + a + '"' + d + ">\x3c/script>");
+      } else {
+        goog.ENABLE_CHROME_APP_SAFE_SCRIPT_LOADING ? goog.appendScriptSrcNode_(a) : goog.writeScriptSrcNode_(a);
+      }
+    } else {
+      c.write('<script type="text/javascript">' + b + "\x3c/script>");
+    }
     return !0;
   }
   return !1;
-}, goog.lastNonModuleScriptIndex_ = 0, goog.onScriptLoad_ = function(a, b) {
+}, goog.needsTranspile_ = function(a) {
+  if (goog.ALWAYS_TRANSPILE) {
+    return !0;
+  }
+  if (goog.NEVER_TRANSPILE) {
+    return !1;
+  }
+  if (!goog.transpiledLanguages_) {
+    goog.transpiledLanguages_ = {es5:!0, es6:!0, "es6-impl":!0};
+    try {
+      goog.transpiledLanguages_.es5 = eval("[1,].length!=1"), eval('(()=>{"use strict";let a={};const X=class{constructor(){}x(z){return new Map([...arguments]).get(z[0])==3}};return new X().x([a,3])})()') && (goog.transpiledLanguages_["es6-impl"] = !1), eval('(()=>{"use strict";class X{constructor(){if(new.target!=String)throw 1;this.x=42}}let q=Reflect.construct(X,[],String);if(q.x!=42||!(q instanceof String))throw 1;for(const a of[2,3]){if(a==2)continue;function f(z={a}){let a=0;return z.a}{function f(){return 0;}}return f()==3}})()') && 
+      (goog.transpiledLanguages_.es6 = !1);
+    } catch (b) {
+    }
+  }
+  return !!goog.transpiledLanguages_[a];
+}, goog.transpiledLanguages_ = null, goog.lastNonModuleScriptIndex_ = 0, goog.onScriptLoad_ = function(a, b) {
   "complete" == a.readyState && goog.lastNonModuleScriptIndex_ == b && goog.loadQueuedModules_();
   return !0;
 }, goog.writeScripts_ = function(a) {
@@ -295,7 +322,8 @@ goog.DEPENDENCIES_ENABLED && (goog.dependencies_ = {pathIsModule:{}, nameToPath:
   goog.moduleLoaderState_ = null;
   for (a = 0;a < c.length;a++) {
     if (f = c[a]) {
-      e.pathIsModule[f] ? goog.importModule_(goog.basePath + f) : goog.importScript_(goog.basePath + f);
+      var h = e.loadFlags[f] || {}, k = goog.needsTranspile_(h.lang);
+      "goog" == h.module || k ? goog.importProcessedScript_(goog.basePath + f, "goog" == h.module, k) : goog.importScript_(goog.basePath + f);
     } else {
       throw goog.moduleLoaderState_ = g, Error("Undefined script input");
     }
@@ -318,19 +346,34 @@ goog.loadFileSync_ = function(a) {
   var b = new goog.global.XMLHttpRequest;
   b.open("get", a, !1);
   b.send();
-  return b.responseText;
+  return 200 == b.status ? b.responseText : null;
 };
-goog.retrieveAndExecModule_ = function(a) {
+goog.retrieveAndExec_ = function(a, b, c) {
   if (!COMPILED) {
-    var b = a;
+    var d = a;
     a = goog.normalizePath_(a);
-    var c = goog.global.CLOSURE_IMPORT_SCRIPT || goog.writeScriptTag_, d = goog.loadFileSync_(a);
-    if (null != d) {
-      d = goog.wrapModule_(a, d), goog.IS_OLD_IE_ ? (goog.dependencies_.deferred[b] = d, goog.queuedModules_.push(b)) : c(a, d);
-    } else {
-      throw Error("load of " + a + "failed");
+    var e = goog.global.CLOSURE_IMPORT_SCRIPT || goog.writeScriptTag_, f = goog.loadFileSync_(a);
+    if (null == f) {
+      throw Error('Load of "' + a + '" failed');
     }
+    c && (f = goog.transpile_.call(goog.global, f, a));
+    f = b ? goog.wrapModule_(a, f) : f + ("\n//# sourceURL=" + a);
+    goog.IS_OLD_IE_ ? (goog.dependencies_.deferred[d] = f, goog.queuedModules_.push(d)) : e(a, f);
   }
+};
+goog.transpile_ = function(a, b) {
+  var c = goog.global.$jscomp;
+  c || (goog.global.$jscomp = c = {});
+  var d = c.transpile;
+  if (!d) {
+    var e = goog.basePath + "transpile.js", f = goog.loadFileSync_(e);
+    f && (eval(f + "\n//# sourceURL=" + e), c = goog.global.$jscomp, d = c.transpile);
+  }
+  d || (d = c.transpile = function(a, b) {
+    goog.logToConsole_(b + " requires transpilation but no transpiler was found.");
+    return a;
+  });
+  return d(a, b);
 };
 goog.typeOf = function(a) {
   var b = typeof a;
@@ -595,19 +638,19 @@ goog.defineClass = function(a, b) {
 };
 goog.defineClass.SEAL_CLASS_INSTANCES = goog.DEBUG;
 goog.defineClass.createSealingConstructor_ = function(a, b) {
-  if (goog.defineClass.SEAL_CLASS_INSTANCES && Object.seal instanceof Function) {
-    if (b && b.prototype && b.prototype[goog.UNSEALABLE_CONSTRUCTOR_PROPERTY_]) {
-      return a;
-    }
-    var c = function() {
-      var b = a.apply(this, arguments) || this;
-      b[goog.UID_PROPERTY_] = b[goog.UID_PROPERTY_];
-      this.constructor === c && Object.seal(b);
-      return b;
-    };
-    return c;
+  if (!goog.defineClass.SEAL_CLASS_INSTANCES) {
+    return a;
   }
-  return a;
+  var c = !goog.defineClass.isUnsealable_(b), d = function() {
+    var b = a.apply(this, arguments) || this;
+    b[goog.UID_PROPERTY_] = b[goog.UID_PROPERTY_];
+    this.constructor === d && c && Object.seal instanceof Function && Object.seal(b);
+    return b;
+  };
+  return d;
+};
+goog.defineClass.isUnsealable_ = function(a) {
+  return a && a.prototype && a.prototype[goog.UNSEALABLE_CONSTRUCTOR_PROPERTY_];
 };
 goog.defineClass.OBJECT_PROTOTYPE_FIELDS_ = "constructor hasOwnProperty isPrototypeOf propertyIsEnumerable toLocaleString toString valueOf".split(" ");
 goog.defineClass.applyProperties_ = function(a, b) {
@@ -912,7 +955,7 @@ goog.string.escapeChar = function(a) {
   if (a in goog.string.specialEscapeChars_) {
     return goog.string.jsEscapeCache_[a] = goog.string.specialEscapeChars_[a];
   }
-  var b = a, c = a.charCodeAt(0);
+  var b, c = a.charCodeAt(0);
   if (31 < c && 127 > c) {
     b = a;
   } else {
@@ -1580,6 +1623,9 @@ goog.array.copyByIndex = function(a, b) {
   });
   return c;
 };
+goog.array.concatMap = function(a, b, c) {
+  return goog.array.concat.apply([], goog.array.map(a, b, c));
+};
 goog.proto2 = {};
 goog.proto2.FieldDescriptor = function(a, b, c) {
   this.parent_ = a;
@@ -1667,6 +1713,9 @@ goog.proto2.FieldDescriptor.prototype.isOptional = function() {
   return !this.isRepeated_ && !this.isRequired_;
 };
 goog.object = {};
+goog.object.is = function(a, b) {
+  return a === b ? 0 !== a || 1 / a === 1 / b : a !== a && b !== b;
+};
 goog.object.forEach = function(a, b, c) {
   for (var d in a) {
     b.call(c, a[d], d, a);
@@ -1938,7 +1987,7 @@ goog.proto2.Message.prototype.initializeForLazyDeserializer = function(a, b) {
 };
 goog.proto2.Message.prototype.setUnknown = function(a, b) {
   goog.asserts.assert(!this.fields_[a], "Field is not unknown in this message");
-  goog.asserts.assert(1 <= a, "Tag is not valid");
+  goog.asserts.assert(1 <= a, "Tag " + a + ' has value "' + b + '" in descriptor ' + this.getDescriptor().getName());
   goog.asserts.assert(null !== b, "Value cannot be null");
   this.values_[a] = b;
   this.deserializedFields_ && delete this.deserializedFields_[a];
@@ -3287,10 +3336,10 @@ i18n.phonenumbers.metadata.countryToMetadata = {AC:[, [, , "[46]\\d{4}|[01589]\\
 "\\d{7}", , , "3212345"], [, , "(?:7[0-8]|8[034679]|9\\d)\\d{5}", "\\d{7}", , , "7012345"], [, , "0800\\d{7}", "\\d{11}", , , "08001234567"], [, , "NA", "NA"], [, , "NA", "NA"], [, , "NA", "NA"], [, , "NA", "NA"], "FJ", 679, "0(?:0|52)", , , , , , "00", , [[, "(\\d{3})(\\d{4})", "$1 $2", ["[36-9]"]], [, "(\\d{4})(\\d{3})(\\d{4})", "$1 $2 $3", ["0"]]], , [, , "NA", "NA"], , , [, , "NA", "NA"], [, , "NA", "NA"], 1, , [, , "NA", "NA"]], FK:[, [, , "[2-7]\\d{4}", "\\d{5}"], [, , "[2-47]\\d{4}", "\\d{5}", 
 , , "31234"], [, , "[56]\\d{4}", "\\d{5}", , , "51234"], [, , "NA", "NA"], [, , "NA", "NA"], [, , "NA", "NA"], [, , "NA", "NA"], [, , "NA", "NA"], "FK", 500, "00", , , , , , , , , , [, , "NA", "NA"], , , [, , "NA", "NA"], [, , "NA", "NA"], , , [, , "NA", "NA"]], FM:[, [, , "[39]\\d{6}", "\\d{7}"], [, , "3[2357]0[1-9]\\d{3}|9[2-6]\\d{5}", "\\d{7}", , , "3201234"], [, , "3[2357]0[1-9]\\d{3}|9[2-7]\\d{5}", "\\d{7}", , , "3501234"], [, , "NA", "NA"], [, , "NA", "NA"], [, , "NA", "NA"], [, , "NA", "NA"], 
 [, , "NA", "NA"], "FM", 691, "00", , , , , , , , [[, "(\\d{3})(\\d{4})", "$1 $2"]], , [, , "NA", "NA"], , , [, , "NA", "NA"], [, , "NA", "NA"], , , [, , "NA", "NA"]], FO:[, [, , "[2-9]\\d{5}", "\\d{6}"], [, , "(?:20|[3-4]\\d|8[19])\\d{4}", "\\d{6}", , , "201234"], [, , "(?:[27][1-9]|5\\d)\\d{4}", "\\d{6}", , , "211234"], [, , "80[257-9]\\d{3}", "\\d{6}", , , "802123"], [, , "90(?:[1345][15-7]|2[125-7]|99)\\d{2}", "\\d{6}", , , "901123"], [, , "NA", "NA"], [, , "NA", "NA"], [, , "(?:6[0-36]|88)\\d{4}", 
-"\\d{6}", , , "601234"], "FO", 298, "00", , , , "(10(?:01|[12]0|88))", , , , [[, "(\\d{6})", "$1", , , "$CC $1"]], , [, , "NA", "NA"], , , [, , "NA", "NA"], [, , "NA", "NA"], , , [, , "NA", "NA"]], FR:[, [, , "[1-9]\\d{8}", "\\d{9}"], [, , "[1-5]\\d{8}", "\\d{9}", , , "123456789"], [, , "6\\d{8}|7(?:00\\d{6}|[3-9]\\d{7})", "\\d{9}", , , "612345678"], [, , "80\\d{7}", "\\d{9}", , , "801234567"], [, , "89[1-37-9]\\d{6}", "\\d{9}", , , "891123456"], [, , "8(?:1[019]|2[0156]|84|90)\\d{6}", "\\d{9}", 
+"\\d{6}", , , "601234"], "FO", 298, "00", , , , "(10(?:01|[12]0|88))", , , , [[, "(\\d{6})", "$1", , , "$CC $1"]], , [, , "NA", "NA"], , , [, , "NA", "NA"], [, , "NA", "NA"], , , [, , "NA", "NA"]], FR:[, [, , "[1-9]\\d{8}", "\\d{9}"], [, , "[1-5]\\d{8}", "\\d{9}", , , "123456789"], [, , "6\\d{8}|7(?:00\\d{6}|[3-9]\\d{7})", "\\d{9}", , , "612345678"], [, , "80[0-5]\\d{6}", "\\d{9}", , , "801234567"], [, , "89[1-37-9]\\d{6}", "\\d{9}", , , "891123456"], [, , "8(?:1[019]|2[0156]|84|90)\\d{6}", "\\d{9}", 
 , , "810123456"], [, , "NA", "NA"], [, , "9\\d{8}", "\\d{9}", , , "912345678"], "FR", 33, "00", "0", , , "0", , , , [[, "([1-79])(\\d{2})(\\d{2})(\\d{2})(\\d{2})", "$1 $2 $3 $4 $5", ["[1-79]"], "0$1"], [, "(1\\d{2})(\\d{3})", "$1 $2", ["11"], "$1"], [, "(8\\d{2})(\\d{2})(\\d{2})(\\d{2})", "$1 $2 $3 $4", ["8"], "0 $1"]], [[, "([1-79])(\\d{2})(\\d{2})(\\d{2})(\\d{2})", "$1 $2 $3 $4 $5", ["[1-79]"], "0$1"], [, "(8\\d{2})(\\d{2})(\\d{2})(\\d{2})", "$1 $2 $3 $4", ["8"], "0 $1"]], [, , "NA", "NA"], , , 
-[, , "NA", "NA"], [, , "NA", "NA"], , , [, , "NA", "NA"]], GA:[, [, , "0?\\d{7}", "\\d{7,8}"], [, , "01\\d{6}", "\\d{8}", , , "01441234"], [, , "0?[2-7]\\d{6}", "\\d{7,8}", , , "06031234"], [, , "NA", "NA"], [, , "NA", "NA"], [, , "NA", "NA"], [, , "NA", "NA"], [, , "NA", "NA"], "GA", 241, "00", , , , , , , , [[, "(\\d)(\\d{2})(\\d{2})(\\d{2})", "$1 $2 $3 $4", ["[2-7]"], "0$1"], [, "(\\d{2})(\\d{2})(\\d{2})(\\d{2})", "$1 $2 $3 $4", ["0"]]], , [, , "NA", "NA"], , , [, , "NA", "NA"], [, , "NA", "NA"], 
-1, , [, , "NA", "NA"]], GB:[, [, , "\\d{7,10}", "\\d{4,10}"], [, , "2(?:0[01378]|3[0189]|4[017]|8[0-46-9]|9[012])\\d{7}|1(?:(?:1(?:3[0-48]|[46][0-4]|5[012789]|7[0-49]|8[01349])|21[0-7]|31[0-8]|[459]1\\d|61[0-46-9]))\\d{6}|1(?:2(?:0[024-9]|2[3-9]|3[3-79]|4[1-689]|[58][02-9]|6[0-4789]|7[013-9]|9\\d)|3(?:0\\d|[25][02-9]|3[02-579]|[468][0-46-9]|7[1235679]|9[24578])|4(?:0[03-9]|[28][02-5789]|[37]\\d|4[02-69]|5[0-8]|[69][0-79])|5(?:0[1235-9]|2[024-9]|3[015689]|4[02-9]|5[03-9]|6\\d|7[0-35-9]|8[0-468]|9[0-5789])|6(?:0[034689]|2[0-35689]|[38][013-9]|4[1-467]|5[0-69]|6[13-9]|7[0-8]|9[0124578])|7(?:0[0246-9]|2\\d|3[023678]|4[03-9]|5[0-46-9]|6[013-9]|7[0-35-9]|8[024-9]|9[02-9])|8(?:0[35-9]|2[1-5789]|3[02-578]|4[0-578]|5[124-9]|6[2-69]|7\\d|8[02-9]|9[02569])|9(?:0[02-589]|2[02-689]|3[1-5789]|4[2-9]|5[0-579]|6[234789]|7[0124578]|8\\d|9[2-57]))\\d{6}|1(?:2(?:0(?:46[1-4]|87[2-9])|545[1-79]|76(?:2\\d|3[1-8]|6[1-6])|9(?:7(?:2[0-4]|3[2-5])|8(?:2[2-8]|7[0-4789]|8[345])))|3(?:638[2-5]|647[23]|8(?:47[04-9]|64[015789]))|4(?:044[1-7]|20(?:2[23]|8\\d)|6(?:0(?:30|5[2-57]|6[1-8]|7[2-8])|140)|8(?:052|87[123]))|5(?:24(?:3[2-79]|6\\d)|276\\d|6(?:26[06-9]|686))|6(?:06(?:4\\d|7[4-79])|295[567]|35[34]\\d|47(?:24|61)|59(?:5[08]|6[67]|74)|955[0-4])|7(?:26(?:6[13-9]|7[0-7])|442\\d|50(?:2[0-3]|[3-68]2|76))|8(?:27[56]\\d|37(?:5[2-5]|8[239])|84(?:3[2-58]))|9(?:0(?:0(?:6[1-8]|85)|52\\d)|3583|4(?:66[1-8]|9(?:2[01]|81))|63(?:23|3[1-4])|9561))\\d{3}|176888[234678]\\d{2}|16977[23]\\d{3}", 
+[, , "NA", "NA"], [, , "80[6-9]\\d{6}", "\\d{9}", , , "806123456"], , , [, , "NA", "NA"]], GA:[, [, , "0?\\d{7}", "\\d{7,8}"], [, , "01\\d{6}", "\\d{8}", , , "01441234"], [, , "0?[2-7]\\d{6}", "\\d{7,8}", , , "06031234"], [, , "NA", "NA"], [, , "NA", "NA"], [, , "NA", "NA"], [, , "NA", "NA"], [, , "NA", "NA"], "GA", 241, "00", , , , , , , , [[, "(\\d)(\\d{2})(\\d{2})(\\d{2})", "$1 $2 $3 $4", ["[2-7]"], "0$1"], [, "(\\d{2})(\\d{2})(\\d{2})(\\d{2})", "$1 $2 $3 $4", ["0"]]], , [, , "NA", "NA"], , , 
+[, , "NA", "NA"], [, , "NA", "NA"], 1, , [, , "NA", "NA"]], GB:[, [, , "\\d{7,10}", "\\d{4,10}"], [, , "2(?:0[01378]|3[0189]|4[017]|8[0-46-9]|9[012])\\d{7}|1(?:(?:1(?:3[0-48]|[46][0-4]|5[012789]|7[0-49]|8[01349])|21[0-7]|31[0-8]|[459]1\\d|61[0-46-9]))\\d{6}|1(?:2(?:0[024-9]|2[3-9]|3[3-79]|4[1-689]|[58][02-9]|6[0-4789]|7[013-9]|9\\d)|3(?:0\\d|[25][02-9]|3[02-579]|[468][0-46-9]|7[1235679]|9[24578])|4(?:0[03-9]|[28][02-5789]|[37]\\d|4[02-69]|5[0-8]|[69][0-79])|5(?:0[1235-9]|2[024-9]|3[015689]|4[02-9]|5[03-9]|6\\d|7[0-35-9]|8[0-468]|9[0-5789])|6(?:0[034689]|2[0-35689]|[38][013-9]|4[1-467]|5[0-69]|6[13-9]|7[0-8]|9[0124578])|7(?:0[0246-9]|2\\d|3[023678]|4[03-9]|5[0-46-9]|6[013-9]|7[0-35-9]|8[024-9]|9[02-9])|8(?:0[35-9]|2[1-5789]|3[02-578]|4[0-578]|5[124-9]|6[2-69]|7\\d|8[02-9]|9[02569])|9(?:0[02-589]|2[02-689]|3[1-5789]|4[2-9]|5[0-579]|6[234789]|7[0124578]|8\\d|9[2-57]))\\d{6}|1(?:2(?:0(?:46[1-4]|87[2-9])|545[1-79]|76(?:2\\d|3[1-8]|6[1-6])|9(?:7(?:2[0-4]|3[2-5])|8(?:2[2-8]|7[0-4789]|8[345])))|3(?:638[2-5]|647[23]|8(?:47[04-9]|64[015789]))|4(?:044[1-7]|20(?:2[23]|8\\d)|6(?:0(?:30|5[2-57]|6[1-8]|7[2-8])|140)|8(?:052|87[123]))|5(?:24(?:3[2-79]|6\\d)|276\\d|6(?:26[06-9]|686))|6(?:06(?:4\\d|7[4-79])|295[567]|35[34]\\d|47(?:24|61)|59(?:5[08]|6[67]|74)|955[0-4])|7(?:26(?:6[13-9]|7[0-7])|442\\d|50(?:2[0-3]|[3-68]2|76))|8(?:27[56]\\d|37(?:5[2-5]|8[239])|84(?:3[2-58]))|9(?:0(?:0(?:6[1-8]|85)|52\\d)|3583|4(?:66[1-8]|9(?:2[01]|81))|63(?:23|3[1-4])|9561))\\d{3}|176888[234678]\\d{2}|16977[23]\\d{3}", 
 "\\d{4,10}", , , "1212345678"], [, , "7(?:[1-4]\\d\\d|5(?:0[0-8]|[13-9]\\d|2[0-35-9])|7(?:0[1-9]|[1-7]\\d|8[02-9]|9[0-689])|8(?:[014-9]\\d|[23][0-8])|9(?:[04-9]\\d|1[02-9]|2[0-35-9]|3[0-689]))\\d{6}", "\\d{10}", , , "7400123456"], [, , "80(?:0(?:1111|\\d{6,7})|8\\d{7})|500\\d{6}", "\\d{7}(?:\\d{2,3})?", , , "8001234567"], [, , "(?:87[123]|9(?:[01]\\d|8[2349]))\\d{7}", "\\d{10}", , , "9012345678"], [, , "8(?:4(?:5464\\d|[2-5]\\d{7})|70\\d{7})", "\\d{7}(?:\\d{3})?", , , "8431234567"], [, , "70\\d{8}", 
 "\\d{10}", , , "7012345678"], [, , "56\\d{8}", "\\d{10}", , , "5612345678"], "GB", 44, "00", "0", " x", , "0", , , , [[, "(\\d{2})(\\d{4})(\\d{4})", "$1 $2 $3", ["2|5[56]|7(?:0|6[013-9])", "2|5[56]|7(?:0|6(?:[013-9]|2[0-35-9]))"], "0$1"], [, "(\\d{3})(\\d{3})(\\d{4})", "$1 $2 $3", ["1(?:1|\\d1)|3|9[018]"], "0$1"], [, "(\\d{5})(\\d{4,5})", "$1 $2", ["1(?:38|5[23]|69|76|94)", "1(?:387|5(?:24|39)|697|768|946)", "1(?:3873|5(?:242|39[456])|697[347]|768[347]|9467)"], "0$1"], [, "(1\\d{3})(\\d{5,6})", "$1 $2", 
 ["1"], "0$1"], [, "(7\\d{3})(\\d{6})", "$1 $2", ["7(?:[1-5789]|62)", "7(?:[1-5789]|624)"], "0$1"], [, "(800)(\\d{4})", "$1 $2", ["800", "8001", "80011", "800111", "8001111"], "0$1"], [, "(845)(46)(4\\d)", "$1 $2 $3", ["845", "8454", "84546", "845464"], "0$1"], [, "(8\\d{2})(\\d{3})(\\d{4})", "$1 $2 $3", ["8(?:4[2-5]|7[0-3])"], "0$1"], [, "(80\\d)(\\d{3})(\\d{4})", "$1 $2 $3", ["80"], "0$1"], [, "([58]00)(\\d{6})", "$1 $2", ["[58]00"], "0$1"]], , [, , "76(?:0[012]|2[356]|4[0134]|5[49]|6[0-369]|77|81|9[39])\\d{6}", 
@@ -3326,7 +3375,7 @@ i18n.phonenumbers.metadata.countryToMetadata = {AC:[, [, , "[46]\\d{4}|[01589]\\
 "$1 $2", ["800"], "0$1"], [, "(804)(\\d{3})(\\d{4})", "$1 $2 $3", ["804"], "0$1"], [, "(80\\d)(\\d)(\\d{3})(\\d{3})", "$1 $2 $3 $4", ["80[79]"], "0$1"]], , [, , "NA", "NA"], , , [, , "8071\\d{6}", "\\d{10}", , , "8071123456"], [, , "1500\\d{3}|8071\\d{6}", "\\d{7,10}", , , "8071123456"], , , [, , "NA", "NA"]], IE:[, [, , "[124-9]\\d{6,9}", "\\d{5,10}"], [, , "1\\d{7,8}|2(?:1\\d{6,7}|3\\d{7}|[24-9]\\d{5})|4(?:0[24]\\d{5}|[1-469]\\d{7}|5\\d{6}|7\\d{5}|8[0-46-9]\\d{7})|5(?:0[45]\\d{5}|1\\d{6}|[23679]\\d{7}|8\\d{5})|6(?:1\\d{6}|[237-9]\\d{5}|[4-6]\\d{7})|7[14]\\d{7}|9(?:1\\d{6}|[04]\\d{7}|[35-9]\\d{5})", 
 "\\d{5,10}", , , "2212345"], [, , "8(?:22\\d{6}|[35-9]\\d{7})", "\\d{9}", , , "850123456"], [, , "1800\\d{6}", "\\d{10}", , , "1800123456"], [, , "15(?:1[2-8]|[2-8]0|9[089])\\d{6}", "\\d{10}", , , "1520123456"], [, , "18[59]0\\d{6}", "\\d{10}", , , "1850123456"], [, , "700\\d{6}", "\\d{9}", , , "700123456"], [, , "76\\d{7}", "\\d{9}", , , "761234567"], "IE", 353, "00", "0", , , "0", , , , [[, "(1)(\\d{3,4})(\\d{4})", "$1 $2 $3", ["1"], "(0$1)"], [, "(\\d{2})(\\d{5})", "$1 $2", ["2[24-9]|47|58|6[237-9]|9[35-9]"], 
 "(0$1)"], [, "(\\d{3})(\\d{5})", "$1 $2", ["40[24]|50[45]"], "(0$1)"], [, "(48)(\\d{4})(\\d{4})", "$1 $2 $3", ["48"], "(0$1)"], [, "(818)(\\d{3})(\\d{3})", "$1 $2 $3", ["81"], "(0$1)"], [, "(\\d{2})(\\d{3})(\\d{3,4})", "$1 $2 $3", ["[24-69]|7[14]"], "(0$1)"], [, "([78]\\d)(\\d{3,4})(\\d{4})", "$1 $2 $3", ["76|8[35-9]"], "0$1"], [, "(700)(\\d{3})(\\d{3})", "$1 $2 $3", ["70"], "0$1"], [, "(\\d{4})(\\d{3})(\\d{3})", "$1 $2 $3", ["1(?:8[059]|5)", "1(?:8[059]0|5)"], "$1"]], , [, , "NA", "NA"], , , [, 
-, "18[59]0\\d{6}", "\\d{10}", , , "1850123456"], [, , "818\\d{6}", "\\d{9}", , , "818123456"], , , [, , "8[35-9]\\d{8}", "\\d{10}", , , "8501234567"]], IL:[, [, , "[17]\\d{6,9}|[2-589]\\d{3}(?:\\d{3,6})?|6\\d{3}", "\\d{4,10}"], [, , "[2-489]\\d{7}", "\\d{7,8}", , , "21234567"], [, , "5(?:[02-47-9]\\d{2}|5(?:01|2[23]|3[2-4]|4[45]|5[5689]|6[67]|7[0178]|8[6-9]|9[5-9])|6[2-9]\\d)\\d{5}", "\\d{9}", , , "501234567"], [, , "1(?:80[019]\\d{3}|255)\\d{3}", "\\d{7,10}", , , "1800123456"], [, , "1(?:212|(?:9(?:0[01]|19)|200)\\d{2})\\d{4}", 
+, "18[59]0\\d{6}", "\\d{10}", , , "1850123456"], [, , "818\\d{6}", "\\d{9}", , , "818123456"], , , [, , "8[35-9]\\d{8}", "\\d{10}", , , "8501234567"]], IL:[, [, , "[17]\\d{6,9}|[2-589]\\d{3}(?:\\d{3,6})?|6\\d{3}", "\\d{4,10}"], [, , "[2-489]\\d{7}", "\\d{7,8}", , , "21234567"], [, , "5(?:[02-47-9]\\d{2}|5(?:01|2[23]|3[2-4]|4[45]|5[5689]|6[67]|7[0178]|8[6-9]|9[4-9])|6[2-9]\\d)\\d{5}", "\\d{9}", , , "501234567"], [, , "1(?:80[019]\\d{3}|255)\\d{3}", "\\d{7,10}", , , "1800123456"], [, , "1(?:212|(?:9(?:0[01]|19)|200)\\d{2})\\d{4}", 
 "\\d{8,10}", , , "1919123456"], [, , "1700\\d{6}", "\\d{10}", , , "1700123456"], [, , "NA", "NA"], [, , "7(?:18\\d|2[23]\\d|3[237]\\d|47\\d|6(?:5\\d|8[0168])|7\\d{2}|8(?:2\\d|33|55|77|81)|9[29]\\d)\\d{5}", "\\d{9}", , , "771234567"], "IL", 972, "0(?:0|1[2-9])", "0", , , "0", , , , [[, "([2-489])(\\d{3})(\\d{4})", "$1-$2-$3", ["[2-489]"], "0$1"], [, "([57]\\d)(\\d{3})(\\d{4})", "$1-$2-$3", ["[57]"], "0$1"], [, "(1)([7-9]\\d{2})(\\d{3})(\\d{3})", "$1-$2-$3-$4", ["1[7-9]"], "$1"], [, "(1255)(\\d{3})", 
 "$1-$2", ["125"], "$1"], [, "(1200)(\\d{3})(\\d{3})", "$1-$2-$3", ["120"], "$1"], [, "(1212)(\\d{2})(\\d{2})", "$1-$2-$3", ["121"], "$1"], [, "(1599)(\\d{6})", "$1-$2", ["15"], "$1"], [, "(\\d{4})", "*$1", ["[2-689]"], "$1"]], , [, , "NA", "NA"], , , [, , "1700\\d{6}|[2-689]\\d{3}", "\\d{4,10}", , , "1700123456"], [, , "[2-689]\\d{3}|1599\\d{6}", "\\d{4}(?:\\d{6})?", , , "1599123456"], , , [, , "NA", "NA"]], IM:[, [, , "[135789]\\d{6,9}", "\\d{6,10}"], [, , "1624\\d{6}", "\\d{6,10}", , , "1624456789"], 
 [, , "7[569]24\\d{6}", "\\d{10}", , , "7924123456"], [, , "808162\\d{4}", "\\d{10}", , , "8081624567"], [, , "(?:872299|90[0167]624)\\d{4}", "\\d{10}", , , "9016247890"], [, , "8(?:4(?:40[49]06|5624\\d)|70624\\d)\\d{3}", "\\d{10}", , , "8456247890"], [, , "70\\d{8}", "\\d{10}", , , "7012345678"], [, , "56\\d{8}", "\\d{10}", , , "5612345678"], "IM", 44, "00", "0", " x", , "0", , , , , , [, , "NA", "NA"], , , [, , "NA", "NA"], [, , "3(?:08162\\d|3\\d{5}|4(?:40[49]06|5624\\d)|7(?:0624\\d|2299\\d))\\d{3}|55\\d{8}", 
@@ -3373,13 +3422,16 @@ i18n.phonenumbers.metadata.countryToMetadata = {AC:[, [, , "[46]\\d{4}|[01589]\\
 , "3001\\d{4}", "\\d{5,8}", , , "30010000"], [, , "NA", "NA"], [, , "NA", "NA"], [, , "NA", "NA"], "KI", 686, "00", , , , "0", , , , , , [, , "NA", "NA"], , , [, , "NA", "NA"], [, , "NA", "NA"], , , [, , "NA", "NA"]], KM:[, [, , "[379]\\d{6}", "\\d{7}"], [, , "7(?:6[0-37-9]|7[0-57-9])\\d{4}", "\\d{7}", , , "7712345"], [, , "3[234]\\d{5}", "\\d{7}", , , "3212345"], [, , "NA", "NA"], [, , "(?:39[01]|9[01]0)\\d{4}", "\\d{7}", , , "9001234"], [, , "NA", "NA"], [, , "NA", "NA"], [, , "NA", "NA"], "KM", 
 269, "00", , , , , , , , [[, "(\\d{3})(\\d{2})(\\d{2})", "$1 $2 $3"]], , [, , "NA", "NA"], , , [, , "NA", "NA"], [, , "NA", "NA"], , , [, , "NA", "NA"]], KN:[, [, , "[589]\\d{9}", "\\d{7}(?:\\d{3})?"], [, , "869(?:2(?:29|36)|302|4(?:6[015-9]|70))\\d{4}", "\\d{7}(?:\\d{3})?", , , "8692361234"], [, , "869(?:5(?:5[6-8]|6[5-7])|66\\d|76[02-6])\\d{4}", "\\d{10}", , , "8697652917"], [, , "8(?:00|44|55|66|77|88)[2-9]\\d{6}", "\\d{10}", , , "8002123456"], [, , "900[2-9]\\d{6}", "\\d{10}", , , "9002123456"], 
 [, , "NA", "NA"], [, , "5(?:00|33|44|66|77|88)[2-9]\\d{6}", "\\d{10}", , , "5002345678"], [, , "NA", "NA"], "KN", 1, "011", "1", , , "1", , , , , , [, , "NA", "NA"], , "869", [, , "NA", "NA"], [, , "NA", "NA"], , , [, , "NA", "NA"]], KP:[, [, , "1\\d{9}|[28]\\d{7}", "\\d{6,8}|\\d{10}"], [, , "2\\d{7}|85\\d{6}", "\\d{6,8}", , , "21234567"], [, , "19[123]\\d{7}", "\\d{10}", , , "1921234567"], [, , "NA", "NA"], [, , "NA", "NA"], [, , "NA", "NA"], [, , "NA", "NA"], [, , "NA", "NA"], "KP", 850, "00|99", 
-"0", , , "0", , , , [[, "(\\d{3})(\\d{3})(\\d{4})", "$1 $2 $3", ["1"], "0$1"], [, "(\\d)(\\d{3})(\\d{4})", "$1 $2 $3", ["2"], "0$1"], [, "(\\d{2})(\\d{3})(\\d{3})", "$1 $2 $3", ["8"], "0$1"]], , [, , "NA", "NA"], , , [, , "2(?:[0-24-9]\\d{2}|3(?:[0-79]\\d|8[02-9]))\\d{4}", "\\d{8}", , , "23821234"], [, , "NA", "NA"], , , [, , "NA", "NA"]], KR:[, [, , "[1-7]\\d{3,9}|8\\d{8}", "\\d{4,10}"], [, , "(?:2|3[1-3]|[46][1-4]|5[1-5])(?:1\\d{2,3}|[1-9]\\d{6,7})", "\\d{4,10}", , , "22123456"], [, , "1[0-26-9]\\d{7,8}", 
-"\\d{9,10}", , , "1000000000"], [, , "80\\d{7}", "\\d{9}", , , "801234567"], [, , "60[2-9]\\d{6}", "\\d{9}", , , "602345678"], [, , "NA", "NA"], [, , "50\\d{8}", "\\d{10}", , , "5012345678"], [, , "70\\d{8}", "\\d{10}", , , "7012345678"], "KR", 82, "00(?:[124-68]|[37]\\d{2})", "0", , , "0(8[1-46-8]|85\\d{2})?", , , , [[, "(\\d{2})(\\d{4})(\\d{4})", "$1-$2-$3", ["1(?:0|1[19]|[69]9|5[458])|[57]0", "1(?:0|1[19]|[69]9|5(?:44|59|8))|[57]0"], "0$1", "0$CC-$1"], [, "(\\d{2})(\\d{3,4})(\\d{4})", "$1-$2-$3", 
-["1(?:[01]|5[1-4]|6[2-8]|[7-9])|[68]0|[3-6][1-9][1-9]", "1(?:[01]|5(?:[1-3]|4[56])|6[2-8]|[7-9])|[68]0|[3-6][1-9][1-9]"], "0$1", "0$CC-$1"], [, "(\\d{3})(\\d)(\\d{4})", "$1-$2-$3", ["131", "1312"], "0$1", "0$CC-$1"], [, "(\\d{3})(\\d{2})(\\d{4})", "$1-$2-$3", ["131", "131[13-9]"], "0$1", "0$CC-$1"], [, "(\\d{3})(\\d{3})(\\d{4})", "$1-$2-$3", ["13[2-9]"], "0$1", "0$CC-$1"], [, "(\\d{2})(\\d{2})(\\d{3})(\\d{4})", "$1-$2-$3-$4", ["30"], "0$1", "0$CC-$1"], [, "(\\d)(\\d{3,4})(\\d{4})", "$1-$2-$3", ["2[1-9]"], 
-"0$1", "0$CC-$1"], [, "(\\d)(\\d{3,4})", "$1-$2", ["21[0-46-9]"], "0$1", "0$CC-$1"], [, "(\\d{2})(\\d{3,4})", "$1-$2", ["[3-6][1-9]1", "[3-6][1-9]1(?:[0-46-9])"], "0$1", "0$CC-$1"], [, "(\\d{4})(\\d{4})", "$1-$2", ["1(?:5[46-9]|6[04678]|8[0579])", "1(?:5(?:44|66|77|88|99)|6(?:00|44|6[16]|70|88)|8(?:00|55|77|99))"], "$1", "0$CC-$1"]], , [, , "15\\d{7,8}", "\\d{9,10}", , , "1523456789"], , , [, , "NA", "NA"], [, , "1(?:5(?:44|66|77|88|99)|6(?:00|44|6[16]|70|88)|8(?:00|55|77|99))\\d{4}", "\\d{8}", , 
-, "15441234"], , , [, , "NA", "NA"]], KW:[, [, , "[12569]\\d{6,7}", "\\d{7,8}"], [, , "(?:18\\d|2(?:[23]\\d{2}|4(?:[1-35-9]\\d|44)|5(?:0[034]|[2-46]\\d|5[1-3]|7[1-7])))\\d{4}", "\\d{7,8}", , , "22345678"], [, , "(?:5(?:[05]\\d{2}|1[0-7]\\d|2(?:22|5[25]))|6(?:0[034679]\\d|5[015-9]\\d|6\\d{2}|7[067]\\d|9[0369]\\d)|9(?:0[09]\\d|22\\d|4[01479]\\d|55\\d|6[0679]\\d|[79]\\d{2}|8[057-9]\\d))\\d{4}", "\\d{8}", , , "50012345"], [, , "NA", "NA"], [, , "NA", "NA"], [, , "NA", "NA"], [, , "NA", "NA"], [, , "NA", 
-"NA"], "KW", 965, "00", , , , , , , , [[, "(\\d{4})(\\d{3,4})", "$1 $2", ["[16]|2(?:[0-35-9]|4[0-35-9])|9[024-9]|52[25]"]], [, "(\\d{3})(\\d{5})", "$1 $2", ["244|5[015]"]]], , [, , "NA", "NA"], , , [, , "NA", "NA"], [, , "NA", "NA"], , , [, , "NA", "NA"]], KY:[, [, , "[3589]\\d{9}", "\\d{7}(?:\\d{3})?"], [, , "345(?:2(?:22|44)|444|6(?:23|38|40)|7(?:4[35-79]|6[6-9]|77)|8(?:00|1[45]|25|[48]8)|9(?:14|4[035-9]))\\d{4}", "\\d{7}(?:\\d{3})?", , , "3452221234"], [, , "345(?:32[1-9]|5(?:1[67]|2[5-7]|4[6-8]|76)|9(?:1[67]|2[2-9]|3[689]))\\d{4}", 
-"\\d{10}", , , "3453231234"], [, , "8(?:00|44|55|66|77|88)[2-9]\\d{6}", "\\d{10}", , , "8002345678"], [, , "900[2-9]\\d{6}|345976\\d{4}", "\\d{10}", , , "9002345678"], [, , "NA", "NA"], [, , "5(?:00|33|44|66|77|88)[2-9]\\d{6}", "\\d{10}", , , "5002345678"], [, , "NA", "NA"], "KY", 1, "011", "1", , , "1", , , , , , [, , "345849\\d{4}", "\\d{10}", , , "3458491234"], , "345", [, , "NA", "NA"], [, , "NA", "NA"], , , [, , "NA", "NA"]], KZ:[, [, , "(?:33\\d|7\\d{2}|80[09])\\d{7}", "\\d{10}"], [, , "33622\\d{5}|7(?:1(?:0(?:[23]\\d|4[023]|59|63)|1(?:[23]\\d|4[0-79]|59)|2(?:[23]\\d|59)|3(?:2\\d|3[1-79]|4[0-35-9]|59)|4(?:2\\d|3[013-79]|4[0-8]|5[1-79])|5(?:2\\d|3[1-8]|4[1-7]|59)|6(?:[234]\\d|5[19]|61)|72\\d|8(?:[27]\\d|3[1-46-9]|4[0-5]))|2(?:1(?:[23]\\d|4[46-9]|5[3469])|2(?:2\\d|3[0679]|46|5[12679])|3(?:[234]\\d|5[139])|4(?:2\\d|3[1235-9]|59)|5(?:[23]\\d|4[01246-8]|59|61)|6(?:2\\d|3[1-9]|4[0-4]|59)|7(?:[237]\\d|40|5[279])|8(?:[23]\\d|4[0-3]|59)|9(?:2\\d|3[124578]|59)))\\d{5}", 
+"0", , , "0", , , , [[, "(\\d{3})(\\d{3})(\\d{4})", "$1 $2 $3", ["1"], "0$1"], [, "(\\d)(\\d{3})(\\d{4})", "$1 $2 $3", ["2"], "0$1"], [, "(\\d{2})(\\d{3})(\\d{3})", "$1 $2 $3", ["8"], "0$1"]], , [, , "NA", "NA"], , , [, , "2(?:[0-24-9]\\d{2}|3(?:[0-79]\\d|8[02-9]))\\d{4}", "\\d{8}", , , "23821234"], [, , "NA", "NA"], , , [, , "NA", "NA"]], KR:[, [, , "007\\d{9,11}|[1-7]\\d{3,9}|8\\d{8}", "\\d{4,14}"], [, , "(?:2|3[1-3]|[46][1-4]|5[1-5])(?:1\\d{2,3}|[1-9]\\d{6,7})", "\\d{4,10}", , , "22123456"], [, 
+, "1[0-26-9]\\d{7,8}", "\\d{9,10}", , , "1000000000"], [, , "(?:00798\\d{0,2}|80)\\d{7}", "\\d{9,14}", , , "801234567"], [, , "60[2-9]\\d{6}", "\\d{9}", , , "602345678"], [, , "NA", "NA"], [, , "50\\d{8}", "\\d{10}", , , "5012345678"], [, , "70\\d{8}", "\\d{10}", , , "7012345678"], "KR", 82, "00(?:[124-68]|3\\d{2}|7(?:[0-8]\\d|9[0-79]))", "0", , , "0(8[1-46-8]|85\\d{2})?", , , , [[, "(\\d{5})(\\d{3,4})(\\d{4})", "$1 $2 $3", ["00798"], "$1", "0$CC-$1"], [, "(\\d{5})(\\d{2})(\\d{3})(\\d{4})", "$1 $2 $3 $4", 
+["00798"], "$1", "0$CC-$1"], [, "(\\d{2})(\\d{4})(\\d{4})", "$1-$2-$3", ["1(?:0|1[19]|[69]9|5[458])|[57]0", "1(?:0|1[19]|[69]9|5(?:44|59|8))|[57]0"], "0$1", "0$CC-$1"], [, "(\\d{2})(\\d{3,4})(\\d{4})", "$1-$2-$3", ["1(?:[01]|5[1-4]|6[2-8]|[7-9])|[68]0|[3-6][1-9][1-9]", "1(?:[01]|5(?:[1-3]|4[56])|6[2-8]|[7-9])|[68]0|[3-6][1-9][1-9]"], "0$1", "0$CC-$1"], [, "(\\d{3})(\\d)(\\d{4})", "$1-$2-$3", ["131", "1312"], "0$1", "0$CC-$1"], [, "(\\d{3})(\\d{2})(\\d{4})", "$1-$2-$3", ["131", "131[13-9]"], "0$1", 
+"0$CC-$1"], [, "(\\d{3})(\\d{3})(\\d{4})", "$1-$2-$3", ["13[2-9]"], "0$1", "0$CC-$1"], [, "(\\d{2})(\\d{2})(\\d{3})(\\d{4})", "$1-$2-$3-$4", ["30"], "0$1", "0$CC-$1"], [, "(\\d)(\\d{3,4})(\\d{4})", "$1-$2-$3", ["2[1-9]"], "0$1", "0$CC-$1"], [, "(\\d)(\\d{3,4})", "$1-$2", ["21[0-46-9]"], "0$1", "0$CC-$1"], [, "(\\d{2})(\\d{3,4})", "$1-$2", ["[3-6][1-9]1", "[3-6][1-9]1(?:[0-46-9])"], "0$1", "0$CC-$1"], [, "(\\d{4})(\\d{4})", "$1-$2", ["1(?:5[46-9]|6[04678]|8[0579])", "1(?:5(?:44|66|77|88|99)|6(?:00|44|6[16]|70|88)|8(?:00|55|77|99))"], 
+"$1", "0$CC-$1"]], [[, "(\\d{2})(\\d{4})(\\d{4})", "$1-$2-$3", ["1(?:0|1[19]|[69]9|5[458])|[57]0", "1(?:0|1[19]|[69]9|5(?:44|59|8))|[57]0"], "0$1", "0$CC-$1"], [, "(\\d{2})(\\d{3,4})(\\d{4})", "$1-$2-$3", ["1(?:[01]|5[1-4]|6[2-8]|[7-9])|[68]0|[3-6][1-9][1-9]", "1(?:[01]|5(?:[1-3]|4[56])|6[2-8]|[7-9])|[68]0|[3-6][1-9][1-9]"], "0$1", "0$CC-$1"], [, "(\\d{3})(\\d)(\\d{4})", "$1-$2-$3", ["131", "1312"], "0$1", "0$CC-$1"], [, "(\\d{3})(\\d{2})(\\d{4})", "$1-$2-$3", ["131", "131[13-9]"], "0$1", "0$CC-$1"], 
+[, "(\\d{3})(\\d{3})(\\d{4})", "$1-$2-$3", ["13[2-9]"], "0$1", "0$CC-$1"], [, "(\\d{2})(\\d{2})(\\d{3})(\\d{4})", "$1-$2-$3-$4", ["30"], "0$1", "0$CC-$1"], [, "(\\d)(\\d{3,4})(\\d{4})", "$1-$2-$3", ["2[1-9]"], "0$1", "0$CC-$1"], [, "(\\d)(\\d{3,4})", "$1-$2", ["21[0-46-9]"], "0$1", "0$CC-$1"], [, "(\\d{2})(\\d{3,4})", "$1-$2", ["[3-6][1-9]1", "[3-6][1-9]1(?:[0-46-9])"], "0$1", "0$CC-$1"], [, "(\\d{4})(\\d{4})", "$1-$2", ["1(?:5[46-9]|6[04678]|8[0579])", "1(?:5(?:44|66|77|88|99)|6(?:00|44|6[16]|70|88)|8(?:00|55|77|99))"], 
+"$1", "0$CC-$1"]], [, , "15\\d{7,8}", "\\d{9,10}", , , "1523456789"], , , [, , "00798\\d{7,9}", "\\d{12,14}", , , "007981234567"], [, , "1(?:5(?:44|66|77|88|99)|6(?:00|44|6[16]|70|88)|8(?:00|55|77|99))\\d{4}", "\\d{8}", , , "15441234"], , , [, , "NA", "NA"]], KW:[, [, , "[12569]\\d{6,7}", "\\d{7,8}"], [, , "(?:18\\d|2(?:[23]\\d{2}|4(?:[1-35-9]\\d|44)|5(?:0[034]|[2-46]\\d|5[1-3]|7[1-7])))\\d{4}", "\\d{7,8}", , , "22345678"], [, , "(?:5(?:[05]\\d{2}|1[0-7]\\d|2(?:22|5[25]))|6(?:0[034679]\\d|5[015-9]\\d|6\\d{2}|7[067]\\d|9[0369]\\d)|9(?:0[09]\\d|22\\d|4[01479]\\d|55\\d|6[0679]\\d|[79]\\d{2}|8[057-9]\\d))\\d{4}", 
+"\\d{8}", , , "50012345"], [, , "NA", "NA"], [, , "NA", "NA"], [, , "NA", "NA"], [, , "NA", "NA"], [, , "NA", "NA"], "KW", 965, "00", , , , , , , , [[, "(\\d{4})(\\d{3,4})", "$1 $2", ["[16]|2(?:[0-35-9]|4[0-35-9])|9[024-9]|52[25]"]], [, "(\\d{3})(\\d{5})", "$1 $2", ["244|5[015]"]]], , [, , "NA", "NA"], , , [, , "NA", "NA"], [, , "NA", "NA"], , , [, , "NA", "NA"]], KY:[, [, , "[3589]\\d{9}", "\\d{7}(?:\\d{3})?"], [, , "345(?:2(?:22|44)|444|6(?:23|38|40)|7(?:4[35-79]|6[6-9]|77)|8(?:00|1[45]|25|[48]8)|9(?:14|4[035-9]))\\d{4}", 
+"\\d{7}(?:\\d{3})?", , , "3452221234"], [, , "345(?:32[1-9]|5(?:1[67]|2[5-7]|4[6-8]|76)|9(?:1[67]|2[2-9]|3[689]))\\d{4}", "\\d{10}", , , "3453231234"], [, , "8(?:00|44|55|66|77|88)[2-9]\\d{6}", "\\d{10}", , , "8002345678"], [, , "900[2-9]\\d{6}|345976\\d{4}", "\\d{10}", , , "9002345678"], [, , "NA", "NA"], [, , "5(?:00|33|44|66|77|88)[2-9]\\d{6}", "\\d{10}", , , "5002345678"], [, , "NA", "NA"], "KY", 1, "011", "1", , , "1", , , , , , [, , "345849\\d{4}", "\\d{10}", , , "3458491234"], , "345", [, 
+, "NA", "NA"], [, , "NA", "NA"], , , [, , "NA", "NA"]], KZ:[, [, , "(?:33\\d|7\\d{2}|80[09])\\d{7}", "\\d{10}"], [, , "33622\\d{5}|7(?:1(?:0(?:[23]\\d|4[023]|59|63)|1(?:[23]\\d|4[0-79]|59)|2(?:[23]\\d|59)|3(?:2\\d|3[1-79]|4[0-35-9]|59)|4(?:2\\d|3[013-79]|4[0-8]|5[1-79])|5(?:2\\d|3[1-8]|4[1-7]|59)|6(?:[234]\\d|5[19]|61)|72\\d|8(?:[27]\\d|3[1-46-9]|4[0-5]))|2(?:1(?:[23]\\d|4[46-9]|5[3469])|2(?:2\\d|3[0679]|46|5[12679])|3(?:[234]\\d|5[139])|4(?:2\\d|3[1235-9]|59)|5(?:[23]\\d|4[01246-8]|59|61)|6(?:2\\d|3[1-9]|4[0-4]|59)|7(?:[237]\\d|40|5[279])|8(?:[23]\\d|4[0-3]|59)|9(?:2\\d|3[124578]|59)))\\d{5}", 
 "\\d{10}", , , "7123456789"], [, , "7(?:0[012578]|47|6[02-4]|7[15-8]|85)\\d{7}", "\\d{10}", , , "7710009998"], [, , "800\\d{7}", "\\d{10}", , , "8001234567"], [, , "809\\d{7}", "\\d{10}", , , "8091234567"], [, , "NA", "NA"], [, , "NA", "NA"], [, , "751\\d{7}", "\\d{10}", , , "7511234567"], "KZ", 7, "810", "8", , , "8", , "8~10", , , , [, , "NA", "NA"], , , [, , "751\\d{7}", "\\d{10}", , , "7511234567"], [, , "NA", "NA"], , , [, , "NA", "NA"]], LA:[, [, , "[2-8]\\d{7,9}", "\\d{6,10}"], [, , "(?:2[13]|3(?:0\\d|[14])|[5-7][14]|41|8[1468])\\d{6}", 
 "\\d{6,9}", , , "21212862"], [, , "20(?:2[2389]|5[4-689]|7[6-8]|9[15-9])\\d{6}", "\\d{10}", , , "2023123456"], [, , "NA", "NA"], [, , "NA", "NA"], [, , "NA", "NA"], [, , "NA", "NA"], [, , "NA", "NA"], "LA", 856, "00", "0", , , "0", , , , [[, "(20)(\\d{2})(\\d{3})(\\d{3})", "$1 $2 $3 $4", ["20"], "0$1"], [, "([2-8]\\d)(\\d{3})(\\d{3})", "$1 $2 $3", ["2[13]|3[14]|[4-8]"], "0$1"], [, "(30)(\\d{2})(\\d{2})(\\d{3})", "$1 $2 $3 $4", ["30"], "0$1"]], , [, , "NA", "NA"], , , [, , "NA", "NA"], [, , "NA", 
 "NA"], , , [, , "NA", "NA"]], LB:[, [, , "[13-9]\\d{6,7}", "\\d{7,8}"], [, , "(?:[14-6]\\d{2}|7(?:[2-57]\\d|62|8[0-7]|9[04-9])|8[02-9]\\d|9\\d{2})\\d{4}", "\\d{7}", , , "1123456"], [, , "(?:3\\d|7(?:[01]\\d|6[013-9]|8[89]|9[1-3])|81\\d)\\d{5}", "\\d{7,8}", , , "71123456"], [, , "NA", "NA"], [, , "9[01]\\d{6}", "\\d{8}", , , "90123456"], [, , "80\\d{6}", "\\d{8}", , , "80123456"], [, , "NA", "NA"], [, , "NA", "NA"], "LB", 961, "00", "0", , , "0", , , , [[, "(\\d)(\\d{3})(\\d{3})", "$1 $2 $3", ["[13-6]|7(?:[2-57]|62|8[0-7]|9[04-9])|8[02-9]|9"], 
@@ -3730,20 +3782,18 @@ i18n.phonenumbers.PhoneNumberUtil.prototype.formatByPattern = function(a, b, c) 
   if (!this.hasValidCountryCallingCode_(d)) {
     return e;
   }
-  var f = this.getRegionCodeForCountryCode(d), f = this.getMetadataForRegionOrCallingCode_(d, f), g = "", g = this.chooseFormattingPatternForNumber_(c, e);
-  if (null == g) {
-    g = e;
-  } else {
+  var f = this.getRegionCodeForCountryCode(d), f = this.getMetadataForRegionOrCallingCode_(d, f), g = this.chooseFormattingPatternForNumber_(c, e);
+  if (null != g) {
     c = g.clone();
     g = g.getNationalPrefixFormattingRuleOrDefault();
     if (0 < g.length) {
       var h = f.getNationalPrefixOrDefault();
       0 < h.length ? (g = g.replace(i18n.phonenumbers.PhoneNumberUtil.NP_PATTERN_, h).replace(i18n.phonenumbers.PhoneNumberUtil.FG_PATTERN_, "$1"), c.setNationalPrefixFormattingRule(g)) : c.clearNationalPrefixFormattingRule();
     }
-    g = this.formatNsnUsingPattern_(e, c, b);
+    e = this.formatNsnUsingPattern_(e, c, b);
   }
   a = this.maybeGetFormattedExtension_(a, f, b);
-  return this.prefixNumberWithCountryCallingCode_(d, b, g, a);
+  return this.prefixNumberWithCountryCallingCode_(d, b, e, a);
 };
 i18n.phonenumbers.PhoneNumberUtil.prototype.formatNationalNumberWithCarrierCode = function(a, b) {
   var c = a.getCountryCodeOrDefault(), d = this.getNationalSignificantNumber(a);
@@ -3928,10 +3978,10 @@ i18n.phonenumbers.PhoneNumberUtil.prototype.chooseFormattingPatternForNumber_ = 
   return null;
 };
 i18n.phonenumbers.PhoneNumberUtil.prototype.formatNsnUsingPattern_ = function(a, b, c, d) {
-  var e = b.getFormatOrDefault(), f = new RegExp(b.getPattern()), g = b.getDomesticCarrierCodeFormattingRuleOrDefault(), h = "";
-  c == i18n.phonenumbers.PhoneNumberFormat.NATIONAL && null != d && 0 < d.length && 0 < g.length ? (b = g.replace(i18n.phonenumbers.PhoneNumberUtil.CC_PATTERN_, d), e = e.replace(i18n.phonenumbers.PhoneNumberUtil.FIRST_GROUP_PATTERN_, b), h = a.replace(f, e)) : (b = b.getNationalPrefixFormattingRuleOrDefault(), h = c == i18n.phonenumbers.PhoneNumberFormat.NATIONAL && null != b && 0 < b.length ? a.replace(f, e.replace(i18n.phonenumbers.PhoneNumberUtil.FIRST_GROUP_PATTERN_, b)) : a.replace(f, e));
-  c == i18n.phonenumbers.PhoneNumberFormat.RFC3966 && (h = h.replace(new RegExp("^" + i18n.phonenumbers.PhoneNumberUtil.SEPARATOR_PATTERN_), ""), h = h.replace(new RegExp(i18n.phonenumbers.PhoneNumberUtil.SEPARATOR_PATTERN_, "g"), "-"));
-  return h;
+  var e = b.getFormatOrDefault(), f = new RegExp(b.getPattern()), g = b.getDomesticCarrierCodeFormattingRuleOrDefault();
+  c == i18n.phonenumbers.PhoneNumberFormat.NATIONAL && null != d && 0 < d.length && 0 < g.length ? (b = g.replace(i18n.phonenumbers.PhoneNumberUtil.CC_PATTERN_, d), e = e.replace(i18n.phonenumbers.PhoneNumberUtil.FIRST_GROUP_PATTERN_, b), a = a.replace(f, e)) : (b = b.getNationalPrefixFormattingRuleOrDefault(), a = c == i18n.phonenumbers.PhoneNumberFormat.NATIONAL && null != b && 0 < b.length ? a.replace(f, e.replace(i18n.phonenumbers.PhoneNumberUtil.FIRST_GROUP_PATTERN_, b)) : a.replace(f, e));
+  c == i18n.phonenumbers.PhoneNumberFormat.RFC3966 && (a = a.replace(new RegExp("^" + i18n.phonenumbers.PhoneNumberUtil.SEPARATOR_PATTERN_), ""), a = a.replace(new RegExp(i18n.phonenumbers.PhoneNumberUtil.SEPARATOR_PATTERN_, "g"), "-"));
+  return a;
 };
 i18n.phonenumbers.PhoneNumberUtil.prototype.getExampleNumber = function(a) {
   return this.getExampleNumberForType(a, i18n.phonenumbers.PhoneNumberType.FIXED_LINE);
