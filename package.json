@@ -1,6 +1,6 @@
 {
   "name": "google-libphonenumber",
-  "version": "1.0.22",
+  "version": "1.0.23",
   "description": "A browserify-compatible wrapper for Google's libphonenumber.",
   "author": {
     "name": "Rui Marinho",
