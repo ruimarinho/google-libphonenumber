@@ -161,8 +161,8 @@ goog.LOAD_MODULE_USING_EVAL = !0;
 goog.SEAL_MODULE_EXPORTS = goog.DEBUG;
 goog.loadedModules_ = {};
 goog.DEPENDENCIES_ENABLED = !COMPILED && goog.ENABLE_DEBUG_LOADER;
-goog.ALWAYS_TRANSPILE = !1;
-goog.NEVER_TRANSPILE = !1;
+goog.TRANSPILE = "detect";
+goog.TRANSPILER = "transpile.js";
 goog.DEPENDENCIES_ENABLED && (goog.dependencies_ = {loadFlags:{}, nameToPath:{}, requires:{}, visited:{}, written:{}, deferred:{}}, goog.inHtmlDocument_ = function() {
   var a = goog.global.document;
   return null != a && "write" in a;
@@ -217,32 +217,6 @@ goog.DEPENDENCIES_ENABLED && (goog.dependencies_ = {loadFlags:{}, nameToPath:{},
   }
 }, goog.loadModuleFromUrl = function(a) {
   goog.retrieveAndExec_(a, !0, !1);
-}, goog.loadModule = function(a) {
-  var b = goog.moduleLoaderState_;
-  try {
-    goog.moduleLoaderState_ = {moduleName:void 0, declareLegacyNamespace:!1};
-    var c;
-    if (goog.isFunction(a)) {
-      c = a.call(goog.global, {});
-    } else {
-      if (goog.isString(a)) {
-        c = goog.loadModuleFromSource_.call(goog.global, a);
-      } else {
-        throw Error("Invalid module definition");
-      }
-    }
-    var d = goog.moduleLoaderState_.moduleName;
-    if (!goog.isString(d) || !d) {
-      throw Error('Invalid module name "' + d + '"');
-    }
-    goog.moduleLoaderState_.declareLegacyNamespace ? goog.constructNamespace_(d, c) : goog.SEAL_MODULE_EXPORTS && Object.seal && Object.seal(c);
-    goog.loadedModules_[d] = c;
-  } finally {
-    goog.moduleLoaderState_ = b;
-  }
-}, goog.loadModuleFromSource_ = function(a) {
-  eval(a);
-  return {};
 }, goog.writeScriptSrcNode_ = function(a) {
   goog.global.document.write('<script type="text/javascript" src="' + a + '">\x3c/script>');
 }, goog.appendScriptSrcNode_ = function(a) {
@@ -275,10 +249,10 @@ goog.DEPENDENCIES_ENABLED && (goog.dependencies_ = {loadFlags:{}, nameToPath:{},
   }
   return !1;
 }, goog.needsTranspile_ = function(a) {
-  if (goog.ALWAYS_TRANSPILE) {
+  if ("always" == goog.TRANSPILE) {
     return !0;
   }
-  if (goog.NEVER_TRANSPILE) {
+  if ("never" == goog.TRANSPILE) {
     return !1;
   }
   if (!goog.transpiledLanguages_) {
@@ -331,6 +305,34 @@ goog.DEPENDENCIES_ENABLED && (goog.dependencies_ = {loadFlags:{}, nameToPath:{},
 }, goog.getPathFromDeps_ = function(a) {
   return a in goog.dependencies_.nameToPath ? goog.dependencies_.nameToPath[a] : null;
 }, goog.findBasePath_(), goog.global.CLOSURE_NO_DEPS || goog.importScript_(goog.basePath + "deps.js"));
+goog.loadModule = function(a) {
+  var b = goog.moduleLoaderState_;
+  try {
+    goog.moduleLoaderState_ = {moduleName:void 0, declareLegacyNamespace:!1};
+    var c;
+    if (goog.isFunction(a)) {
+      c = a.call(void 0, {});
+    } else {
+      if (goog.isString(a)) {
+        c = goog.loadModuleFromSource_.call(void 0, a);
+      } else {
+        throw Error("Invalid module definition");
+      }
+    }
+    var d = goog.moduleLoaderState_.moduleName;
+    if (!goog.isString(d) || !d) {
+      throw Error('Invalid module name "' + d + '"');
+    }
+    goog.moduleLoaderState_.declareLegacyNamespace ? goog.constructNamespace_(d, c) : goog.SEAL_MODULE_EXPORTS && Object.seal && Object.seal(c);
+    goog.loadedModules_[d] = c;
+  } finally {
+    goog.moduleLoaderState_ = b;
+  }
+};
+goog.loadModuleFromSource_ = function(a) {
+  eval(a);
+  return {};
+};
 goog.normalizePath_ = function(a) {
   a = a.split("/");
   for (var b = 0;b < a.length;) {
@@ -342,10 +344,14 @@ goog.loadFileSync_ = function(a) {
   if (goog.global.CLOSURE_LOAD_FILE_SYNC) {
     return goog.global.CLOSURE_LOAD_FILE_SYNC(a);
   }
-  var b = new goog.global.XMLHttpRequest;
-  b.open("get", a, !1);
-  b.send();
-  return 200 == b.status ? b.responseText : null;
+  try {
+    var b = new goog.global.XMLHttpRequest;
+    b.open("get", a, !1);
+    b.send();
+    return 0 == b.status || 200 == b.status ? b.responseText : null;
+  } catch (c) {
+    return null;
+  }
 };
 goog.retrieveAndExec_ = function(a, b, c) {
   if (!COMPILED) {
@@ -365,7 +371,7 @@ goog.transpile_ = function(a, b) {
   c || (goog.global.$jscomp = c = {});
   var d = c.transpile;
   if (!d) {
-    var e = goog.basePath + "transpile.js", f = goog.loadFileSync_(e);
+    var e = goog.basePath + goog.TRANSPILER, f = goog.loadFileSync_(e);
     f && (eval(f + "\n//# sourceURL=" + e), c = goog.global.$jscomp, d = c.transpile);
   }
   d || (d = c.transpile = function(a, b) {
