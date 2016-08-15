@@ -1,5 +1,14 @@
 # Changelog
 
+## [v1.1.0](https://github.com/seegno/google-libphonenumber/tree/v1.1.0) (2016-08-16)
+[Full Changelog](https://github.com/seegno/google-libphonenumber/compare/v1.0.27...v1.1.0)
+
+**Merged pull requests:**
+
+- Remove jscs in favour of eslint [\#76](https://github.com/seegno/google-libphonenumber/pull/76) ([ruimarinho](https://github.com/ruimarinho))
+- Remove non-essential files from npm package [\#75](https://github.com/seegno/google-libphonenumber/pull/75) ([ruimarinho](https://github.com/ruimarinho))
+- Update libphonenumber@7.5.2 [\#74](https://github.com/seegno/google-libphonenumber/pull/74) ([ruimarinho](https://github.com/ruimarinho))
+
 ## [v1.0.27](https://github.com/seegno/google-libphonenumber/tree/v1.0.27) (2016-07-31)
 [Full Changelog](https://github.com/seegno/google-libphonenumber/compare/v1.0.26...v1.0.27)
 
