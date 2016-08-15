@@ -1,3 +1,11 @@
+.eslintignore
+.eslintrc.yml
+.gitattributes
+.gitignore
+.jscsrc
+.travis.yml
 /bin
+/src
+/test
 bower.json
 build.xml
