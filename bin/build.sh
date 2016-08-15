@@ -30,16 +30,4 @@ else
   ant build
 fi
 
-if [ "${BROWSERIFY:-true}" == "true" ]; then
-  echo "Browserifying..."
-
-  mkdir -p dist/browser
-
-  browserify dist/libphonenumber.js --standalone libphonenumber --no-browser-field --outfile dist/browser/libphonenumber.js
-
-  echo "Minifying..."
-
-  browserify dist/libphonenumber.js --standalone libphonenumber --plugin \[minifyify --no-map\] --outfile dist/browser/libphonenumber.min.js
-fi
-
 echo "Build completed!"
