@@ -26,7 +26,7 @@ describe('Exports', function() {
       'default',
       'libphonenumber',
       'metadata'
-      ]);
+    ]);
   });
 
   it('should export an instance of `PhoneNumberUtil`', function() {
