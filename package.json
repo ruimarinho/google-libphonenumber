@@ -15,7 +15,6 @@
     "url": "https://github.com/seegno/google-libphonenumber.git"
   },
   "main": "dist/libphonenumber.js",
-  "browser": "dist/browser/libphonenumber.js",
   "keywords": [
     "browserify",
     "e164",
@@ -38,7 +37,7 @@
     "changelog": "github_changelog_generator --no-issues --header-label='# Changelog' --future-release=v$npm_config_future_release && sed -i '' -e :a -e '$d;N;2,3ba' -e 'P;D' CHANGELOG.md",
     "lint": "eslint src/index.js test",
     "prepublish": "npm run build",
-    "test": "BROWSERIFY=false npm run build && npm run testonly",
+    "test": "npm run build && npm run testonly",
     "testonly": "mocha $npm_package_options_mocha",
     "update": "bin/update.sh",
     "version": "npm run changelog --future-release=$npm_package_version && npm run build && git add -A CHANGELOG.md dist"
@@ -47,7 +46,6 @@
     "browserify": "^13.1.0",
     "eslint": "^3.3.1",
     "eslint-config-seegno": "^6.0.0",
-    "minifyify": "^7.3.3",
     "mocha": "^3.0.2",
     "should": "^11.1.0"
   },
