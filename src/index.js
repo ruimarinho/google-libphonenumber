@@ -11,4 +11,8 @@ goog.require('i18n.phonenumbers.AsYouTypeFormatter');
  * Export `libphonenumber`.
  */
 
-module.exports = i18n.phonenumbers.default = i18n.phonenumbers.libphonenumber = i18n.phonenumbers;
+Object.defineProperty(exports, '__esModule', { value: true });
+
+exports.default = i18n.phonenumbers;
+
+module.exports = exports['default'];
