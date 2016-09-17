@@ -1,15 +1,16 @@
 {
   "name": "google-libphonenumber",
-  "description": "A browserify-compatible wrapper for Google's libphonenumber.",
+  "description": "The up-to-date and reliable Google's libphonenumber package for node.js.",
   "homepage": "http://seegno.github.io/google-libphonenumber/",
   "author": {
     "name": "Rui Marinho",
     "email": "rui.marinho@seegno.com",
     "url": "http://seegno.com"
   },
-  "main": "./dist/browser/libphonenumber.js",
+  "main": "./dist/libphonenumber.js",
   "license": "MIT",
   "keywords": [
+    "browserify",
     "e164",
     "format",
     "formatting",
@@ -23,14 +24,16 @@
     "wrapper"
   ],
   "ignore": [
+    ".eslintignore",
+    ".eslintrc.yml",
+    ".gitattributes",
     ".gitignore",
-    ".jshintrc",
-    ".npmignore",
+    ".jscsrc",
     ".travis.yml",
-    "bin",
-    "build.xml",
-    "dist/libphonenumber.js",
-    "src",
-    "test"
+    "/bin",
+    "/src",
+    "/test",
+    "bower.json",
+    "build.xml"
   ]
 }
