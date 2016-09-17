@@ -23,8 +23,6 @@ describe('Exports', function() {
       'PhoneNumberFormat',
       'PhoneNumberType',
       'PhoneNumberUtil',
-      'default',
-      'libphonenumber',
       'metadata'
     ]);
   });
