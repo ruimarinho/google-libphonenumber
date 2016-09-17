@@ -1,3 +1,4 @@
+(function(f){if(typeof exports==="object"&&typeof module!=="undefined"){module.exports=f()}else if(typeof define==="function"&&define.amd){define([],f)}else{var g;if(typeof window!=="undefined"){g=window}else if(typeof global!=="undefined"){g=global}else if(typeof self!=="undefined"){g=self}else{g=this}g.libphonenumber = f()}})(function(){var define,module,exports;return (function e(t,n,r){function s(o,u){if(!n[o]){if(!t[o]){var a=typeof require=="function"&&require;if(!u&&a)return a(o,!0);if(i)return i(o,!0);var f=new Error("Cannot find module '"+o+"'");throw f.code="MODULE_NOT_FOUND",f}var l=n[o]={exports:{}};t[o][0].call(l.exports,function(e){var n=t[o][1][e];return s(n?n:e)},l,l.exports,e,t,n,r)}return n[o].exports}var i=typeof require=="function"&&require;for(var o=0;o<r.length;o++)s(r[o]);return s})({1:[function(require,module,exports){
 var COMPILED = !0, goog = goog || {};
 goog.global = this;
 goog.isDef = function(a) {
@@ -4769,5 +4770,10 @@ i18n.phonenumbers.AsYouTypeFormatter.prototype.inputDigitHelper_ = function(a) {
   this.currentFormattingPattern_ = "";
   return this.accruedInput_.toString();
 };
-module.exports = i18n.phonenumbers["default"] = i18n.phonenumbers.libphonenumber = i18n.phonenumbers;
+Object.defineProperty(exports, "__esModule", {value:!0});
+exports["default"] = i18n.phonenumbers;
+module.exports = exports["default"];
 
+
+},{}]},{},[1])(1)
+});

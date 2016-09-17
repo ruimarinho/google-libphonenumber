@@ -1,5 +1,13 @@
 # Changelog
 
+## [v2.0.0](https://github.com/seegno/google-libphonenumber/tree/v2.0.0) (2016-09-17)
+[Full Changelog](https://github.com/seegno/google-libphonenumber/compare/v1.1.2...v2.0.0)
+
+**Merged pull requests:**
+
+- Remove named export [\#82](https://github.com/seegno/google-libphonenumber/pull/82) ([ruimarinho](https://github.com/ruimarinho))
+- Remove specific browser builds [\#78](https://github.com/seegno/google-libphonenumber/pull/78) ([ruimarinho](https://github.com/ruimarinho))
+
 ## [v1.1.2](https://github.com/seegno/google-libphonenumber/tree/v1.1.2) (2016-09-16)
 [Full Changelog](https://github.com/seegno/google-libphonenumber/compare/v1.1.1...v1.1.2)
 
