@@ -22,7 +22,7 @@ if [ "${ONLINE:-true}" == "true" ]; then
     --data-urlencode js_code@src/phonemetadata.pb.js \
     --data-urlencode js_code@src/metadata.js \
     --data-urlencode js_code@src/phonenumber.pb.js \
-    --output dist/libphonenumber.js \
+    --output dist/libphonenumber.original.js \
     http://closure-compiler.appspot.com/compile
 else
   echo "Compiling locally..."
@@ -33,13 +33,8 @@ fi
 if [ "${BROWSERIFY:-true}" == "true" ]; then
   echo "Browserifying..."
 
-  mkdir -p dist/browser
-
-  browserify dist/libphonenumber.js --standalone libphonenumber --no-browser-field --outfile dist/browser/libphonenumber.js
-
-  echo "Minifying..."
-
-  browserify dist/libphonenumber.js --standalone libphonenumber --plugin \[minifyify --no-map\] --outfile dist/browser/libphonenumber.min.js
+  browserify dist/libphonenumber.original.js --standalone libphonenumber --no-browser-field --outfile dist/libphonenumber.js
+  rm dist/libphonenumber.original.js
 fi
 
 echo "Build completed!"
