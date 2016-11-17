@@ -1,5 +1,13 @@
 # Changelog
 
+## [v2.0.5](https://github.com/seegno/google-libphonenumber/tree/v2.0.5) (2016-11-17)
+[Full Changelog](https://github.com/seegno/google-libphonenumber/compare/v2.0.4...v2.0.5)
+
+**Merged pull requests:**
+
+- Update libphonenumber@7.7.4 [\#91](https://github.com/seegno/google-libphonenumber/pull/91) ([ruimarinho](https://github.com/ruimarinho))
+- Add Node.js v7 to .travis.yml [\#87](https://github.com/seegno/google-libphonenumber/pull/87) ([fixe](https://github.com/fixe))
+
 ## [v2.0.4](https://github.com/seegno/google-libphonenumber/tree/v2.0.4) (2016-10-27)
 [Full Changelog](https://github.com/seegno/google-libphonenumber/compare/v2.0.3...v2.0.4)
 
