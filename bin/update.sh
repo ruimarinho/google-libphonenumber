@@ -19,7 +19,7 @@ git checkout -b support/update-libphonenumber-${1//\./\-}
 # Download the requested tagged release.
 echo "Downloading release $1..."
 
-curl -L -s https://github.com/googlei18n/libphonenumber/archive/libphonenumber-$1.tar.gz | tar -xf - --strip-components=4 -C $PWD/../src --include='*javascript/i18n/phonenumbers*'
+curl -L -s https://github.com/googlei18n/libphonenumber/archive/v$1.tar.gz | tar -xf - --strip-components=4 -C $PWD/../src --include='*javascript/i18n/phonenumbers*'
 
 # Apply custom patch to convert strings to proper errors.
 echo "Applying patches..."
