@@ -21,11 +21,6 @@ echo "Downloading release $1..."
 
 curl -L -s https://github.com/googlei18n/libphonenumber/archive/v$1.tar.gz | tar -xf - --strip-components=4 -C $PWD/../src --include='*javascript/i18n/phonenumbers*'
 
-# Apply custom patch to convert strings to proper errors.
-echo "Applying patches..."
-
-curl -L -s https://gist.githubusercontent.com/ruimarinho/d52c0cdde7e4fcd1d589da06b77ed954/raw/866c54a8f1dfc77b5a9e470a313fbed0c1ff6ff1/error.patch | git apply
-
 echo "Done!"
 
 # Add the modified files to git.
