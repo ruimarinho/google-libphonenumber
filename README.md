@@ -61,11 +61,7 @@ formatter.clear();
 * All classes available from `libphonenumber` are exported as-is. No magic methods.
 * Always based on the latest `google-closure` library version available from Google with performance and bug fixes.
 * Relies on a simplified and [well documented update process](https://github.com/seegno/google-libphonenumber/blob/master/bin/update.sh) to keep the underlying `libphonenumber` library always up-to-date.
-* Throws errors instead of strings.
 
-#### Errors
-
-The javascript port of the original `libphonenumber` library throws errors as string, e.g. `throw "Invalid country code"` and, as Guillermo Rauch puts it, [a string is not an error](http://www.devthought.com/2011/12/22/a-string-is-not-an-error/). However, the `libphonenumber` team has refused change this behaviour due to breaking changes, so a patch is applied on top of the source files to make sure that stacktraces are available and useful.
 
 ## Tests
 
