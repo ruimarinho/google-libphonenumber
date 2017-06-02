@@ -4,17 +4,26 @@ goog.global = this;
 goog.isDef = function(a) {
   return void 0 !== a;
 };
+goog.isString = function(a) {
+  return "string" == typeof a;
+};
+goog.isBoolean = function(a) {
+  return "boolean" == typeof a;
+};
+goog.isNumber = function(a) {
+  return "number" == typeof a;
+};
 goog.exportPath_ = function(a, b, c) {
   a = a.split(".");
   c = c || goog.global;
   a[0] in c || !c.execScript || c.execScript("var " + a[0]);
-  for (var d;a.length && (d = a.shift());) {
+  for (var d; a.length && (d = a.shift());) {
     !a.length && goog.isDef(b) ? c[d] = b : c = c[d] && c[d] !== Object.prototype[d] ? c[d] : c[d] = {};
   }
 };
 goog.define = function(a, b) {
   var c = b;
-  COMPILED || (goog.global.CLOSURE_UNCOMPILED_DEFINES && Object.prototype.hasOwnProperty.call(goog.global.CLOSURE_UNCOMPILED_DEFINES, a) ? c = goog.global.CLOSURE_UNCOMPILED_DEFINES[a] : goog.global.CLOSURE_DEFINES && Object.prototype.hasOwnProperty.call(goog.global.CLOSURE_DEFINES, a) && (c = goog.global.CLOSURE_DEFINES[a]));
+  COMPILED || (goog.global.CLOSURE_UNCOMPILED_DEFINES && void 0 === goog.global.CLOSURE_UNCOMPILED_DEFINES.nodeType && Object.prototype.hasOwnProperty.call(goog.global.CLOSURE_UNCOMPILED_DEFINES, a) ? c = goog.global.CLOSURE_UNCOMPILED_DEFINES[a] : goog.global.CLOSURE_DEFINES && void 0 === goog.global.CLOSURE_DEFINES.nodeType && Object.prototype.hasOwnProperty.call(goog.global.CLOSURE_DEFINES, a) && (c = goog.global.CLOSURE_DEFINES[a]));
   goog.exportPath_(a, c);
 };
 goog.DEBUG = !0;
@@ -35,7 +44,7 @@ goog.provide = function(a) {
 goog.constructNamespace_ = function(a, b) {
   if (!COMPILED) {
     delete goog.implicitNamespaces_[a];
-    for (var c = a;(c = c.substring(0, c.lastIndexOf("."))) && !goog.getObjectByName(c);) {
+    for (var c = a; (c = c.substring(0, c.lastIndexOf("."))) && !goog.getObjectByName(c);) {
       goog.implicitNamespaces_[c] = !0;
     }
   }
@@ -98,7 +107,7 @@ COMPILED || (goog.isProvided_ = function(a) {
   return a in goog.loadedModules_ || !goog.implicitNamespaces_[a] && goog.isDefAndNotNull(goog.getObjectByName(a));
 }, goog.implicitNamespaces_ = {"goog.module":!0});
 goog.getObjectByName = function(a, b) {
-  for (var c = a.split("."), d = b || goog.global, e;e = c.shift();) {
+  for (var c = a.split("."), d = b || goog.global, e; e = c.shift();) {
     if (goog.isDefAndNotNull(d[e])) {
       d = d[e];
     } else {
@@ -119,10 +128,10 @@ goog.addDependency = function(a, b, c, d) {
     a = a.replace(/\\/g, "/");
     var f = goog.dependencies_;
     d && "boolean" !== typeof d || (d = d ? {module:"goog"} : {});
-    for (var g = 0;e = b[g];g++) {
+    for (var g = 0; e = b[g]; g++) {
       f.nameToPath[e] = a, f.loadFlags[a] = d;
     }
-    for (d = 0;b = c[d];d++) {
+    for (d = 0; b = c[d]; d++) {
       a in f.requires || (f.requires[a] = {}), f.requires[a][b] = !0;
     }
   }
@@ -178,11 +187,14 @@ goog.DEPENDENCIES_ENABLED && (goog.dependencies_ = {loadFlags:{}, nameToPath:{},
   var a = goog.global.document;
   return null != a && "write" in a;
 }, goog.findBasePath_ = function() {
-  if (goog.isDef(goog.global.CLOSURE_BASE_PATH)) {
+  if (goog.isDef(goog.global.CLOSURE_BASE_PATH) && goog.isString(goog.global.CLOSURE_BASE_PATH)) {
     goog.basePath = goog.global.CLOSURE_BASE_PATH;
   } else {
     if (goog.inHtmlDocument_()) {
-      for (var a = goog.global.document.getElementsByTagName("SCRIPT"), b = a.length - 1;0 <= b;--b) {
+      var a = goog.global.document;
+      var b = a.currentScript;
+      a = b ? [b] : a.getElementsByTagName("SCRIPT");
+      for (b = a.length - 1; 0 <= b; --b) {
         var c = a[b].src, d = c.lastIndexOf("?"), d = -1 == d ? c.length : d;
         if ("base.js" == c.substr(d - 7, 7)) {
           goog.basePath = c.substr(0, d - 7);
@@ -202,7 +214,7 @@ goog.DEPENDENCIES_ENABLED && (goog.dependencies_ = {loadFlags:{}, nameToPath:{},
   if (0 < a) {
     var b = goog.queuedModules_;
     goog.queuedModules_ = [];
-    for (var c = 0;c < a;c++) {
+    for (var c = 0; c < a; c++) {
       goog.maybeProcessDeferredPath_(b[c]);
     }
   }
@@ -298,16 +310,15 @@ goog.DEPENDENCIES_ENABLED && (goog.dependencies_ = {loadFlags:{}, nameToPath:{},
   }
   var c = [], d = {}, e = goog.dependencies_;
   b(a);
-  for (a = 0;a < c.length;a++) {
-    var f = c[a];
-    goog.dependencies_.written[f] = !0;
+  for (var f = 0; f < c.length; f++) {
+    a = c[f], goog.dependencies_.written[a] = !0;
   }
   var g = goog.moduleLoaderState_;
   goog.moduleLoaderState_ = null;
-  for (a = 0;a < c.length;a++) {
-    if (f = c[a]) {
-      var h = e.loadFlags[f] || {}, k = goog.needsTranspile_(h.lang || "es3");
-      "goog" == h.module || k ? goog.importProcessedScript_(goog.basePath + f, "goog" == h.module, k) : goog.importScript_(goog.basePath + f);
+  for (f = 0; f < c.length; f++) {
+    if (a = c[f]) {
+      var h = e.loadFlags[a] || {}, k = goog.needsTranspile_(h.lang || "es3");
+      "goog" == h.module || k ? goog.importProcessedScript_(goog.basePath + a, "goog" == h.module, k) : goog.importScript_(goog.basePath + a);
     } else {
       throw goog.moduleLoaderState_ = g, Error("Undefined script input");
     }
@@ -319,9 +330,8 @@ goog.DEPENDENCIES_ENABLED && (goog.dependencies_ = {loadFlags:{}, nameToPath:{},
 goog.hasBadLetScoping = null;
 goog.useSafari10Workaround = function() {
   if (null == goog.hasBadLetScoping) {
-    var a;
     try {
-      a = !eval('"use strict";let x = 1; function f() { return typeof x; };f() == "number";');
+      var a = !eval('"use strict";let x = 1; function f() { return typeof x; };f() == "number";');
     } catch (b) {
       a = !1;
     }
@@ -336,9 +346,8 @@ goog.loadModule = function(a) {
   var b = goog.moduleLoaderState_;
   try {
     goog.moduleLoaderState_ = {moduleName:void 0, declareLegacyNamespace:!1};
-    var c;
     if (goog.isFunction(a)) {
-      c = a.call(void 0, {});
+      var c = a.call(void 0, {});
     } else {
       if (goog.isString(a)) {
         goog.useSafari10Workaround() && (a = goog.workaroundSafari10EvalBug(a)), c = goog.loadModuleFromSource_.call(void 0, a);
@@ -362,7 +371,7 @@ goog.loadModuleFromSource_ = function(a) {
 };
 goog.normalizePath_ = function(a) {
   a = a.split("/");
-  for (var b = 0;b < a.length;) {
+  for (var b = 0; b < a.length;) {
     "." == a[b] ? a.splice(b, 1) : b && ".." == a[b] && a[b - 1] && ".." != a[b - 1] ? a.splice(--b, 2) : b++;
   }
   return a.join("/");
@@ -460,15 +469,6 @@ goog.isArrayLike = function(a) {
 };
 goog.isDateLike = function(a) {
   return goog.isObject(a) && "function" == typeof a.getFullYear;
-};
-goog.isString = function(a) {
-  return "string" == typeof a;
-};
-goog.isBoolean = function(a) {
-  return "boolean" == typeof a;
-};
-goog.isNumber = function(a) {
-  return "number" == typeof a;
 };
 goog.isFunction = function(a) {
   return "function" == goog.typeOf(a);
@@ -587,7 +587,7 @@ goog.getCssName = function(a, b) {
     return goog.cssNameMapping_[a] || a;
   }, d = function(a) {
     a = a.split("-");
-    for (var b = [], d = 0;d < a.length;d++) {
+    for (var b = [], d = 0; d < a.length; d++) {
       b.push(c(a[d]));
     }
     return b.join("-");
@@ -624,7 +624,7 @@ goog.inherits = function(a, b) {
   a.prototype = new c;
   a.prototype.constructor = a;
   a.base = function(a, c, f) {
-    for (var d = Array(arguments.length - 2), e = 2;e < arguments.length;e++) {
+    for (var d = Array(arguments.length - 2), e = 2; e < arguments.length; e++) {
       d[e - 2] = arguments[e];
     }
     return b.prototype[c].apply(a, d);
@@ -636,16 +636,16 @@ goog.base = function(a, b, c) {
     throw Error("arguments.caller not defined.  goog.base() cannot be used with strict mode code. See http://www.ecma-international.org/ecma-262/5.1/#sec-C");
   }
   if (d.superClass_) {
-    for (var e = Array(arguments.length - 1), f = 1;f < arguments.length;f++) {
+    for (var e = Array(arguments.length - 1), f = 1; f < arguments.length; f++) {
       e[f - 1] = arguments[f];
     }
     return d.superClass_.constructor.apply(a, e);
   }
   e = Array(arguments.length - 2);
-  for (f = 2;f < arguments.length;f++) {
+  for (f = 2; f < arguments.length; f++) {
     e[f - 2] = arguments[f];
   }
-  for (var f = !1, g = a.constructor;g;g = g.superClass_ && g.superClass_.constructor) {
+  for (var f = !1, g = a.constructor; g; g = g.superClass_ && g.superClass_.constructor) {
     if (g.prototype[b] === d) {
       f = !0;
     } else {
@@ -700,7 +700,7 @@ goog.defineClass.applyProperties_ = function(a, b) {
   for (var c in b) {
     Object.prototype.hasOwnProperty.call(b, c) && (a[c] = b[c]);
   }
-  for (var d = 0;d < goog.defineClass.OBJECT_PROTOTYPE_FIELDS_.length;d++) {
+  for (var d = 0; d < goog.defineClass.OBJECT_PROTOTYPE_FIELDS_.length; d++) {
     c = goog.defineClass.OBJECT_PROTOTYPE_FIELDS_[d], Object.prototype.hasOwnProperty.call(b, c) && (a[c] = b[c]);
   }
 };
@@ -749,7 +749,7 @@ goog.string.StringBuffer.prototype.set = function(a) {
 goog.string.StringBuffer.prototype.append = function(a, b, c) {
   this.buffer_ += String(a);
   if (null != b) {
-    for (var d = 1;d < arguments.length;d++) {
+    for (var d = 1; d < arguments.length; d++) {
       this.buffer_ += arguments[d];
     }
   }
@@ -799,7 +799,7 @@ goog.string.caseInsensitiveEquals = function(a, b) {
   return a.toLowerCase() == b.toLowerCase();
 };
 goog.string.subs = function(a, b) {
-  for (var c = a.split("%s"), d = "", e = Array.prototype.slice.call(arguments, 1);e.length && 1 < c.length;) {
+  for (var c = a.split("%s"), d = "", e = Array.prototype.slice.call(arguments, 1); e.length && 1 < c.length;) {
     d += c.shift() + e.shift();
   }
   return d + c.join("%s");
@@ -876,7 +876,7 @@ goog.string.numberAwareCompare_ = function(a, b, c) {
   if (!b) {
     return 1;
   }
-  for (var d = a.toLowerCase().match(c), e = b.toLowerCase().match(c), f = Math.min(d.length, e.length), g = 0;g < f;g++) {
+  for (var d = a.toLowerCase().match(c), e = b.toLowerCase().match(c), f = Math.min(d.length, e.length), g = 0; g < f; g++) {
     c = d[g];
     var h = e[g];
     if (c != h) {
@@ -933,8 +933,8 @@ goog.string.unescapeEntitiesWithDocument = function(a, b) {
   return goog.string.contains(a, "&") ? goog.string.unescapeEntitiesUsingDom_(a, b) : a;
 };
 goog.string.unescapeEntitiesUsingDom_ = function(a, b) {
-  var c = {"&amp;":"&", "&lt;":"<", "&gt;":">", "&quot;":'"'}, d;
-  d = b ? b.createElement("div") : goog.global.document.createElement("div");
+  var c = {"&amp;":"&", "&lt;":"<", "&gt;":">", "&quot;":'"'};
+  var d = b ? b.createElement("div") : goog.global.document.createElement("div");
   return a.replace(goog.string.HTML_ENTITY_PATTERN_, function(a, b) {
     var e = c[a];
     if (e) {
@@ -978,7 +978,7 @@ goog.string.preserveSpaces = function(a) {
   return a.replace(/(^|[\n ]) /g, "$1" + goog.string.Unicode.NBSP);
 };
 goog.string.stripQuotes = function(a, b) {
-  for (var c = b.length, d = 0;d < c;d++) {
+  for (var c = b.length, d = 0; d < c; d++) {
     var e = 1 == c ? b : b.charAt(d);
     if (a.charAt(0) == e && a.charAt(a.length - 1) == e) {
       return a.substring(1, a.length - 1);
@@ -1008,7 +1008,7 @@ goog.string.specialEscapeChars_ = {"\x00":"\\0", "\b":"\\b", "\f":"\\f", "\n":"\
 goog.string.jsEscapeCache_ = {"'":"\\'"};
 goog.string.quote = function(a) {
   a = String(a);
-  for (var b = ['"'], c = 0;c < a.length;c++) {
+  for (var b = ['"'], c = 0; c < a.length; c++) {
     var d = a.charAt(c), e = d.charCodeAt(0);
     b[c + 1] = goog.string.specialEscapeChars_[d] || (31 < e && 127 > e ? d : goog.string.escapeChar(d));
   }
@@ -1016,7 +1016,7 @@ goog.string.quote = function(a) {
   return b.join("");
 };
 goog.string.escapeString = function(a) {
-  for (var b = [], c = 0;c < a.length;c++) {
+  for (var b = [], c = 0; c < a.length; c++) {
     b[c] = goog.string.escapeChar(a.charAt(c));
   }
   return b.join("");
@@ -1028,20 +1028,20 @@ goog.string.escapeChar = function(a) {
   if (a in goog.string.specialEscapeChars_) {
     return goog.string.jsEscapeCache_[a] = goog.string.specialEscapeChars_[a];
   }
-  var b, c = a.charCodeAt(0);
-  if (31 < c && 127 > c) {
-    b = a;
+  var b = a.charCodeAt(0);
+  if (31 < b && 127 > b) {
+    var c = a;
   } else {
-    if (256 > c) {
-      if (b = "\\x", 16 > c || 256 < c) {
-        b += "0";
+    if (256 > b) {
+      if (c = "\\x", 16 > b || 256 < b) {
+        c += "0";
       }
     } else {
-      b = "\\u", 4096 > c && (b += "0");
+      c = "\\u", 4096 > b && (c += "0");
     }
-    b += c.toString(16).toUpperCase();
+    c += b.toString(16).toUpperCase();
   }
-  return goog.string.jsEscapeCache_[a] = b;
+  return goog.string.jsEscapeCache_[a] = c;
 };
 goog.string.contains = function(a, b) {
   return -1 != a.indexOf(b);
@@ -1092,7 +1092,7 @@ goog.string.getRandomString = function() {
   return Math.floor(2147483648 * Math.random()).toString(36) + Math.abs(Math.floor(2147483648 * Math.random()) ^ goog.now()).toString(36);
 };
 goog.string.compareVersions = function(a, b) {
-  for (var c = 0, d = goog.string.trim(String(a)).split("."), e = goog.string.trim(String(b)).split("."), f = Math.max(d.length, e.length), g = 0;0 == c && g < f;g++) {
+  for (var c = 0, d = goog.string.trim(String(a)).split("."), e = goog.string.trim(String(b)).split("."), f = Math.max(d.length, e.length), g = 0; 0 == c && g < f; g++) {
     var h = d[g] || "", k = e[g] || "";
     do {
       h = /(\d*)(\D*)(.*)/.exec(h) || ["", "", "", ""];
@@ -1109,7 +1109,7 @@ goog.string.compareElements_ = function(a, b) {
   return a < b ? -1 : a > b ? 1 : 0;
 };
 goog.string.hashCode = function(a) {
-  for (var b = 0, c = 0;c < a.length;++c) {
+  for (var b = 0, c = 0; c < a.length; ++c) {
     b = 31 * b + a.charCodeAt(c) >>> 0;
   }
   return b;
@@ -1151,7 +1151,7 @@ goog.string.parseInt = function(a) {
 };
 goog.string.splitLimit = function(a, b, c) {
   a = a.split(b);
-  for (var d = [];0 < c && a.length;) {
+  for (var d = []; 0 < c && a.length;) {
     d.push(a.shift()), c--;
   }
   a.length && d.push(a.join(b));
@@ -1163,7 +1163,7 @@ goog.string.lastComponent = function(a, b) {
   } else {
     return a;
   }
-  for (var c = -1, d = 0;d < b.length;d++) {
+  for (var c = -1, d = 0; d < b.length; d++) {
     if ("" != b[d]) {
       var e = a.lastIndexOf(b[d]);
       e > c && (c = e);
@@ -1179,15 +1179,15 @@ goog.string.editDistance = function(a, b) {
   if (!a.length || !b.length) {
     return Math.max(a.length, b.length);
   }
-  for (var e = 0;e < b.length + 1;e++) {
+  for (var e = 0; e < b.length + 1; e++) {
     c[e] = e;
   }
-  for (e = 0;e < a.length;e++) {
+  for (e = 0; e < a.length; e++) {
     d[0] = e + 1;
-    for (var f = 0;f < b.length;f++) {
+    for (var f = 0; f < b.length; f++) {
       d[f + 1] = Math.min(d[f] + 1, c[f + 1] + 1, c[f] + Number(a[e] != b[f]));
     }
-    for (f = 0;f < c.length;f++) {
+    for (f = 0; f < c.length; f++) {
       c[f] = d[f];
     }
   }
@@ -1210,7 +1210,8 @@ goog.asserts.errorHandler_ = goog.asserts.DEFAULT_ERROR_HANDLER;
 goog.asserts.doAssertFailure_ = function(a, b, c, d) {
   var e = "Assertion failed";
   if (c) {
-    var e = e + (": " + c), f = d;
+    e += ": " + c;
+    var f = d;
   } else {
     a && (e += ": " + a, f = b);
   }
@@ -1282,7 +1283,7 @@ goog.array.indexOf = goog.NATIVE_ARRAY_PROTOTYPES && (goog.array.ASSUME_NATIVE_F
   if (goog.isString(a)) {
     return goog.isString(b) && 1 == b.length ? a.indexOf(b, c) : -1;
   }
-  for (;c < a.length;c++) {
+  for (; c < a.length; c++) {
     if (c in a && a[c] === b) {
       return c;
     }
@@ -1298,7 +1299,7 @@ goog.array.lastIndexOf = goog.NATIVE_ARRAY_PROTOTYPES && (goog.array.ASSUME_NATI
   if (goog.isString(a)) {
     return goog.isString(b) && 1 == b.length ? a.lastIndexOf(b, c) : -1;
   }
-  for (;0 <= c;c--) {
+  for (; 0 <= c; c--) {
     if (c in a && a[c] === b) {
       return c;
     }
@@ -1309,12 +1310,12 @@ goog.array.forEach = goog.NATIVE_ARRAY_PROTOTYPES && (goog.array.ASSUME_NATIVE_F
   goog.asserts.assert(null != a.length);
   Array.prototype.forEach.call(a, b, c);
 } : function(a, b, c) {
-  for (var d = a.length, e = goog.isString(a) ? a.split("") : a, f = 0;f < d;f++) {
+  for (var d = a.length, e = goog.isString(a) ? a.split("") : a, f = 0; f < d; f++) {
     f in e && b.call(c, e[f], f, a);
   }
 };
 goog.array.forEachRight = function(a, b, c) {
-  for (var d = a.length, e = goog.isString(a) ? a.split("") : a, d = d - 1;0 <= d;--d) {
+  for (var d = a.length, e = goog.isString(a) ? a.split("") : a, d = d - 1; 0 <= d; --d) {
     d in e && b.call(c, e[d], d, a);
   }
 };
@@ -1322,7 +1323,7 @@ goog.array.filter = goog.NATIVE_ARRAY_PROTOTYPES && (goog.array.ASSUME_NATIVE_FU
   goog.asserts.assert(null != a.length);
   return Array.prototype.filter.call(a, b, c);
 } : function(a, b, c) {
-  for (var d = a.length, e = [], f = 0, g = goog.isString(a) ? a.split("") : a, h = 0;h < d;h++) {
+  for (var d = a.length, e = [], f = 0, g = goog.isString(a) ? a.split("") : a, h = 0; h < d; h++) {
     if (h in g) {
       var k = g[h];
       b.call(c, k, h, a) && (e[f++] = k);
@@ -1334,7 +1335,7 @@ goog.array.map = goog.NATIVE_ARRAY_PROTOTYPES && (goog.array.ASSUME_NATIVE_FUNCT
   goog.asserts.assert(null != a.length);
   return Array.prototype.map.call(a, b, c);
 } : function(a, b, c) {
-  for (var d = a.length, e = Array(d), f = goog.isString(a) ? a.split("") : a, g = 0;g < d;g++) {
+  for (var d = a.length, e = Array(d), f = goog.isString(a) ? a.split("") : a, g = 0; g < d; g++) {
     g in f && (e[g] = b.call(c, f[g], g, a));
   }
   return e;
@@ -1366,7 +1367,7 @@ goog.array.some = goog.NATIVE_ARRAY_PROTOTYPES && (goog.array.ASSUME_NATIVE_FUNC
   goog.asserts.assert(null != a.length);
   return Array.prototype.some.call(a, b, c);
 } : function(a, b, c) {
-  for (var d = a.length, e = goog.isString(a) ? a.split("") : a, f = 0;f < d;f++) {
+  for (var d = a.length, e = goog.isString(a) ? a.split("") : a, f = 0; f < d; f++) {
     if (f in e && b.call(c, e[f], f, a)) {
       return !0;
     }
@@ -1377,7 +1378,7 @@ goog.array.every = goog.NATIVE_ARRAY_PROTOTYPES && (goog.array.ASSUME_NATIVE_FUN
   goog.asserts.assert(null != a.length);
   return Array.prototype.every.call(a, b, c);
 } : function(a, b, c) {
-  for (var d = a.length, e = goog.isString(a) ? a.split("") : a, f = 0;f < d;f++) {
+  for (var d = a.length, e = goog.isString(a) ? a.split("") : a, f = 0; f < d; f++) {
     if (f in e && !b.call(c, e[f], f, a)) {
       return !1;
     }
@@ -1396,7 +1397,7 @@ goog.array.find = function(a, b, c) {
   return 0 > b ? null : goog.isString(a) ? a.charAt(b) : a[b];
 };
 goog.array.findIndex = function(a, b, c) {
-  for (var d = a.length, e = goog.isString(a) ? a.split("") : a, f = 0;f < d;f++) {
+  for (var d = a.length, e = goog.isString(a) ? a.split("") : a, f = 0; f < d; f++) {
     if (f in e && b.call(c, e[f], f, a)) {
       return f;
     }
@@ -1408,7 +1409,7 @@ goog.array.findRight = function(a, b, c) {
   return 0 > b ? null : goog.isString(a) ? a.charAt(b) : a[b];
 };
 goog.array.findIndexRight = function(a, b, c) {
-  for (var d = a.length, e = goog.isString(a) ? a.split("") : a, d = d - 1;0 <= d;d--) {
+  for (var d = a.length, e = goog.isString(a) ? a.split("") : a, d = d - 1; 0 <= d; d--) {
     if (d in e && b.call(c, e[d], d, a)) {
       return d;
     }
@@ -1423,7 +1424,7 @@ goog.array.isEmpty = function(a) {
 };
 goog.array.clear = function(a) {
   if (!goog.isArray(a)) {
-    for (var b = a.length - 1;0 <= b;b--) {
+    for (var b = a.length - 1; 0 <= b; b--) {
       delete a[b];
     }
   }
@@ -1475,7 +1476,7 @@ goog.array.join = function(a) {
 goog.array.toArray = function(a) {
   var b = a.length;
   if (0 < b) {
-    for (var c = Array(b), d = 0;d < b;d++) {
+    for (var c = Array(b), d = 0; d < b; d++) {
       c[d] = a[d];
     }
     return c;
@@ -1484,12 +1485,12 @@ goog.array.toArray = function(a) {
 };
 goog.array.clone = goog.array.toArray;
 goog.array.extend = function(a, b) {
-  for (var c = 1;c < arguments.length;c++) {
+  for (var c = 1; c < arguments.length; c++) {
     var d = arguments[c];
     if (goog.isArrayLike(d)) {
       var e = a.length || 0, f = d.length || 0;
       a.length = e + f;
-      for (var g = 0;g < f;g++) {
+      for (var g = 0; g < f; g++) {
         a[e + g] = d[g];
       }
     } else {
@@ -1511,7 +1512,7 @@ goog.array.removeDuplicates = function(a, b, c) {
     return goog.isObject(a) ? "o" + goog.getUid(a) : (typeof a).charAt(0) + a;
   };
   c = c || d;
-  for (var d = {}, e = 0, f = 0;f < a.length;) {
+  for (var d = {}, e = 0, f = 0; f < a.length;) {
     var g = a[f++], h = c(g);
     Object.prototype.hasOwnProperty.call(d, h) || (d[h] = !0, b[e++] = g);
   }
@@ -1524,9 +1525,9 @@ goog.array.binarySelect = function(a, b, c) {
   return goog.array.binarySearch_(a, b, !0, void 0, c);
 };
 goog.array.binarySearch_ = function(a, b, c, d, e) {
-  for (var f = 0, g = a.length, h;f < g;) {
-    var k = f + g >> 1, l;
-    l = c ? b.call(e, a[k], k, a) : b(d, a[k]);
+  for (var f = 0, g = a.length, h; f < g;) {
+    var k = f + g >> 1;
+    var l = c ? b.call(e, a[k], k, a) : b(d, a[k]);
     0 < l ? f = k + 1 : (g = k, h = !l);
   }
   return h ? f : ~f;
@@ -1535,14 +1536,14 @@ goog.array.sort = function(a, b) {
   a.sort(b || goog.array.defaultCompare);
 };
 goog.array.stableSort = function(a, b) {
-  for (var c = Array(a.length), d = 0;d < a.length;d++) {
+  for (var c = Array(a.length), d = 0; d < a.length; d++) {
     c[d] = {index:d, value:a[d]};
   }
   var e = b || goog.array.defaultCompare;
   goog.array.sort(c, function(a, b) {
     return e(a.value, b.value) || a.index - b.index;
   });
-  for (d = 0;d < a.length;d++) {
+  for (d = 0; d < a.length; d++) {
     a[d] = c[d].value;
   }
 };
@@ -1559,7 +1560,7 @@ goog.array.sortObjectsByKey = function(a, b, c) {
 };
 goog.array.isSorted = function(a, b, c) {
   b = b || goog.array.defaultCompare;
-  for (var d = 1;d < a.length;d++) {
+  for (var d = 1; d < a.length; d++) {
     var e = b(a[d - 1], a[d]);
     if (0 < e || 0 == e && c) {
       return !1;
@@ -1573,7 +1574,7 @@ goog.array.equals = function(a, b, c) {
   }
   var d = a.length;
   c = c || goog.array.defaultCompareEquality;
-  for (var e = 0;e < d;e++) {
+  for (var e = 0; e < d; e++) {
     if (!c(a[e], b[e])) {
       return !1;
     }
@@ -1582,7 +1583,7 @@ goog.array.equals = function(a, b, c) {
 };
 goog.array.compare3 = function(a, b, c) {
   c = c || goog.array.defaultCompare;
-  for (var d = Math.min(a.length, b.length), e = 0;e < d;e++) {
+  for (var d = Math.min(a.length, b.length), e = 0; e < d; e++) {
     var f = c(a[e], b[e]);
     if (0 != f) {
       return f;
@@ -1608,7 +1609,7 @@ goog.array.binaryRemove = function(a, b, c) {
   return 0 <= b ? goog.array.removeAt(a, b) : !1;
 };
 goog.array.bucket = function(a, b, c) {
-  for (var d = {}, e = 0;e < a.length;e++) {
+  for (var d = {}, e = 0; e < a.length; e++) {
     var f = a[e], g = b.call(c, f, e, a);
     goog.isDef(g) && (d[g] || (d[g] = [])).push(f);
   }
@@ -1629,28 +1630,28 @@ goog.array.range = function(a, b, c) {
     return [];
   }
   if (0 < c) {
-    for (a = e;a < f;a += c) {
+    for (a = e; a < f; a += c) {
       d.push(a);
     }
   } else {
-    for (a = e;a > f;a += c) {
+    for (a = e; a > f; a += c) {
       d.push(a);
     }
   }
   return d;
 };
 goog.array.repeat = function(a, b) {
-  for (var c = [], d = 0;d < b;d++) {
+  for (var c = [], d = 0; d < b; d++) {
     c[d] = a;
   }
   return c;
 };
 goog.array.flatten = function(a) {
-  for (var b = [], c = 0;c < arguments.length;c++) {
+  for (var b = [], c = 0; c < arguments.length; c++) {
     var d = arguments[c];
     if (goog.isArray(d)) {
-      for (var e = 0;e < d.length;e += 8192) {
-        for (var f = goog.array.slice(d, e, e + 8192), f = goog.array.flatten.apply(null, f), g = 0;g < f.length;g++) {
+      for (var e = 0; e < d.length; e += 8192) {
+        for (var f = goog.array.slice(d, e, e + 8192), f = goog.array.flatten.apply(null, f), g = 0; g < f.length; g++) {
           b.push(f[g]);
         }
       }
@@ -1675,11 +1676,11 @@ goog.array.zip = function(a) {
   if (!arguments.length) {
     return [];
   }
-  for (var b = [], c = arguments[0].length, d = 1;d < arguments.length;d++) {
+  for (var b = [], c = arguments[0].length, d = 1; d < arguments.length; d++) {
     arguments[d].length < c && (c = arguments[d].length);
   }
-  for (d = 0;d < c;d++) {
-    for (var e = [], f = 0;f < arguments.length;f++) {
+  for (d = 0; d < c; d++) {
+    for (var e = [], f = 0; f < arguments.length; f++) {
       e.push(arguments[f][d]);
     }
     b.push(e);
@@ -1687,7 +1688,7 @@ goog.array.zip = function(a) {
   return b;
 };
 goog.array.shuffle = function(a, b) {
-  for (var c = b || Math.random, d = a.length - 1;0 < d;d--) {
+  for (var c = b || Math.random, d = a.length - 1; 0 < d; d--) {
     var e = Math.floor(c() * (d + 1)), f = a[d];
     a[d] = a[e];
     a[e] = f;
@@ -1777,7 +1778,7 @@ goog.object.getKeys = function(a) {
   return b;
 };
 goog.object.getValueByKeys = function(a, b) {
-  for (var c = goog.isArrayLike(b), d = c ? b : arguments, c = c ? 0 : 1;c < d.length && (a = a[d[c]], goog.isDef(a));c++) {
+  for (var c = goog.isArrayLike(b), d = c ? b : arguments, c = c ? 0 : 1; c < d.length && (a = a[d[c]], goog.isDef(a)); c++) {
   }
   return a;
 };
@@ -1883,12 +1884,12 @@ goog.object.transpose = function(a) {
 };
 goog.object.PROTOTYPE_FIELDS_ = "constructor hasOwnProperty isPrototypeOf propertyIsEnumerable toLocaleString toString valueOf".split(" ");
 goog.object.extend = function(a, b) {
-  for (var c, d, e = 1;e < arguments.length;e++) {
+  for (var c, d, e = 1; e < arguments.length; e++) {
     d = arguments[e];
     for (c in d) {
       a[c] = d[c];
     }
-    for (var f = 0;f < goog.object.PROTOTYPE_FIELDS_.length;f++) {
+    for (var f = 0; f < goog.object.PROTOTYPE_FIELDS_.length; f++) {
       c = goog.object.PROTOTYPE_FIELDS_[f], Object.prototype.hasOwnProperty.call(d, c) && (a[c] = d[c]);
     }
   }
@@ -1901,7 +1902,7 @@ goog.object.create = function(a) {
   if (b % 2) {
     throw Error("Uneven number of arguments");
   }
-  for (var c = {}, d = 0;d < b;d += 2) {
+  for (var c = {}, d = 0; d < b; d += 2) {
     c[arguments[d]] = arguments[d + 1];
   }
   return c;
@@ -1911,7 +1912,7 @@ goog.object.createSet = function(a) {
   if (1 == b && goog.isArray(arguments[0])) {
     return goog.object.createSet.apply(null, arguments[0]);
   }
-  for (var c = {}, d = 0;d < b;d++) {
+  for (var c = {}, d = 0; d < b; d++) {
     c[arguments[d]] = !0;
   }
   return c;
@@ -1924,20 +1925,20 @@ goog.object.createImmutableView = function(a) {
 goog.object.isImmutableView = function(a) {
   return !!Object.isFrozen && Object.isFrozen(a);
 };
-goog.object.getAllPropertyNames = function(a, b) {
+goog.object.getAllPropertyNames = function(a, b, c) {
   if (!a) {
     return [];
   }
   if (!Object.getOwnPropertyNames || !Object.getPrototypeOf) {
     return goog.object.getKeys(a);
   }
-  for (var c = {}, d = a;d && (d !== Object.prototype || b);) {
-    for (var e = Object.getOwnPropertyNames(d), f = 0;f < e.length;f++) {
-      c[e[f]] = !0;
+  for (var d = {}; a && (a !== Object.prototype || b) && (a !== Function.prototype || c);) {
+    for (var e = Object.getOwnPropertyNames(a), f = 0; f < e.length; f++) {
+      d[e[f]] = !0;
     }
-    d = Object.getPrototypeOf(d);
+    a = Object.getPrototypeOf(a);
   }
-  return goog.object.getKeys(c);
+  return goog.object.getKeys(d);
 };
 goog.proto2 = {};
 goog.proto2.FieldDescriptor = function(a, b, c) {
@@ -2025,7 +2026,7 @@ goog.proto2.Descriptor = function(a, b, c) {
   this.fullName_ = b.fullName || null;
   this.containingType_ = b.containingType;
   this.fields_ = {};
-  for (a = 0;a < c.length;a++) {
+  for (a = 0; a < c.length; a++) {
     b = c[a], this.fields_[b.getTag()] = b;
   }
 };
@@ -2122,7 +2123,7 @@ goog.proto2.Message.prototype.equals = function(a) {
   if (!a || this.constructor != a.constructor) {
     return !1;
   }
-  for (var b = this.getDescriptor().getFields(), c = 0;c < b.length;c++) {
+  for (var b = this.getDescriptor().getFields(), c = 0; c < b.length; c++) {
     var d = b[c], e = d.getTag();
     if (this.has$Value(e) != a.has$Value(e)) {
       return !1;
@@ -2133,7 +2134,7 @@ goog.proto2.Message.prototype.equals = function(a) {
         if (g.length != e.length) {
           return !1;
         }
-        for (d = 0;d < g.length;d++) {
+        for (d = 0; d < g.length; d++) {
           var h = g[d], k = e[d];
           if (f ? !h.equals(k) : h != k) {
             return !1;
@@ -2154,13 +2155,13 @@ goog.proto2.Message.prototype.copyFrom = function(a) {
 };
 goog.proto2.Message.prototype.mergeFrom = function(a) {
   goog.asserts.assert(this.constructor == a.constructor, "The source message must have the same type.");
-  for (var b = this.getDescriptor().getFields(), c = 0;c < b.length;c++) {
+  for (var b = this.getDescriptor().getFields(), c = 0; c < b.length; c++) {
     var d = b[c], e = d.getTag();
     if (a.has$Value(e)) {
       this.deserializedFields_ && delete this.deserializedFields_[d.getTag()];
       var f = d.isCompositeType();
       if (d.isRepeated()) {
-        for (var d = a.array$Values(e), g = 0;g < d.length;g++) {
+        for (var d = a.array$Values(e), g = 0; g < d.length; g++) {
           this.add$Value(e, f ? d[g].clone() : d[g]);
         }
       } else {
@@ -2175,12 +2176,12 @@ goog.proto2.Message.prototype.clone = function() {
   return a;
 };
 goog.proto2.Message.prototype.initDefaults = function(a) {
-  for (var b = this.getDescriptor().getFields(), c = 0;c < b.length;c++) {
+  for (var b = this.getDescriptor().getFields(), c = 0; c < b.length; c++) {
     var d = b[c], e = d.getTag(), f = d.isCompositeType();
     this.has$Value(e) || d.isRepeated() || (f ? this.values_[e] = new (d.getNativeType()) : a && (this.values_[e] = d.getDefaultValue()));
     if (f) {
       if (d.isRepeated()) {
-        for (d = this.array$Values(e), e = 0;e < d.length;e++) {
+        for (d = this.array$Values(e), e = 0; e < d.length; e++) {
           d[e].initDefaults(a);
         }
       } else {
@@ -2303,13 +2304,13 @@ goog.proto2.PbLiteSerializer.prototype.setZeroIndexed = function(a) {
   this.zeroIndexing_ = a;
 };
 goog.proto2.PbLiteSerializer.prototype.serialize = function(a) {
-  for (var b = a.getDescriptor().getFields(), c = [], d = this.zeroIndexing_, e = 0;e < b.length;e++) {
+  for (var b = a.getDescriptor().getFields(), c = [], d = this.zeroIndexing_, e = 0; e < b.length; e++) {
     var f = b[e];
     if (a.has(f)) {
       var g = f.getTag(), g = d ? g - 1 : g;
       if (f.isRepeated()) {
         c[g] = [];
-        for (var h = 0;h < a.countOf(f);h++) {
+        for (var h = 0; h < a.countOf(f); h++) {
           c[g][h] = this.getSerializedValue(f, a.get(f, h));
         }
       } else {
@@ -2329,7 +2330,7 @@ goog.proto2.PbLiteSerializer.prototype.deserializeField = function(a, b, c) {
   if (b.isRepeated()) {
     a = [];
     goog.asserts.assert(goog.isArray(c), "Value must be array: %s", c);
-    for (var d = 0;d < c.length;d++) {
+    for (var d = 0; d < c.length; d++) {
       a[d] = this.getDeserializedValue(b, c[d]);
     }
     return a;
@@ -3396,8 +3397,8 @@ i18n.phonenumbers.metadata.countryToMetadata = {AC:[, [, , "[46]\\d{4}|[01589]\\
 , , , "27111234", , , [6, 7, 8, 9]], [, , "(?:1[13-9]\\d|(?:3[78]|44)[02-9]|6(?:44|6[02-9]))\\d{7}", , , , "1812345678", , , [10]], [, , "80[03]\\d{7}", , , , "8001234567", , , [10]], [, , "NA", , , , , , , [-1]], [, , "NA", , , , , , , [-1]], [, , "NA", , , , , , , [-1]], [, , "96(?:0[49]|1[0-4]|6[69])\\d{6}", , , , "9604123456", , , [10]], "BD", 880, "00", "0", , , "0", , , , [[, "(2)(\\d{7,8})", "$1-$2", ["2"], "0$1"], [, "(\\d{2})(\\d{4,6})", "$1-$2", ["[3-79]1"], "0$1"], [, "(\\d{4})(\\d{3,6})", 
 "$1-$2", ["1|3(?:0|[2-58]2)|4(?:0|[25]2|3[23]|[4689][25])|5(?:[02-578]2|6[25])|6(?:[0347-9]2|[26][25])|7[02-9]2|8(?:[023][23]|[4-7]2)|9(?:[02][23]|[458]2|6[016])"], "0$1"], [, "(\\d{3})(\\d{3,7})", "$1-$2", ["[3-79][2-9]|8"], "0$1"]], , [, , "NA", , , , , , , [-1]], , , [, , "NA", , , , , , , [-1]], [, , "NA", , , , , , , [-1]], , , [, , "NA", , , , , , , [-1]]], BE:[, [, , "[1-9]\\d{7,8}", , , , , , , [8, 9]], [, , "(?:1[0-69]|[23][2-8]|4[23]|5\\d|6[013-57-9]|71|8[1-79]|9[2-4])\\d{6}|80[2-8]\\d{5}", 
 , , , "12345678", , , [8]], [, , "4(?:6[0135-8]|[79]\\d|8[3-9])\\d{6}", , , , "470123456", , , [9]], [, , "800\\d{5}", , , , "80012345", , , [8]], [, , "(?:70[2-467]|90[0-79])\\d{5}", , , , "90123456", , , [8]], [, , "NA", , , , , , , [-1]], [, , "NA", , , , , , , [-1]], [, , "NA", , , , , , , [-1]], "BE", 32, "00", "0", , , "0", , , , [[, "(\\d{3})(\\d{2})(\\d{2})(\\d{2})", "$1 $2 $3 $4", ["4[6-9]"], "0$1"], [, "(\\d)(\\d{3})(\\d{2})(\\d{2})", "$1 $2 $3 $4", ["[23]|4[23]|9[2-4]"], "0$1"], [, "(\\d{2})(\\d{2})(\\d{2})(\\d{2})", 
-"$1 $2 $3 $4", ["[156]|7[018]|8(?:0[1-9]|[1-79])"], "0$1"], [, "(\\d{3})(\\d{2})(\\d{3})", "$1 $2 $3", ["(?:80|9)0"], "0$1"]], , [, , "NA", , , , , , , [-1]], , , [, , "NA", , , , , , , [-1]], [, , "78\\d{6}", , , , "78123456", , , [8]], , , [, , "NA", , , , , , , [-1]]], BF:[, [, , "[25-7]\\d{7}", , , , , , , [8]], [, , "2(?:0(?:49|5[23]|6[56]|9[016-9])|4(?:4[569]|5[4-6]|6[56]|7[0179])|5(?:[34]\\d|50|6[56]))\\d{4}", , , , "20491234"], [, , "(?:5[15]|[67]\\d)\\d{6}", , , , "70123456"], [, , "NA", 
-, , , , , , [-1]], [, , "NA", , , , , , , [-1]], [, , "NA", , , , , , , [-1]], [, , "NA", , , , , , , [-1]], [, , "NA", , , , , , , [-1]], "BF", 226, "00", , , , , , , , [[, "(\\d{2})(\\d{2})(\\d{2})(\\d{2})", "$1 $2 $3 $4"]], , [, , "NA", , , , , , , [-1]], , , [, , "NA", , , , , , , [-1]], [, , "NA", , , , , , , [-1]], , , [, , "NA", , , , , , , [-1]]], BG:[, [, , "[23567]\\d{5,7}|[489]\\d{6,8}", , , , , , , [6, 7, 8, 9], [4, 5]], [, , "2\\d{5,7}|(?:[36]\\d|5[1-9]|8[1-6]|9[1-7])\\d{5,6}|(?:4(?:[124-7]\\d|3[1-6])|7(?:0[1-9]|[1-9]\\d))\\d{4,5}", 
+"$1 $2 $3 $4", ["[156]|7[018]|8(?:0[1-9]|[1-79])"], "0$1"], [, "(\\d{3})(\\d{2})(\\d{3})", "$1 $2 $3", ["(?:80|9)0"], "0$1"]], , [, , "NA", , , , , , , [-1]], , , [, , "NA", , , , , , , [-1]], [, , "78\\d{6}", , , , "78123456", , , [8]], , , [, , "NA", , , , , , , [-1]]], BF:[, [, , "[25-7]\\d{7}", , , , , , , [8]], [, , "2(?:0(?:49|5[23]|6[56]|9[016-9])|4(?:4[569]|5[4-6]|6[56]|7[0179])|5(?:[34]\\d|50|6[56]))\\d{4}", , , , "20491234"], [, , "(?:5(?:[15]\\d|6[0-4])|[67]\\d{2})\\d{5}", , , , "70123456"], 
+[, , "NA", , , , , , , [-1]], [, , "NA", , , , , , , [-1]], [, , "NA", , , , , , , [-1]], [, , "NA", , , , , , , [-1]], [, , "NA", , , , , , , [-1]], "BF", 226, "00", , , , , , , , [[, "(\\d{2})(\\d{2})(\\d{2})(\\d{2})", "$1 $2 $3 $4"]], , [, , "NA", , , , , , , [-1]], , , [, , "NA", , , , , , , [-1]], [, , "NA", , , , , , , [-1]], , , [, , "NA", , , , , , , [-1]]], BG:[, [, , "[23567]\\d{5,7}|[489]\\d{6,8}", , , , , , , [6, 7, 8, 9], [4, 5]], [, , "2\\d{5,7}|(?:[36]\\d|5[1-9]|8[1-6]|9[1-7])\\d{5,6}|(?:4(?:[124-7]\\d|3[1-6])|7(?:0[1-9]|[1-9]\\d))\\d{4,5}", 
 , , , "2123456", , , [6, 7, 8], [4, 5]], [, , "(?:8[7-9]\\d|9(?:8\\d|99))\\d{6}|4(?:3[0789]|8\\d)\\d{5}", , , , "48123456", , , [8, 9]], [, , "800\\d{5}", , , , "80012345", , , [8]], [, , "90\\d{6}", , , , "90123456", , , [8]], [, , "NA", , , , , , , [-1]], [, , "700\\d{5}", , , , "70012345", , , [8]], [, , "NA", , , , , , , [-1]], "BG", 359, "00", "0", , , "0", , , , [[, "(2)(\\d)(\\d{2})(\\d{2})", "$1 $2 $3 $4", ["2"], "0$1"], [, "(2)(\\d{3})(\\d{3,4})", "$1 $2 $3", ["2"], "0$1"], [, "(\\d{3})(\\d{4})", 
 "$1 $2", ["43[124-7]|70[1-9]"], "0$1"], [, "(\\d{3})(\\d{3})(\\d{2})", "$1 $2 $3", ["43[124-7]|70[1-9]"], "0$1"], [, "(\\d{3})(\\d{2})(\\d{3})", "$1 $2 $3", ["[78]00"], "0$1"], [, "(\\d{3})(\\d{3})(\\d{3})", "$1 $2 $3", ["999"], "0$1"], [, "(\\d{2})(\\d{3})(\\d{2,3})", "$1 $2 $3", ["[356]|4[124-7]|7[1-9]|8[1-6]|9[1-7]"], "0$1"], [, "(\\d{2})(\\d{3})(\\d{3,4})", "$1 $2 $3", ["48|8[7-9]|9[08]"], "0$1"]], , [, , "NA", , , , , , , [-1]], , , [, , "NA", , , , , , , [-1]], [, , "NA", , , , , , , [-1]], 
 , , [, , "NA", , , , , , , [-1]]], BH:[, [, , "[136-9]\\d{7}", , , , , , , [8]], [, , "(?:1(?:3[1356]|6[0156]|7\\d)\\d|6(?:1[16]\\d|500|6(?:0\\d|3[12]|44|7[7-9])|9[69][69])|7(?:1(?:11|78)|7\\d{2}))\\d{4}", , , , "17001234"], [, , "(?:3(?:[1-4679]\\d|5[013-69]|8[0-47-9])\\d|6(?:3(?:00|33|6[16])|6(?:[69]\\d|3[03-9]|7[0-6])))\\d{4}", , , , "36001234"], [, , "80\\d{6}", , , , "80123456"], [, , "(?:87|9[014578])\\d{6}", , , , "90123456"], [, , "84\\d{6}", , , , "84123456"], [, , "NA", , , , , , , [-1]], 
@@ -3479,7 +3480,7 @@ DZ:[, [, , "(?:[1-4]|[5-9]\\d)\\d{7}", , , , , , , [8, 9]], [, , "(?:1\\d|2[013-
 [, , "17[1-3]\\d{4}|7\\d{6}", , , , "7123456"], [, , "NA", , , , , , , [-1]], [, , "NA", , , , , , , [-1]], [, , "NA", , , , , , , [-1]], [, , "NA", , , , , , , [-1]], [, , "NA", , , , , , , [-1]], "ER", 291, "00", "0", , , "0", , , , [[, "(\\d)(\\d{3})(\\d{3})", "$1 $2 $3", , "0$1"]], , [, , "NA", , , , , , , [-1]], , , [, , "NA", , , , , , , [-1]], [, , "NA", , , , , , , [-1]], , , [, , "NA", , , , , , , [-1]]], ES:[, [, , "[5-9]\\d{8}", , , , , , , [9]], [, , "8(?:[1356]\\d|[28][0-8]|[47][1-9])\\d{6}|9(?:[135]\\d{7}|[28][0-8]\\d{6}|4[1-9]\\d{6}|6(?:[0-8]\\d{6}|9(?:0(?:[0-57-9]\\d{4}|6(?:0[0-8]|1[1-9]|[2-9]\\d)\\d{2})|[1-9]\\d{5}))|7(?:[124-9]\\d{2}|3(?:[0-8]\\d|9[1-9]))\\d{4})", 
 , , , "810123456"], [, , "(?:6\\d{6}|7[1-48]\\d{5}|9(?:6906(?:09|10)|7390\\d{2}))\\d{2}", , , , "612345678"], [, , "[89]00\\d{6}", , , , "800123456"], [, , "80[367]\\d{6}", , , , "803123456"], [, , "90[12]\\d{6}", , , , "901123456"], [, , "70\\d{7}", , , , "701234567"], [, , "NA", , , , , , , [-1]], "ES", 34, "00", , , , , , , , [[, "([89]00)(\\d{3})(\\d{3})", "$1 $2 $3", ["[89]00"]], [, "([5-9]\\d{2})(\\d{2})(\\d{2})(\\d{2})", "$1 $2 $3 $4", ["[568]|[79][0-8]"]]], , [, , "NA", , , , , , , [-1]], 
 , , [, , "NA", , , , , , , [-1]], [, , "51\\d{7}", , , , "511234567"], , , [, , "NA", , , , , , , [-1]]], ET:[, [, , "[1-59]\\d{8}", , , , , , , [9], [7]], [, , "(?:11(?:1(?:1[124]|2[2-57]|3[1-5]|5[5-8]|8[6-8])|2(?:13|3[6-8]|5[89]|7[05-9]|8[2-6])|3(?:2[01]|3[0-289]|4[1289]|7[1-4]|87)|4(?:1[69]|3[2-49]|4[0-3]|6[5-8])|5(?:1[578]|44|5[0-4])|6(?:18|2[69]|39|4[5-7]|5[1-5]|6[0-59]|8[015-8]))|2(?:2(?:11[1-9]|22[0-7]|33\\d|44[1467]|66[1-68])|5(?:11[124-6]|33[2-8]|44[1467]|55[14]|66[1-3679]|77[124-79]|880))|3(?:3(?:11[0-46-8]|22[0-6]|33[0134689]|44[04]|55[0-6]|66[01467])|4(?:44[0-8]|55[0-69]|66[0-3]|77[1-5]))|4(?:6(?:22[0-24-7]|33[1-5]|44[13-69]|55[14-689]|660|88[1-4])|7(?:11[1-9]|22[1-9]|33[13-7]|44[13-6]|55[1-689]))|5(?:7(?:227|55[05]|(?:66|77)[14-8])|8(?:11[149]|22[013-79]|33[0-68]|44[013-8]|550|66[1-5]|77\\d)))\\d{4}", 
-, , , "111112345", , , , [7]], [, , "9(?:[1-468]\\d|5[89])\\d{6}", , , , "911234567"], [, , "NA", , , , , , , [-1]], [, , "NA", , , , , , , [-1]], [, , "NA", , , , , , , [-1]], [, , "NA", , , , , , , [-1]], [, , "NA", , , , , , , [-1]], "ET", 251, "00", "0", , , "0", , , , [[, "([1-59]\\d)(\\d{3})(\\d{4})", "$1 $2 $3", , "0$1"]], , [, , "NA", , , , , , , [-1]], , , [, , "NA", , , , , , , [-1]], [, , "NA", , , , , , , [-1]], , , [, , "NA", , , , , , , [-1]]], FI:[, [, , "1\\d{4,11}|[2-9]\\d{4,10}", 
+, , , "111112345", , , , [7]], [, , "9(?:[1-46-8]\\d|5[89])\\d{6}", , , , "911234567"], [, , "NA", , , , , , , [-1]], [, , "NA", , , , , , , [-1]], [, , "NA", , , , , , , [-1]], [, , "NA", , , , , , , [-1]], [, , "NA", , , , , , , [-1]], "ET", 251, "00", "0", , , "0", , , , [[, "([1-59]\\d)(\\d{3})(\\d{4})", "$1 $2 $3", , "0$1"]], , [, , "NA", , , , , , , [-1]], , , [, , "NA", , , , , , , [-1]], [, , "NA", , , , , , , [-1]], , , [, , "NA", , , , , , , [-1]]], FI:[, [, , "1\\d{4,11}|[2-9]\\d{4,10}", 
 , , , , , , [5, 6, 7, 8, 9, 10, 11, 12]], [, , "1(?:[3569][1-8]\\d{3,9}|[47]\\d{5,10})|2[1-8]\\d{3,9}|3(?:[1-8]\\d{3,9}|9\\d{4,8})|[5689][1-8]\\d{3,9}", , , , "1312345678"], [, , "4\\d{5,10}|50\\d{4,8}", , , , "412345678", , , [6, 7, 8, 9, 10, 11]], [, , "800\\d{4,7}", , , , "8001234567", , , [7, 8, 9, 10]], [, , "[67]00\\d{5,6}", , , , "600123456", , , [8, 9]], [, , "NA", , , , , , , [-1]], [, , "NA", , , , , , , [-1]], [, , "NA", , , , , , , [-1]], "FI", 358, "00|99(?:[02469]|5(?:11|33|5[59]|88|9[09]))", 
 "0", , , "0", , "00", , [[, "(\\d{3})(\\d{3,7})", "$1 $2", ["(?:[1-3]00|[6-8]0)"], "0$1"], [, "(116\\d{3})", "$1", ["116"], "$1"], [, "(\\d{2})(\\d{4,10})", "$1 $2", ["[14]|2[09]|50|7[135]"], "0$1"], [, "(\\d)(\\d{4,11})", "$1 $2", ["[25689][1-8]|3"], "0$1"]], , [, , "NA", , , , , , , [-1]], 1, , [, , "[13]00\\d{3,7}|2(?:0(?:0\\d{3,7}|2[023]\\d{1,6}|9[89]\\d{1,6}))|60(?:[12]\\d{5,6}|6\\d{7})|7(?:1\\d{7}|3\\d{8}|5[03-9]\\d{2,7})", , , , "100123", , , [5, 6, 7, 8, 9, 10]], [, , "[13]0\\d{4,8}|2(?:0(?:[016-8]\\d{3,7}|[2-59]\\d{2,7})|9\\d{4,8})|60(?:[12]\\d{5,6}|6\\d{7})|7(?:1\\d{7}|3\\d{8}|5[03-9]\\d{2,7})", 
 , , , "10112345", , , [5, 6, 7, 8, 9, 10]], , , [, , "NA", , , , , , , [-1]]], FJ:[, [, , "[35-9]\\d{6}|0\\d{10}", , , , , , , [7, 11]], [, , "(?:3[0-5]|6[25-7]|8[58])\\d{5}", , , , "3212345", , , [7]], [, , "(?:5[018]|[79]\\d|8[034679])\\d{5}", , , , "7012345", , , [7]], [, , "0800\\d{7}", , , , "08001234567", , , [11]], [, , "NA", , , , , , , [-1]], [, , "NA", , , , , , , [-1]], [, , "NA", , , , , , , [-1]], [, , "NA", , , , , , , [-1]], "FJ", 679, "0(?:0|52)", , , , , , "00", , [[, "(\\d{3})(\\d{4})", 
@@ -3535,9 +3536,9 @@ DZ:[, [, , "(?:[1-4]|[5-9]\\d)\\d{7}", , , , , , , [8, 9]], [, , "(?:1\\d|2[013-
 [, "(1599)(\\d{6})", "$1-$2", ["15"], "$1"], [, "(\\d{4})", "*$1", ["[2-689]"], "$1"]], , [, , "NA", , , , , , , [-1]], , , [, , "1700\\d{6}|[2-689]\\d{3}", , , , "1700123456", , , [4, 10]], [, , "[2-689]\\d{3}|1599\\d{6}", , , , "1599123456", , , [4, 10]], , , [, , "NA", , , , , , , [-1]]], IM:[, [, , "[135789]\\d{6,9}", , , , , , , [10], [6]], [, , "1624\\d{6}", , , , "1624456789", , , , [6]], [, , "7(?:4576|[59]24\\d)\\d{5}", , , , "7924123456"], [, , "808162\\d{4}", , , , "8081624567"], [, , 
 "(?:872299|90[0167]624)\\d{4}", , , , "9016247890"], [, , "8(?:4(?:40[49]06|5624\\d)|70624\\d)\\d{3}", , , , "8456247890"], [, , "70\\d{8}", , , , "7012345678"], [, , "56\\d{8}", , , , "5612345678"], "IM", 44, "00", "0", " x", , "0", , , , , , [, , "76242\\d{5}", , , , "7624212345"], , , [, , "NA", , , , , , , [-1]], [, , "3(?:08162\\d|3\\d{5}|4(?:40[49]06|5624\\d)|7(?:0624\\d|2299\\d))\\d{3}|55\\d{8}", , , , "5512345678"], , , [, , "NA", , , , , , , [-1]]], IN:[, [, , "008\\d{9}|1\\d{7,12}|[2-9]\\d{9,10}", 
 , , , , , , [8, 9, 10, 11, 12, 13], [6, 7]], [, , "(?:11|2[02]|33|4[04]|79)[2-7]\\d{7}|80[2-467]\\d{7}|(?:1(?:2[0-249]|3[0-25]|4[145]|[59][14]|6[014]|7[1257]|8[01346])|2(?:1[257]|3[013]|4[01]|5[0137]|6[0158]|78|8[1568]|9[14])|3(?:26|4[1-3]|5[34]|6[01489]|7[02-46]|8[159])|4(?:1[36]|2[1-47]|3[15]|5[12]|6[0-26-9]|7[0-24-9]|8[013-57]|9[014-7])|5(?:1[025]|[36][25]|22|4[28]|5[12]|[78]1|9[15])|6(?:12|[2345]1|57|6[13]|7[14]|80)|7(?:12|2[14]|3[134]|4[47]|5[15]|[67]1|88)|8(?:16|2[014]|3[126]|6[136]|7[078]|8[34]|91))[2-7]\\d{6}|(?:(?:1(?:2[35-8]|3[346-9]|4[236-9]|[59][0235-9]|6[235-9]|7[34689]|8[257-9])|2(?:1[134689]|3[24-8]|4[2-8]|5[25689]|6[2-4679]|7[13-79]|8[2-479]|9[235-9])|3(?:01|1[79]|2[1-5]|4[25-8]|5[125689]|6[235-7]|7[157-9]|8[2-467])|4(?:1[14578]|2[5689]|3[2-467]|5[4-7]|6[35]|73|8[2689]|9[2389])|5(?:[16][146-9]|2[14-8]|3[1346]|4[14-69]|5[46]|7[2-4]|8[2-8]|9[246])|6(?:1[1358]|2[2457]|3[2-4]|4[235-7]|[57][2-689]|6[24-578]|8[1-6])|8(?:1[1357-9]|2[235-8]|3[03-57-9]|4[0-24-9]|5\\d|6[2457-9]|7[1-6]|8[1256]|9[2-4]))\\d|7(?:(?:1[013-9]|2[0235-9]|3[2679]|4[1-35689]|5[2-46-9]|[67][02-9]|9\\d)\\d|8(?:2[0-6]|[013-8]\\d)))[2-7]\\d{5}", 
-, , , "1123456789", , , [10], [6, 7, 8]], [, , "(?:600[1-3]\\d|7(?:0\\d{3}|19[0-5]\\d|2(?:[0235679]\\d{2}|[14][017-9]\\d|8(?:[0-59]\\d|[678][089]))|3(?:[05-8]\\d{2}|1(?:[089]\\d|7[5-8])|2(?:[0-49][089]|[5-8]\\d)|3[017-9]\\d|4(?:[07-9]\\d|11)|9(?:[016-9]\\d|[2-5][089]))|4(?:0\\d{2}|1(?:[015-9]\\d|[23][089]|4[089])|2(?:0[089]|[1-7][089]|[89]\\d)|3(?:[0-8][089]|9\\d)|4(?:[089]\\d|11|7[02-8])|[56]\\d[089]|7(?:[089]\\d|11|7[02-8])|8(?:[0-24-7][089]|[389]\\d)|9(?:[0-6][089]|7[089]|[89]\\d))|5(?:[0346-8]\\d{2}|1(?:[07-9]\\d|11)|2(?:[04-9]\\d|[123][089])|5[017-9]\\d|9(?:[0-6][089]|[7-9]\\d))|6(?:0(?:[0-47]\\d|[5689][089])|(?:1[0-257-9]|[6-9]\\d)\\d|2(?:[0-4]\\d|[5-9][089])|3(?:[02-8][089]|[19]\\d)|4\\d[089]|5(?:[0-367][089]|[4589]\\d))|7(?:0(?:0[02-9]|[13-6][089]|[289]\\d|7[89])|[1-9]\\d{2})|8(?:[0-79]\\d{2}|8(?:[089]\\d|11|7[02-9]))|9(?:[089]\\d{2}|313|7(?:[02-8]\\d|9[07-9])))|8(?:0(?:[01589]\\d{2}|6[67]\\d|7(?:[02-8]\\d|9[05-9]))|1(?:[02-57-9]\\d{2}|1(?:[0-35-9]\\d|4[0-46-9])|6(?:[089]\\d|7[02-8]))|2(?:0(?:[08]\\d|7[02])|[14](?:[089]\\d|7[02-8])|[235-9]\\d{2})|3(?:[0357-9]\\d{2}|1(?:[089]\\d|7[02-6])|2(?:[09]\\d|77|8[0-689])|4[1-9]\\d|6(?:[089]\\d|7[02-7]))|[45]\\d{3}|6(?:[02457-9]\\d{2}|1(?:[089]\\d|7[02-8])|3(?:[089]\\d|7[02358])|6(?:[08]\\d|7[02-8]|9[01]))|7(?:0[07-9]\\d|[1-69]\\d{2}|[78](?:[089]\\d|7[02-8]))|8(?:[0-25-9]\\d{2}|3(?:[089]\\d|7[02-8])|4(?:[0489]\\d|7[2-68]))|9(?:[02-9]\\d{2}|1(?:[0289]\\d|7[2-6])))|9\\d{4})\\d{5}", 
-, , , "9987654321", , , [10]], [, , "00800\\d{7}|1(?:600\\d{6}|80(?:0\\d{4,9}|3\\d{9}))", , , , "1800123456"], [, , "186[12]\\d{9}", , , , "1861123456789", , , [13]], [, , "1860\\d{7}", , , , "18603451234", , , [11]], [, , "NA", , , , , , , [-1]], [, , "NA", , , , , , , [-1]], "IN", 91, "00", "0", , , "0", , , , [[, "(\\d{5})(\\d{5})", "$1 $2", ["600|7(?:[02-8]|19|9[037-9])|8(?:0[015-9]|[1-9]|20)|9", "600|7(?:[078]|19[0-5]|2(?:[02356-9]|[14][017-9]|9[389])|3(?:[025-9]|1[07-9]|[34][017-9])|4(?:[0-35689]|[47][017-9])|5(?:[02346-9]|1[017-9]|5[017-9])|6(?:[02-9]|1[0-257-9])|9(?:[089]|31|7[02-9]))|8(?:0(?:[01589]|6[67]|7[02-9])|1(?:[0-57-9]|6[07-9])|2(?:0[078]|[14][07-9]|[235-9])|3(?:[0357-9]|[126][07-9]|4[1-9])|[45]|6(?:[02457-9]|[136][07-9])|7(?:[078][07-9]|[1-69])|8(?:[0-25-9]|3[07-9]|4[047-9])|9(?:[02-9]|1[027-9]))|9", 
-"600|7(?:0|19[0-5]|2(?:[0235679]|[14][017-9]|8(?:[0-569]|[78][089])|9[389])|3(?:[05-8]|1(?:[089]|7[5-9])|2(?:[5-8]|[0-49][089])|3[017-9]|4(?:[07-9]|11)|9(?:[01689]|[2345][089]|40|7[0189]))|4(?:[056]|1(?:[0135-9]|[23][089]|2[089]|4[089])|2(?:0[089]|[1-7][089]|[89])|3(?:[0-8][089]|9)|4(?:[089]|11|7[02-8])|7(?:[089]|11|7[02-8])|8(?:[0-24-7][089]|[389])|9(?:[0-7][089]|[89]))|5(?:[0346-9]|1[017-9]|2(?:[03-9]|[12][089])|5[017-9])|6(?:[0346-9]|1[0-257-9]|2(?:[0-4]\\d|[5-9][089])|5(?:[0-367][089]|[4589]))|7(?:0(?:[02-9]|1[089])|[1-9])|8(?:[0-79]|8(?:0[0189]|11|8[013-9]|9))|9(?:[089]|313|7(?:[02-8]|9[07-9])))|8(?:0(?:[01589]|6[67]|7(?:[02-8]|9[05-9]))|1(?:[02-57-9]|1(?:[0-35-9]|4[0-46-9])|6(?:[089]|7[02-8]))|2(?:0(?:[08]|7[02])|[14](?:[089]|7[02-8])|[235-9])|3(?:[0357-9]|1(?:[089]|7[02-6])|2(?:[09]|77|8[0-689])|4[1-9]|6(?:[089]|7[02-7]))|[45]|6(?:[02457-9]|1(?:[089]|7[02-8])|3(?:[089]|7[02358])|6(?:[08]|7[02-8]|9[01]))|7(?:0[07-9]|[1-69]|7(?:[089]|7[02-8])|8(?:[089]|7[02-8]))|8(?:[0-25-9]|3(?:[089]|7[02-8])|4(?:[0489]|7[02-68]))|9(?:[02-9]|1(?:[0289]|7[2-6])))|9"], 
+, , , "1123456789", , , [10], [6, 7, 8]], [, , "(?:600[1-3]\\d|7(?:0\\d{3}|19[0-5]\\d|2(?:[0235679]\\d{2}|[14][017-9]\\d|8(?:[0-59]\\d|[678][089]))|3(?:[05-8]\\d{2}|1(?:[089]\\d|7[5-8])|2(?:[0-49][089]|[5-8]\\d)|3[017-9]\\d|4(?:[07-9]\\d|11)|9(?:[016-9]\\d|[2-5][089]))|4(?:0\\d{2}|1(?:[015-9]\\d|[23][089]|4[089])|2(?:0[089]|[1-7][089]|[89]\\d)|3(?:[0-8][089]|9\\d)|4(?:[089]\\d|11|7[02-8])|[56]\\d[089]|7(?:[089]\\d|11|7[02-8])|8(?:[0-24-7][089]|[389]\\d)|9(?:[0-6][089]|7[089]|[89]\\d))|5(?:[0346-8]\\d{2}|1(?:[07-9]\\d|11)|2(?:[04-9]\\d|[123][089])|5[017-9]\\d|9(?:[0-6][089]|[7-9]\\d))|6(?:0(?:[0-47]\\d|[5689][089])|(?:1[0-257-9]|[6-9]\\d)\\d|2(?:[0-4]\\d|[5-9][089])|3(?:[02-8][089]|[19]\\d)|4\\d[089]|5(?:[0-367][089]|[4589]\\d))|7(?:0(?:0[02-9]|[13-6][089]|[289]\\d|7[89])|[1-9]\\d{2})|8(?:[0-79]\\d{2}|8(?:[089]\\d|11|7[02-9]))|9(?:[089]\\d{2}|313|7(?:[02-8]\\d|9[07-9])))|8(?:0(?:[01589]\\d{2}|6[67]\\d|7(?:[02-8]\\d|9[05-9]))|1(?:[02-57-9]\\d{2}|1(?:[0-35-9]\\d|4[0-46-9])|6(?:[089]\\d|7[02-8]))|2(?:0(?:[089]\\d|7[02])|[14](?:[089]\\d|7[02-8])|[235-9]\\d{2})|3(?:[0357-9]\\d{2}|1(?:[089]\\d|7[02-6])|2(?:[09]\\d|77|8[0-689])|4(?:0[1-7]|[1-9]\\d)|6(?:[089]\\d|7[02-7]))|[45]\\d{3}|6(?:[02457-9]\\d{2}|1(?:[089]\\d|7[02-8])|3(?:[089]\\d|7[02-68])|6(?:[08]\\d|7[02-8]|9[01]))|7(?:0[07-9]\\d|[1-69]\\d{2}|[78](?:[089]\\d|7[02-8]))|8(?:[0-25-9]\\d{2}|3(?:[089]\\d|7[02-8])|4(?:[0489]\\d|7[02-68]))|9(?:[02-9]\\d{2}|1(?:[0289]\\d|7[2-6])))|9\\d{4})\\d{5}", 
+, , , "8123456789", , , [10]], [, , "00800\\d{7}|1(?:600\\d{6}|80(?:0\\d{4,9}|3\\d{9}))", , , , "1800123456"], [, , "186[12]\\d{9}", , , , "1861123456789", , , [13]], [, , "1860\\d{7}", , , , "18603451234", , , [11]], [, , "NA", , , , , , , [-1]], [, , "NA", , , , , , , [-1]], "IN", 91, "00", "0", , , "0", , , , [[, "(\\d{5})(\\d{5})", "$1 $2", ["600|7(?:[02-8]|19|9[037-9])|8(?:0[015-9]|[1-9])|9", "600|7(?:[078]|19[0-5]|2(?:[02356-9]|[14][017-9]|9[389])|3(?:[025-9]|1[07-9]|[34][017-9])|4(?:[0-35689]|[47][017-9])|5(?:[02346-9]|1[017-9]|5[017-9])|6(?:[02-9]|1[0-257-9])|9(?:[089]|31|7[02-9]))|8(?:0(?:[01589]|6[67]|7[02-9])|1(?:[0-57-9]|6[07-9])|2(?:0[07-9]|[14][07-9]|[235-9])|3(?:[03-57-9]|[126][07-9])|[45]|6(?:[02457-9]|[136][07-9])|7(?:[078][07-9]|[1-69])|8(?:[0-25-9]|3[07-9]|4[047-9])|9(?:[02-9]|1[027-9]))|9", 
+"600|7(?:0|19[0-5]|2(?:[0235679]|[14][017-9]|8(?:[0-569]|[78][089])|9[389])|3(?:[05-8]|1(?:[089]|7[5-9])|2(?:[5-8]|[0-49][089])|3[017-9]|4(?:[07-9]|11)|9(?:[01689]|[2345][089]|40|7[0189]))|4(?:[056]|1(?:[0135-9]|[23][089]|2[089]|4[089])|2(?:0[089]|[1-7][089]|[89])|3(?:[0-8][089]|9)|4(?:[089]|11|7[02-8])|7(?:[089]|11|7[02-8])|8(?:[0-24-7][089]|[389])|9(?:[0-7][089]|[89]))|5(?:[0346-9]|1[017-9]|2(?:[03-9]|[12][089])|5[017-9])|6(?:[0346-9]|1[0-257-9]|2(?:[0-4]\\d|[5-9][089])|5(?:[0-367][089]|[4589]))|7(?:0(?:[02-9]|1[089])|[1-9])|8(?:[0-79]|8(?:0[0189]|11|8[013-9]|9))|9(?:[089]|313|7(?:[02-8]|9[07-9])))|8(?:0(?:[01589]|6[67]|7(?:[02-8]|9[05-9]))|1(?:[02-57-9]|1(?:[0-35-9]|4[0-46-9])|6(?:[089]|7[02-8]))|2(?:0(?:[089]|7[02])|[14](?:[089]|7[02-8])|[235-9])|3(?:[0357-9]|1(?:[089]|7[02-6])|2(?:[09]|77|8[0-689])|4(?:0[1-7]|[1-9])|6(?:[089]|7[02-7]))|[45]|6(?:[02457-9]|1(?:[089]|7[02-8])|3(?:[089]|7[02-68])|6(?:[08]|7[02-8]|9[01]))|7(?:0[07-9]|[1-69]|7(?:[089]|7[02-8])|8(?:[089]|7[02-8]))|8(?:[0-25-9]|3(?:[089]|7[02-8])|4(?:[0489]|7[02-68]))|9(?:[02-9]|1(?:[0289]|7[2-6])))|9"], 
 "0$1", , 1], [, "(\\d{2})(\\d{4})(\\d{4})", "$1 $2 $3", ["11|2[02]|33|4[04]|79[1-9]|80[2-46]"], "0$1", , 1], [, "(\\d{3})(\\d{3})(\\d{4})", "$1 $2 $3", ["1(?:2[0-249]|3[0-25]|4[145]|[59][14]|7[1257]|[68][1-9])|2(?:1[257]|3[013]|4[01]|5[0137]|6[0158]|78|8[1568]|9[14])|3(?:26|4[1-3]|5[34]|6[01489]|7[02-46]|8[159])|4(?:1[36]|2[1-47]|3[15]|5[12]|6[0-26-9]|7[0-24-9]|8[013-57]|9[014-7])|5(?:1[025]|[36][25]|22|4[28]|5[12]|[78]1|9[15])|6(?:12|[2-4]1|5[17]|6[13]|7[14]|80)|7(?:12|2[14]|3[134]|4[47]|5[15]|[67]1|88)|8(?:16|2[014]|3[126]|6[136]|7[078]|8[34]|91)"], 
 "0$1", , 1], [, "(\\d{4})(\\d{3})(\\d{3})", "$1 $2 $3", ["1(?:[23579]|[468][1-9])|[2-8]"], "0$1", , 1], [, "(\\d{2})(\\d{3})(\\d{4})(\\d{3})", "$1 $2 $3 $4", ["008"], "0$1", , 1], [, "(\\d{3})(\\d{3})(\\d{4})", "$1 $2 $3", ["140"], "$1", , 1], [, "(\\d{4})(\\d{2})(\\d{4})", "$1 $2 $3", ["160", "1600"], "$1", , 1], [, "(\\d{4})(\\d{4,5})", "$1 $2", ["180", "1800"], "$1", , 1], [, "(\\d{4})(\\d{2,4})(\\d{4})", "$1 $2 $3", ["180", "1800"], "$1", , 1], [, "(\\d{4})(\\d{3,4})(\\d{4})", "$1 $2 $3", ["186", 
 "1860"], "$1", , 1], [, "(\\d{4})(\\d{3})(\\d{3})(\\d{3})", "$1 $2 $3 $4", ["18[06]"], "$1", , 1]], , [, , "NA", , , , , , , [-1]], , , [, , "00800\\d{7}|1(?:600\\d{6}|8(?:0(?:0\\d{4,9}|3\\d{9})|6(?:0\\d{7}|[12]\\d{9})))", , , , "1800123456"], [, , "140\\d{7}", , , , "1409305260", , , [10]], 1, , [, , "NA", , , , , , , [-1]]], IO:[, [, , "3\\d{6}", , , , , , , [7]], [, , "37\\d{5}", , , , "3709100"], [, , "38\\d{5}", , , , "3801234"], [, , "NA", , , , , , , [-1]], [, , "NA", , , , , , , [-1]], [, 
@@ -3570,8 +3571,8 @@ DZ:[, [, , "(?:[1-4]|[5-9]\\d)\\d{7}", , , , , , , [8, 9]], [, , "(?:1\\d|2[013-
 "1(?:2[3-6]|3[3-9]|4[2-6]|5(?:[236-8]|[45][2-69])|[68][2-7]|7[2-689]|9[1-578])|2(?:2(?:[04-689]|3[23])|3[3-58]|4[0-468]|5(?:5[78]|7[2-4]|[0468][2-9])|6(?:[0135-8]|4[2-5])|7(?:[0679]|8[2-7])|8(?:[024578]|3[25-9]|9[6-9])|9(?:11|3[2-4]))|4(?:2(?:2[2-9]|8[237-9])|3[689]|6[035-7]|7(?:[059][2-8]|[68])|80|9[3-5])|5(?:3[1-36-9]|4[4578]|5[013-8]|6[1-9]|7[2-8]|8[14-7]|9(?:[89][2-8]|[4-7]))|7(?:2[15]|3[5-9]|4[02-9]|6[135-8]|7[0-4689]|9(?:[017-9]|4[6-8]|5[2-478]|6[2-589]))|8(?:2(?:4[4-8]|9(?:[3578]|20|4[04-9]|6(?:5[25]|60)))|3(?:7(?:[2-5]|6[0-59])|[3-6][2-9]|8[2-5])|4[5-8]|5[2-9]|6(?:[37]|5(?:[467]|5[014-9])|6(?:[2-8]|9[02-69])|8[2-8]|9(?:[236-8]|9[23]))|7[579]|8[03-579]|9[2-8])|9(?:[23]0|4[02-46-9]|5[024-79]|6[4-9]|7[2-47-9]|8[02-7]|9(?:3(?:3[02-9]|4[0-24689])|4[2-69]|[5-7]))"], 
 "0$1"], [, "(\\d{2})(\\d{3})(\\d{4})", "$1-$2-$3", ["1|2(?:2[37]|5[5-9]|64|78|8[39]|91)|4(?:2[2689]|64|7[347])|5(?:[2-589]|39)|60|8(?:[46-9]|3[279]|2[124589])|9(?:[235-8]|93)", "1|2(?:2[37]|5(?:[57]|[68]0|9[19])|64|78|8[39]|917)|4(?:2(?:[68]|20|9[178])|64|7[347])|5(?:[2-589]|39[67])|60|8(?:[46-9]|3[279]|2[124589])|9(?:[235-8]|93[34])", "1|2(?:2[37]|5(?:[57]|[68]0|9(?:17|99))|64|78|8[39]|917)|4(?:2(?:[68]|20|9[178])|64|7[347])|5(?:[2-589]|39[67])|60|8(?:[46-9]|3[279]|2[124589])|9(?:[235-8]|93(?:31|4))"], 
 "0$1"], [, "(\\d{3})(\\d{2})(\\d{4})", "$1-$2-$3", ["2(?:9[14-79]|74|[34]7|[56]9)|82|993"], "0$1"], [, "(\\d)(\\d{4})(\\d{4})", "$1-$2-$3", ["3|4(?:2[09]|7[01])|6[1-9]"], "0$1"], [, "(\\d{2})(\\d{3})(\\d{4})", "$1-$2-$3", ["[2479][1-9]"], "0$1"]], [, , "20\\d{8}", , , , "2012345678", , , [10]], , , [, , "00(?:37\\d{6,13}|66\\d{6,13}|777(?:[01]\\d{2}|5\\d{3}|8\\d{4})|882[1245]\\d{4})", , , , "00777012"], [, , "570\\d{6}", , , , "570123456", , , [9]], 1, , [, , "NA", , , , , , , [-1]]], KE:[, [, , 
-"20\\d{6,7}|[4-9]\\d{6,9}", , , , , , , [7, 8, 9, 10]], [, , "20\\d{6,7}|4(?:0\\d{6,7}|[136]\\d{7}|[245]\\d{5,7})|5(?:[08]\\d{7}|[1-79]\\d{5,7})|6(?:[01457-9]\\d{5,7}|2\\d{7}|6\\d{6,7})", , , , "202012345", , , [7, 8, 9]], [, , "7(?:[0-3679]\\d|4[0-2479]|5[0-6]|8[0-25-9])\\d{6}", , , , "712123456", , , [9]], [, , "800[24-8]\\d{5,6}", , , , "800223456", , , [9, 10]], [, , "900[02-9]\\d{5}", , , , "900223456", , , [9]], [, , "NA", , , , , , , [-1]], [, , "NA", , , , , , , [-1]], [, , "NA", , , , , 
-, , [-1]], "KE", 254, "000", "0", , , "005|0", , , , [[, "(\\d{2})(\\d{5,7})", "$1 $2", ["[24-6]"], "0$1"], [, "(\\d{3})(\\d{6})", "$1 $2", ["7"], "0$1"], [, "(\\d{3})(\\d{3})(\\d{3,4})", "$1 $2 $3", ["[89]"], "0$1"]], , [, , "NA", , , , , , , [-1]], , , [, , "NA", , , , , , , [-1]], [, , "NA", , , , , , , [-1]], , , [, , "NA", , , , , , , [-1]]], KG:[, [, , "[235-8]\\d{8,9}", , , , , , , [9, 10], [5, 6]], [, , "(?:3(?:1(?:[256]\\d|3[1-9]|47)|2(?:22|3[0-479]|6[0-7])|4(?:22|5[6-9]|6\\d)|5(?:22|3[4-7]|59|6\\d)|6(?:22|5[35-7]|6\\d)|7(?:22|3[468]|4[1-9]|59|[67]\\d)|9(?:22|4[1-8]|6\\d))|6(?:09|12|2[2-4])\\d)\\d{5}", 
+"20\\d{6,7}|[4-9]\\d{6,9}", , , , , , , [7, 8, 9, 10]], [, , "20\\d{6,7}|4(?:0\\d{6,7}|[136]\\d{7}|[245]\\d{5,7})|5(?:[08]\\d{7}|[1-79]\\d{5,7})|6(?:[01457-9]\\d{5,7}|2\\d{7}|6\\d{6,7})", , , , "202012345", , , [7, 8, 9]], [, , "7(?:[0-3679]\\d|4[0-479]|5[0-6]|8[0-25-9])\\d{6}", , , , "712123456", , , [9]], [, , "800[24-8]\\d{5,6}", , , , "800223456", , , [9, 10]], [, , "900[02-9]\\d{5}", , , , "900223456", , , [9]], [, , "NA", , , , , , , [-1]], [, , "NA", , , , , , , [-1]], [, , "NA", , , , , , 
+, [-1]], "KE", 254, "000", "0", , , "005|0", , , , [[, "(\\d{2})(\\d{5,7})", "$1 $2", ["[24-6]"], "0$1"], [, "(\\d{3})(\\d{6})", "$1 $2", ["7"], "0$1"], [, "(\\d{3})(\\d{3})(\\d{3,4})", "$1 $2 $3", ["[89]"], "0$1"]], , [, , "NA", , , , , , , [-1]], , , [, , "NA", , , , , , , [-1]], [, , "NA", , , , , , , [-1]], , , [, , "NA", , , , , , , [-1]]], KG:[, [, , "[235-8]\\d{8,9}", , , , , , , [9, 10], [5, 6]], [, , "(?:3(?:1(?:[256]\\d|3[1-9]|47)|2(?:22|3[0-479]|6[0-7])|4(?:22|5[6-9]|6\\d)|5(?:22|3[4-7]|59|6\\d)|6(?:22|5[35-7]|6\\d)|7(?:22|3[468]|4[1-9]|59|[67]\\d)|9(?:22|4[1-8]|6\\d))|6(?:09|12|2[2-4])\\d)\\d{5}", 
 , , , "312123456", , , [9], [5, 6]], [, , "(?:20[0-35]|5[124-7]\\d|7[07]\\d)\\d{6}", , , , "700123456", , , [9]], [, , "800\\d{6,7}", , , , "800123456"], [, , "NA", , , , , , , [-1]], [, , "NA", , , , , , , [-1]], [, , "NA", , , , , , , [-1]], [, , "NA", , , , , , , [-1]], "KG", 996, "00", "0", , , "0", , , , [[, "(\\d{3})(\\d{3})(\\d{3})", "$1 $2 $3", ["[25-7]|31[25]"], "0$1"], [, "(\\d{4})(\\d{5})", "$1 $2", ["3(?:1[36]|[2-9])"], "0$1"], [, "(\\d{3})(\\d{3})(\\d)(\\d{3})", "$1 $2 $3 $4", ["8"], 
 "0$1"]], , [, , "NA", , , , , , , [-1]], , , [, , "NA", , , , , , , [-1]], [, , "NA", , , , , , , [-1]], , , [, , "NA", , , , , , , [-1]]], KH:[, [, , "[1-9]\\d{7,9}", , , , , , , [8, 9, 10], [6, 7]], [, , "(?:2[3-6]|3[2-6]|4[2-4]|[5-7][2-5])(?:[237-9]|4[56]|5\\d|6\\d?)\\d{5}|23(?:4[234]|8\\d{2})\\d{4}", , , , "23756789", , , [8, 9], [6, 7]], [, , "(?:1(?:[013-79]\\d|[28]\\d{1,2})|2[3-6]48|3(?:[18]\\d{2}|[2-6]48)|4[2-4]48|5[2-5]48|6(?:[016-9]\\d|[2-5]48)|7(?:[07-9]\\d|[16]\\d{2}|[2-5]48)|8(?:[013-79]\\d|8\\d{2})|9(?:6\\d{2}|7\\d{1,2}|[0-589]\\d))\\d{5}", 
 , , , "91234567", , , [8, 9]], [, , "1800(?:1\\d|2[019])\\d{4}", , , , "1800123456", , , [10]], [, , "1900(?:1\\d|2[09])\\d{4}", , , , "1900123456", , , [10]], [, , "NA", , , , , , , [-1]], [, , "NA", , , , , , , [-1]], [, , "NA", , , , , , , [-1]], "KH", 855, "00[14-9]", "0", , , "0", , , , [[, "(\\d{2})(\\d{3})(\\d{3,4})", "$1 $2 $3", ["1\\d[1-9]|[2-9]"], "0$1"], [, "(1[89]00)(\\d{3})(\\d{3})", "$1 $2 $3", ["1[89]0"]]], , [, , "NA", , , , , , , [-1]], , , [, , "NA", , , , , , , [-1]], [, , "NA", 
@@ -3602,7 +3603,7 @@ DZ:[, [, , "(?:[1-4]|[5-9]\\d)\\d{7}", , , , , , , [8, 9]], [, , "(?:1\\d|2[013-
 , , , "332021234", , , [9]], "LR", 231, "00", "0", , , "0", , , , [[, "(2\\d)(\\d{3})(\\d{3})", "$1 $2 $3", ["2"], "0$1"], [, "([4-5])(\\d{3})(\\d{3})", "$1 $2 $3", ["[45]"], "0$1"], [, "(\\d{2})(\\d{3})(\\d{4})", "$1 $2 $3", ["[23578]"], "0$1"]], , [, , "NA", , , , , , , [-1]], , , [, , "NA", , , , , , , [-1]], [, , "NA", , , , , , , [-1]], , , [, , "NA", , , , , , , [-1]]], LS:[, [, , "[2568]\\d{7}", , , , , , , [8]], [, , "2\\d{7}", , , , "22123456"], [, , "[56]\\d{7}", , , , "50123456"], [, , 
 "800[256]\\d{4}", , , , "80021234"], [, , "NA", , , , , , , [-1]], [, , "NA", , , , , , , [-1]], [, , "NA", , , , , , , [-1]], [, , "NA", , , , , , , [-1]], "LS", 266, "00", , , , , , , , [[, "(\\d{4})(\\d{4})", "$1 $2"]], , [, , "NA", , , , , , , [-1]], , , [, , "NA", , , , , , , [-1]], [, , "NA", , , , , , , [-1]], , , [, , "NA", , , , , , , [-1]]], LT:[, [, , "[3-9]\\d{7}", , , , , , , [8]], [, , "(?:3[1478]|4[124-6]|52)\\d{6}", , , , "31234567"], [, , "6\\d{7}", , , , "61234567"], [, , "800\\d{5}", 
 , , , "80012345"], [, , "9(?:0[0239]|10)\\d{5}", , , , "90012345"], [, , "808\\d{5}", , , , "80812345"], [, , "700\\d{5}", , , , "70012345"], [, , "NA", , , , , , , [-1]], "LT", 370, "00", "8", , , "[08]", , , , [[, "([34]\\d)(\\d{6})", "$1 $2", ["37|4(?:1|5[45]|6[2-4])"], "(8-$1)", , 1], [, "([3-6]\\d{2})(\\d{5})", "$1 $2", ["3[148]|4(?:[24]|6[09])|528|6"], "(8-$1)", , 1], [, "([7-9]\\d{2})(\\d{2})(\\d{3})", "$1 $2 $3", ["[7-9]"], "8 $1", , 1], [, "(5)(2\\d{2})(\\d{4})", "$1 $2 $3", ["52[0-79]"], 
-"(8-$1)", , 1]], , [, , "NA", , , , , , , [-1]], , , [, , "NA", , , , , , , [-1]], [, , "70[67]\\d{5}", , , , "70712345"], , , [, , "NA", , , , , , , [-1]]], LU:[, [, , "[24-9]\\d{3,10}|3(?:[0-46-9]\\d{2,9}|5[013-9]\\d{1,8})", , , , , , , [4, 5, 6, 7, 8, 9, 10, 11]], [, , "(?:2[2-9]\\d{2,9}|(?:[3457]\\d{2}|8(?:0[2-9]|[13-9]\\d)|9(?:0[89]|[2-579]\\d))\\d{1,8})", , , , "27123456"], [, , "6[2679][18]\\d{6}", , , , "628123456", , , [9]], [, , "800\\d{5}", , , , "80012345", , , [8]], [, , "90[015]\\d{5}", 
+"(8-$1)", , 1]], , [, , "NA", , , , , , , [-1]], , , [, , "NA", , , , , , , [-1]], [, , "70[67]\\d{5}", , , , "70712345"], , , [, , "NA", , , , , , , [-1]]], LU:[, [, , "[24-9]\\d{3,10}|3(?:[0-46-9]\\d{2,9}|5[013-9]\\d{1,8})", , , , , , , [4, 5, 6, 7, 8, 9, 10, 11]], [, , "(?:2[2-9]\\d{2,9}|(?:[3457]\\d{2}|8(?:0[2-9]|[13-9]\\d)|9(?:0[89]|[2-579]\\d))\\d{1,8})", , , , "27123456"], [, , "6[25-79][18]\\d{6}", , , , "628123456", , , [9]], [, , "800\\d{5}", , , , "80012345", , , [8]], [, , "90[015]\\d{5}", 
 , , , "90012345", , , [8]], [, , "801\\d{5}", , , , "80112345", , , [8]], [, , "70\\d{6}", , , , "70123456", , , [8]], [, , "20(?:1\\d{5}|[2-689]\\d{1,7})", , , , "20201234", , , [4, 5, 6, 7, 8, 9, 10]], "LU", 352, "00", , , , "(15(?:0[06]|1[12]|35|4[04]|55|6[26]|77|88|99)\\d)", , , , [[, "(\\d{2})(\\d{3})", "$1 $2", ["[2-5]|7[1-9]|[89](?:[1-9]|0[2-9])"], , "$CC $1"], [, "(\\d{2})(\\d{2})(\\d{2})", "$1 $2 $3", ["[2-5]|7[1-9]|[89](?:[1-9]|0[2-9])"], , "$CC $1"], [, "(\\d{2})(\\d{2})(\\d{3})", "$1 $2 $3", 
 ["20"], , "$CC $1"], [, "(\\d{2})(\\d{2})(\\d{2})(\\d{1,2})", "$1 $2 $3 $4", ["2(?:[0367]|4[3-8])"], , "$CC $1"], [, "(\\d{2})(\\d{2})(\\d{2})(\\d{3})", "$1 $2 $3 $4", ["20"], , "$CC $1"], [, "(\\d{2})(\\d{2})(\\d{2})(\\d{2})(\\d{1,2})", "$1 $2 $3 $4 $5", ["2(?:[0367]|4[3-8])"], , "$CC $1"], [, "(\\d{2})(\\d{2})(\\d{2})(\\d{1,4})", "$1 $2 $3 $4", ["2(?:[12589]|4[12])|[3-5]|7[1-9]|8(?:[1-9]|0[2-9])|9(?:[1-9]|0[2-46-9])"], , "$CC $1"], [, "(\\d{3})(\\d{2})(\\d{3})", "$1 $2 $3", ["70|80[01]|90[015]"], 
 , "$CC $1"], [, "(\\d{3})(\\d{3})(\\d{3})", "$1 $2 $3", ["6"], , "$CC $1"]], , [, , "NA", , , , , , , [-1]], , , [, , "NA", , , , , , , [-1]], [, , "NA", , , , , , , [-1]], , , [, , "NA", , , , , , , [-1]]], LV:[, [, , "[2689]\\d{7}", , , , , , , [8]], [, , "6\\d{7}", , , , "63123456"], [, , "2\\d{7}", , , , "21234567"], [, , "80\\d{6}", , , , "80123456"], [, , "90\\d{6}", , , , "90123456"], [, , "81\\d{6}", , , , "81123456"], [, , "NA", , , , , , , [-1]], [, , "NA", , , , , , , [-1]], "LV", 371, 
@@ -3769,18 +3770,19 @@ MS:[, [, , "[5689]\\d{9}", , , , , , , [10], [7]], [, , "664491\\d{4}", , , , "6
 , , , , , , [10], [7]], [, , "284(?:(?:229|4(?:22|9[45])|774|8(?:52|6[459]))\\d{4}|496[0-5]\\d{3})", , , , "2842291234", , , , [7]], [, , "284(?:(?:3(?:0[0-3]|4[0-7]|68|9[34])|4(?:4[0-6]|68|99)|54[0-57])\\d{4}|496[6-9]\\d{3})", , , , "2843001234", , , , [7]], [, , "8(?:00|33|44|55|66|77|88)[2-9]\\d{6}", , , , "8002345678"], [, , "900[2-9]\\d{6}", , , , "9002345678"], [, , "NA", , , , , , , [-1]], [, , "5(?:00|22|33|44|66|77|88)[2-9]\\d{6}", , , , "5002345678"], [, , "NA", , , , , , , [-1]], "VG", 
 1, "011", "1", , , "1", , , , , , [, , "NA", , , , , , , [-1]], , "284", [, , "NA", , , , , , , [-1]], [, , "NA", , , , , , , [-1]], , , [, , "NA", , , , , , , [-1]]], VI:[, [, , "[3589]\\d{9}", , , , , , , [10], [7]], [, , "340(?:2(?:01|2[0678]|44|77)|3(?:32|44)|4(?:22|7[34])|5(?:1[34]|55)|6(?:26|4[23]|77|9[023])|7(?:1[2-589]|27|7\\d)|884|998)\\d{4}", , , , "3406421234", , , , [7]], [, , "340(?:2(?:01|2[0678]|44|77)|3(?:32|44)|4(?:22|7[34])|5(?:1[34]|55)|6(?:26|4[23]|77|9[023])|7(?:1[2-589]|27|7\\d)|884|998)\\d{4}", 
 , , , "3406421234", , , , [7]], [, , "8(?:00|33|44|55|66|77|88)[2-9]\\d{6}", , , , "8002345678"], [, , "900[2-9]\\d{6}", , , , "9002345678"], [, , "NA", , , , , , , [-1]], [, , "5(?:00|22|33|44|66|77|88)[2-9]\\d{6}", , , , "5002345678"], [, , "NA", , , , , , , [-1]], "VI", 1, "011", "1", , , "1", , , 1, , , [, , "NA", , , , , , , [-1]], , "340", [, , "NA", , , , , , , [-1]], [, , "NA", , , , , , , [-1]], , , [, , "NA", , , , , , , [-1]]], VN:[, [, , "[167]\\d{6,9}|[2-59]\\d{7,9}|8\\d{6,8}", , , , 
-, , , [7, 8, 9, 10]], [, , "(?:2(?:0(?:\\d|[3-9]\\d)|1[0-689]\\d|2(?:\\d|[0-25-9]\\d)|[5-7]\\d|3\\d{2}|[48][01]\\d|9(?:\\d|[0-4679]\\d))|3(?:[0136-9]|[25][01])\\d|4\\d{2}|5(?:[01][01]|[2-9])\\d|6(?:[0-46-8]|5[01])\\d|7(?:[02-79]|[18][01])\\d)\\d{6}|8(?:[1-57]\\d|6[0-79]|9[0-7])\\d{6}", , , , "2101234567", , , [9, 10]], [, , "(?:9\\d|1(?:2\\d|6[2-9]|8[68]|99))\\d{7}|8(?:68|8\\d|9[89])\\d{6}", , , , "912345678", , , [9, 10]], [, , "1800\\d{4,6}", , , , "1800123456", , , [8, 9, 10]], [, , "1900\\d{4,6}", 
-, , , "1900123456", , , [8, 9, 10]], [, , "NA", , , , , , , [-1]], [, , "NA", , , , , , , [-1]], [, , "NA", , , , , , , [-1]], "VN", 84, "00", "0", , , "0", , , , [[, "([17]99)(\\d{4})", "$1 $2", ["[17]99"], "0$1", , 1], [, "([48])(\\d{4})(\\d{4})", "$1 $2 $3", ["4|8(?:[1-57]|6[0-79]|9[0-7])"], "0$1", , 1], [, "([235-7]\\d)(\\d{4})(\\d{3})", "$1 $2 $3", ["2[025-79]|3[0136-9]|5[2-9]|6[0-46-8]|7[02-79]"], "0$1", , 1], [, "(80)(\\d{5})", "$1 $2", ["80"], "0$1", , 1], [, "(69\\d)(\\d{4,5})", "$1 $2", 
-["69"], "0$1", , 1], [, "([235-7]\\d{2})(\\d{4})(\\d{3})", "$1 $2 $3", ["2[0-489]|3[25]|5[01]|65|7[18]"], "0$1", , 1], [, "([89]\\d)(\\d{3})(\\d{2})(\\d{2})", "$1 $2 $3 $4", ["8(?:68|8|9[89])|9"], "0$1", , 1], [, "(1[2689]\\d)(\\d{3})(\\d{4})", "$1 $2 $3", ["1(?:[26]|8[68]|99)"], "0$1", , 1], [, "(1[89]00)(\\d{4,6})", "$1 $2", ["1[89]0"], "$1", , 1]], , [, , "NA", , , , , , , [-1]], , , [, , "[17]99\\d{4}|69\\d{5,6}", , , , "1992000", , , [7, 8]], [, , "[17]99\\d{4}|69\\d{5,6}|80\\d{5}", , , , "1992000", 
-, , [7, 8]], , , [, , "NA", , , , , , , [-1]]], VU:[, [, , "[2-57-9]\\d{4,6}", , , , , , , [5, 7]], [, , "(?:2[02-9]\\d|3(?:[5-7]\\d|8[0-8])|48[4-9]|88\\d)\\d{2}", , , , "22123", , , [5]], [, , "(?:5(?:7[2-5]|[0-689]\\d)|7[013-7]\\d)\\d{4}", , , , "5912345", , , [7]], [, , "NA", , , , , , , [-1]], [, , "NA", , , , , , , [-1]], [, , "NA", , , , , , , [-1]], [, , "NA", , , , , , , [-1]], [, , "NA", , , , , , , [-1]], "VU", 678, "00", , , , , , , , [[, "(\\d{3})(\\d{4})", "$1 $2", ["[579]"]]], , [, 
-, "NA", , , , , , , [-1]], , , [, , "NA", , , , , , , [-1]], [, , "3[03]\\d{3}|900\\d{4}", , , , "30123"], , , [, , "NA", , , , , , , [-1]]], WF:[, [, , "[4-8]\\d{5}", , , , , , , [6]], [, , "(?:50|68|72)\\d{4}", , , , "501234"], [, , "(?:50|68|72|8[23])\\d{4}", , , , "501234"], [, , "NA", , , , , , , [-1]], [, , "NA", , , , , , , [-1]], [, , "NA", , , , , , , [-1]], [, , "NA", , , , , , , [-1]], [, , "NA", , , , , , , [-1]], "WF", 681, "00", , , , , , , , [[, "(\\d{2})(\\d{2})(\\d{2})", "$1 $2 $3"]], 
-, [, , "NA", , , , , , , [-1]], , , [, , "NA", , , , , , , [-1]], [, , "NA", , , , , , , [-1]], , , [, , "[48]0\\d{4}", , , , "401234"]], WS:[, [, , "[2-8]\\d{4,6}", , , , , , , [5, 6, 7]], [, , "(?:[2-5]\\d|6[1-9]|84\\d{2})\\d{3}", , , , "22123", , , [5, 7]], [, , "(?:60|7[25-7]\\d)\\d{4}", , , , "601234", , , [6, 7]], [, , "800\\d{3}", , , , "800123", , , [6]], [, , "NA", , , , , , , [-1]], [, , "NA", , , , , , , [-1]], [, , "NA", , , , , , , [-1]], [, , "NA", , , , , , , [-1]], "WS", 685, "0", 
-, , , , , , , [[, "(8\\d{2})(\\d{3,4})", "$1 $2", ["8"]], [, "(7\\d)(\\d{5})", "$1 $2", ["7"]], [, "(\\d{5})", "$1", ["[2-6]"]]], , [, , "NA", , , , , , , [-1]], , , [, , "NA", , , , , , , [-1]], [, , "NA", , , , , , , [-1]], , , [, , "NA", , , , , , , [-1]]], YE:[, [, , "[1-7]\\d{6,8}", , , , , , , [7, 8, 9], [6]], [, , "(?:1(?:7\\d|[2-68])|2[2-68]|3[2358]|4[2-58]|5[2-6]|6[3-58]|7[24-68])\\d{5}", , , , "1234567", , , [7, 8], [6]], [, , "7[0137]\\d{7}", , , , "712345678", , , [9]], [, , "NA", , , 
-, , , , [-1]], [, , "NA", , , , , , , [-1]], [, , "NA", , , , , , , [-1]], [, , "NA", , , , , , , [-1]], [, , "NA", , , , , , , [-1]], "YE", 967, "00", "0", , , "0", , , , [[, "([1-7])(\\d{3})(\\d{3,4})", "$1 $2 $3", ["[1-6]|7[24-68]"], "0$1"], [, "(7\\d{2})(\\d{3})(\\d{3})", "$1 $2 $3", ["7[0137]"], "0$1"]], , [, , "NA", , , , , , , [-1]], , , [, , "NA", , , , , , , [-1]], [, , "NA", , , , , , , [-1]], , , [, , "NA", , , , , , , [-1]]], YT:[, [, , "[268]\\d{8}", , , , , , , [9]], [, , "269(?:6[0-4]|50)\\d{4}", 
-, , , "269601234"], [, , "639\\d{6}", , , , "639123456"], [, , "80\\d{7}", , , , "801234567"], [, , "NA", , , , , , , [-1]], [, , "NA", , , , , , , [-1]], [, , "NA", , , , , , , [-1]], [, , "NA", , , , , , , [-1]], "YT", 262, "00", "0", , , "0", , , , , , [, , "NA", , , , , , , [-1]], , "269|63", [, , "NA", , , , , , , [-1]], [, , "NA", , , , , , , [-1]], , , [, , "NA", , , , , , , [-1]]], ZA:[, [, , "[1-79]\\d{8}|8\\d{4,8}", , , , , , , [5, 6, 7, 8, 9]], [, , "(?:1[0-8]|2[1-378]|3[1-69]|4\\d|5[1346-8])\\d{7}", 
-, , , "101234567", , , [9]], [, , "(?:6\\d|7[0-46-9])\\d{7}|8(?:[1-4]\\d{1,5}|5\\d{5})\\d{2}", , , , "711234567"], [, , "80\\d{7}", , , , "801234567", , , [9]], [, , "86[2-9]\\d{6}|9[0-2]\\d{7}", , , , "862345678", , , [9]], [, , "860\\d{6}", , , , "860123456", , , [9]], [, , "NA", , , , , , , [-1]], [, , "87\\d{7}", , , , "871234567", , , [9]], "ZA", 27, "00", "0", , , "0", , , , [[, "(860)(\\d{3})(\\d{3})", "$1 $2 $3", ["860"], "0$1"], [, "(\\d{2})(\\d{3,4})", "$1 $2", ["8[1-4]"], "0$1"], [, "(\\d{2})(\\d{3})(\\d{2,3})", 
-"$1 $2 $3", ["8[1-4]"], "0$1"], [, "(\\d{2})(\\d{3})(\\d{4})", "$1 $2 $3", ["[1-79]|8(?:[0-57]|6[1-9])"], "0$1"]], , [, , "NA", , , , , , , [-1]], , , [, , "NA", , , , , , , [-1]], [, , "861\\d{6}", , , , "861123456", , , [9]], , , [, , "NA", , , , , , , [-1]]], ZM:[, [, , "[289]\\d{8}", , , , , , , [9]], [, , "21[1-8]\\d{6}", , , , "211234567"], [, , "9(?:5[034589]|[67]\\d)\\d{6}", , , , "955123456"], [, , "800\\d{6}", , , , "800123456"], [, , "NA", , , , , , , [-1]], [, , "NA", , , , , , , [-1]], 
-[, , "NA", , , , , , , [-1]], [, , "NA", , , , , , , [-1]], "ZM", 260, "00", "0", , , "0", , , , [[, "([29]\\d)(\\d{7})", "$1 $2", ["[29]"], "0$1"], [, "(800)(\\d{3})(\\d{3})", "$1 $2 $3", ["8"], "0$1"]], , [, , "NA", , , , , , , [-1]], , , [, , "NA", , , , , , , [-1]], [, , "NA", , , , , , , [-1]], , , [, , "NA", , , , , , , [-1]]], ZW:[, [, , "2(?:[012457-9]\\d{3,8}|6(?:[14]\\d{7}|\\d{4}))|[13-79]\\d{4,9}|8[06]\\d{8}", , , , , , , [5, 6, 7, 8, 9, 10], [3, 4]], [, , "(?:2(?:0(?:4\\d|5\\d{2})|2[278]\\d|48\\d|7(?:[1-7]\\d|[089]\\d{2})|8(?:[2-57-9]|[146]\\d{2})|98)|3(?:08|17|3[78]|7(?:[19]|[56]\\d)|8[37]|98)|5[15][78]|6(?:28\\d{2}|[36]7|75\\d|[69]8|8(?:7\\d|8)))\\d{3}|(?:2(?:1[39]|2[0157]|6[14]|7[35]|84)|329)\\d{7}|(?:1(?:3\\d{2}|9\\d|[4-8])|2(?:0\\d{2}|[569]\\d)|3(?:[26]|[013459]\\d)|5(?:0|5\\d{2}|[689]\\d)|6(?:[39]|[01246]\\d|[78]\\d{2}))\\d{3}|(?:29\\d|39|54)\\d{6}|(?:(?:25|54)83|2582\\d)\\d{3}|(?:4\\d{6,7}|9[2-9]\\d{4,5})", 
+, , , [7, 8, 9, 10]], [, , "(?:2(?:0(?:\\d|[3-9]\\d)|1[0-689]\\d|2(?:\\d|[0-25-9]\\d)|[5-7]\\d|3\\d{2}|[48][01]\\d|9(?:\\d|[0-4679]\\d))|3(?:[0136-9]|[25][01])\\d|4\\d{2}|5(?:[01][01]|[2-9])\\d|6(?:[0-46-8]|5[01])\\d|7(?:[02-79]|[18][01])\\d)\\d{6}|8(?:[2-5]\\d|6[236]|7[13])\\d{6}", , , , "2101234567", , , [9, 10]], [, , "(?:9\\d|1(?:2\\d|6[2-9]|8[68]|99))\\d{7}|8(?:6[89]|8\\d|9[89])\\d{6}", , , , "912345678", , , [9, 10]], [, , "1800\\d{4,6}", , , , "1800123456", , , [8, 9, 10]], [, , "1900\\d{4,6}", 
+, , , "1900123456", , , [8, 9, 10]], [, , "NA", , , , , , , [-1]], [, , "NA", , , , , , , [-1]], [, , "NA", , , , , , , [-1]], "VN", 84, "00", "0", , , "0", , , , [[, "([17]99)(\\d{4})", "$1 $2", ["[17]99"], "0$1", , 1], [, "([48])(\\d{4})(\\d{4})", "$1 $2 $3", ["4|8(?:[2-5]|6[236]|7[13])"], "0$1", , 1], [, "([235-7]\\d)(\\d{4})(\\d{3})", "$1 $2 $3", ["2[025-79]|3[0136-9]|5[2-9]|6[0-46-8]|7[02-79]"], "0$1", , 1], [, "(80)(\\d{5})", "$1 $2", ["80"], "0$1", , 1], [, "(69\\d)(\\d{4,5})", "$1 $2", ["69"], 
+"0$1", , 1], [, "([235-7]\\d{2})(\\d{4})(\\d{3})", "$1 $2 $3", ["2[0-489]|3[25]|5[01]|65|7[18]"], "0$1", , 1], [, "([89]\\d)(\\d{3})(\\d{2})(\\d{2})", "$1 $2 $3 $4", ["8(?:8|9[89])|9"], "0$1", , 1], [, "(1[2689]\\d)(\\d{3})(\\d{4})", "$1 $2 $3", ["1(?:[26]|8[68]|99)"], "0$1", , 1], [, "(86[89])(\\d{3})(\\d{3})", "$1 $2 $3", ["86[89]"], "0$1", , 1], [, "(1[89]00)(\\d{4,6})", "$1 $2", ["1[89]0"], "$1", , 1]], , [, , "NA", , , , , , , [-1]], , , [, , "[17]99\\d{4}|69\\d{5,6}", , , , "1992000", , , [7, 
+8]], [, , "[17]99\\d{4}|69\\d{5,6}|80\\d{5}", , , , "1992000", , , [7, 8]], , , [, , "NA", , , , , , , [-1]]], VU:[, [, , "[2-57-9]\\d{4,6}", , , , , , , [5, 7]], [, , "(?:2[02-9]\\d|3(?:[5-7]\\d|8[0-8])|48[4-9]|88\\d)\\d{2}", , , , "22123", , , [5]], [, , "(?:5(?:7[2-5]|[0-689]\\d)|7[013-7]\\d)\\d{4}", , , , "5912345", , , [7]], [, , "NA", , , , , , , [-1]], [, , "NA", , , , , , , [-1]], [, , "NA", , , , , , , [-1]], [, , "NA", , , , , , , [-1]], [, , "NA", , , , , , , [-1]], "VU", 678, "00", , 
+, , , , , , [[, "(\\d{3})(\\d{4})", "$1 $2", ["[579]"]]], , [, , "NA", , , , , , , [-1]], , , [, , "NA", , , , , , , [-1]], [, , "3[03]\\d{3}|900\\d{4}", , , , "30123"], , , [, , "NA", , , , , , , [-1]]], WF:[, [, , "[4-8]\\d{5}", , , , , , , [6]], [, , "(?:50|68|72)\\d{4}", , , , "501234"], [, , "(?:50|68|72|8[23])\\d{4}", , , , "501234"], [, , "NA", , , , , , , [-1]], [, , "NA", , , , , , , [-1]], [, , "NA", , , , , , , [-1]], [, , "NA", , , , , , , [-1]], [, , "NA", , , , , , , [-1]], "WF", 681, 
+"00", , , , , , , , [[, "(\\d{2})(\\d{2})(\\d{2})", "$1 $2 $3"]], , [, , "NA", , , , , , , [-1]], , , [, , "NA", , , , , , , [-1]], [, , "NA", , , , , , , [-1]], , , [, , "[48]0\\d{4}", , , , "401234"]], WS:[, [, , "[2-8]\\d{4,6}", , , , , , , [5, 6, 7]], [, , "(?:[2-5]\\d|6[1-9]|84\\d{2})\\d{3}", , , , "22123", , , [5, 7]], [, , "(?:60|7[25-7]\\d)\\d{4}", , , , "601234", , , [6, 7]], [, , "800\\d{3}", , , , "800123", , , [6]], [, , "NA", , , , , , , [-1]], [, , "NA", , , , , , , [-1]], [, , "NA", 
+, , , , , , [-1]], [, , "NA", , , , , , , [-1]], "WS", 685, "0", , , , , , , , [[, "(8\\d{2})(\\d{3,4})", "$1 $2", ["8"]], [, "(7\\d)(\\d{5})", "$1 $2", ["7"]], [, "(\\d{5})", "$1", ["[2-6]"]]], , [, , "NA", , , , , , , [-1]], , , [, , "NA", , , , , , , [-1]], [, , "NA", , , , , , , [-1]], , , [, , "NA", , , , , , , [-1]]], YE:[, [, , "[1-7]\\d{6,8}", , , , , , , [7, 8, 9], [6]], [, , "(?:1(?:7\\d|[2-68])|2[2-68]|3[2358]|4[2-58]|5[2-6]|6[3-58]|7[24-68])\\d{5}", , , , "1234567", , , [7, 8], [6]], 
+[, , "7[0137]\\d{7}", , , , "712345678", , , [9]], [, , "NA", , , , , , , [-1]], [, , "NA", , , , , , , [-1]], [, , "NA", , , , , , , [-1]], [, , "NA", , , , , , , [-1]], [, , "NA", , , , , , , [-1]], "YE", 967, "00", "0", , , "0", , , , [[, "([1-7])(\\d{3})(\\d{3,4})", "$1 $2 $3", ["[1-6]|7[24-68]"], "0$1"], [, "(7\\d{2})(\\d{3})(\\d{3})", "$1 $2 $3", ["7[0137]"], "0$1"]], , [, , "NA", , , , , , , [-1]], , , [, , "NA", , , , , , , [-1]], [, , "NA", , , , , , , [-1]], , , [, , "NA", , , , , , , [-1]]], 
+YT:[, [, , "[268]\\d{8}", , , , , , , [9]], [, , "269(?:6[0-4]|50)\\d{4}", , , , "269601234"], [, , "639\\d{6}", , , , "639123456"], [, , "80\\d{7}", , , , "801234567"], [, , "NA", , , , , , , [-1]], [, , "NA", , , , , , , [-1]], [, , "NA", , , , , , , [-1]], [, , "NA", , , , , , , [-1]], "YT", 262, "00", "0", , , "0", , , , , , [, , "NA", , , , , , , [-1]], , "269|63", [, , "NA", , , , , , , [-1]], [, , "NA", , , , , , , [-1]], , , [, , "NA", , , , , , , [-1]]], ZA:[, [, , "[1-79]\\d{8}|8\\d{4,8}", 
+, , , , , , [5, 6, 7, 8, 9]], [, , "(?:1[0-8]|2[1-378]|3[1-69]|4\\d|5[1346-8])\\d{7}", , , , "101234567", , , [9]], [, , "(?:6\\d|7[0-46-9])\\d{7}|8(?:[1-4]\\d{1,5}|5\\d{5})\\d{2}", , , , "711234567"], [, , "80\\d{7}", , , , "801234567", , , [9]], [, , "86[2-9]\\d{6}|9[0-2]\\d{7}", , , , "862345678", , , [9]], [, , "860\\d{6}", , , , "860123456", , , [9]], [, , "NA", , , , , , , [-1]], [, , "87\\d{7}", , , , "871234567", , , [9]], "ZA", 27, "00", "0", , , "0", , , , [[, "(860)(\\d{3})(\\d{3})", "$1 $2 $3", 
+["860"], "0$1"], [, "(\\d{2})(\\d{3,4})", "$1 $2", ["8[1-4]"], "0$1"], [, "(\\d{2})(\\d{3})(\\d{2,3})", "$1 $2 $3", ["8[1-4]"], "0$1"], [, "(\\d{2})(\\d{3})(\\d{4})", "$1 $2 $3", ["[1-79]|8(?:[0-57]|6[1-9])"], "0$1"]], , [, , "NA", , , , , , , [-1]], , , [, , "NA", , , , , , , [-1]], [, , "861\\d{6}", , , , "861123456", , , [9]], , , [, , "NA", , , , , , , [-1]]], ZM:[, [, , "[289]\\d{8}", , , , , , , [9]], [, , "21[1-8]\\d{6}", , , , "211234567"], [, , "9(?:5[034589]|[67]\\d)\\d{6}", , , , "955123456"], 
+[, , "800\\d{6}", , , , "800123456"], [, , "NA", , , , , , , [-1]], [, , "NA", , , , , , , [-1]], [, , "NA", , , , , , , [-1]], [, , "NA", , , , , , , [-1]], "ZM", 260, "00", "0", , , "0", , , , [[, "([29]\\d)(\\d{7})", "$1 $2", ["[29]"], "0$1"], [, "(800)(\\d{3})(\\d{3})", "$1 $2 $3", ["8"], "0$1"]], , [, , "NA", , , , , , , [-1]], , , [, , "NA", , , , , , , [-1]], [, , "NA", , , , , , , [-1]], , , [, , "NA", , , , , , , [-1]]], ZW:[, [, , "2(?:[012457-9]\\d{3,8}|6(?:[14]\\d{7}|\\d{4}))|[13-79]\\d{4,9}|8[06]\\d{8}", 
+, , , , , , [5, 6, 7, 8, 9, 10], [3, 4]], [, , "(?:2(?:0(?:4\\d|5\\d{2})|2[278]\\d|48\\d|7(?:[1-7]\\d|[089]\\d{2})|8(?:[2-57-9]|[146]\\d{2})|98)|3(?:08|17|3[78]|7(?:[19]|[56]\\d)|8[37]|98)|5[15][78]|6(?:28\\d{2}|[36]7|75\\d|[69]8|8(?:7\\d|8)))\\d{3}|(?:2(?:1[39]|2[0157]|6[14]|7[35]|84)|329)\\d{7}|(?:1(?:3\\d{2}|9\\d|[4-8])|2(?:0\\d{2}|[569]\\d)|3(?:[26]|[013459]\\d)|5(?:0|5\\d{2}|[689]\\d)|6(?:[39]|[01246]\\d|[78]\\d{2}))\\d{3}|(?:29\\d|39|54)\\d{6}|(?:(?:25|54)83|2582\\d)\\d{3}|(?:4\\d{6,7}|9[2-9]\\d{4,5})", 
 , , , "1312345", , , , [3, 4]], [, , "7[1378]\\d{7}", , , , "711234567", , , [9]], [, , "800\\d{7}", , , , "8001234567", , , [10]], [, , "NA", , , , , , , [-1]], [, , "NA", , , , , , , [-1]], [, , "NA", , , , , , , [-1]], [, , "86(?:1[12]|30|44|55|77|8[367]|99)\\d{6}", , , , "8686123456", , , [10]], "ZW", 263, "00", "0", , , "0", , , , [[, "([49])(\\d{3})(\\d{2,4})", "$1 $2 $3", ["4|9[2-9]"], "0$1"], [, "(7\\d)(\\d{3})(\\d{3,4})", "$1 $2 $3", ["7"], "0$1"], [, "(86\\d{2})(\\d{3})(\\d{3})", "$1 $2 $3", 
 ["86[24]"], "0$1"], [, "([2356]\\d{2})(\\d{3,5})", "$1 $2", ["2(?:0[45]|2[278]|[49]8|[78])|3(?:08|17|3[78]|7[1569]|8[37]|98)|5[15][78]|6(?:[29]8|[38]7|6[78]|75|[89]8)"], "0$1"], [, "(\\d{3})(\\d{3})(\\d{3,4})", "$1 $2 $3", ["2(?:1[39]|2[0157]|6[14]|7[35]|84)|329"], "0$1"], [, "([1-356]\\d)(\\d{3,5})", "$1 $2", ["1[3-9]|2[0569]|3[0-69]|5[05689]|6[0-46-9]"], "0$1"], [, "([235]\\d)(\\d{3})(\\d{3,4})", "$1 $2 $3", ["[23]9|54"], "0$1"], [, "([25]\\d{3})(\\d{3,5})", "$1 $2", ["(?:25|54)8", "258[23]|5483"], 
 "0$1"], [, "(8\\d{3})(\\d{6})", "$1 $2", ["86"], "0$1"], [, "(80\\d)(\\d{3})(\\d{4})", "$1 $2 $3", ["80"], "0$1"]], , [, , "NA", , , , , , , [-1]], , , [, , "NA", , , , , , , [-1]], [, , "NA", , , , , , , [-1]], , , [, , "NA", , , , , , , [-1]]], 800:[, [, , "\\d{8}", , , , , , , [8]], [, , "NA", , , , , , , [-1]], [, , "NA", , , , , , , [-1]], [, , "\\d{8}", , , , "12345678"], [, , "NA", , , , , , , [-1]], [, , "NA", , , , , , , [-1]], [, , "NA", , , , , , , [-1]], [, , "NA", , , , , , , [-1]], 
@@ -3899,8 +3901,12 @@ i18n.phonenumbers.PhoneNumberUtil.prototype.getLengthOfGeographicalAreaCode = fu
   return null != b && (b.hasNationalPrefix() || a.hasItalianLeadingZero()) && this.isNumberGeographical(a) ? this.getLengthOfNationalDestinationCode(a) : 0;
 };
 i18n.phonenumbers.PhoneNumberUtil.prototype.getLengthOfNationalDestinationCode = function(a) {
-  var b;
-  a.hasExtension() ? (b = a.clone(), b.clearExtension()) : b = a;
+  if (a.hasExtension()) {
+    var b = a.clone();
+    b.clearExtension();
+  } else {
+    b = a;
+  }
   b = this.format(b, i18n.phonenumbers.PhoneNumberFormat.INTERNATIONAL).split(i18n.phonenumbers.PhoneNumberUtil.NON_DIGITS_PATTERN_);
   0 == b[0].length && b.shift();
   return 2 >= b.length ? 0 : this.getNumberType(a) == i18n.phonenumbers.PhoneNumberType.MOBILE && (a = i18n.phonenumbers.PhoneNumberUtil.getCountryMobileToken(a.getCountryCodeOrDefault()), "" != a) ? b[2].length + a.length : b[1].length;
@@ -3945,7 +3951,7 @@ i18n.phonenumbers.PhoneNumberUtil.prototype.getSupportedTypesForNonGeoEntity = f
   return null == a ? [] : i18n.phonenumbers.PhoneNumberUtil.getSupportedTypesForMetadata_(a);
 };
 i18n.phonenumbers.PhoneNumberUtil.normalizeHelper_ = function(a, b, c) {
-  for (var d = new goog.string.StringBuffer, e, f, g = a.length, h = 0;h < g;++h) {
+  for (var d = new goog.string.StringBuffer, e, f, g = a.length, h = 0; h < g; ++h) {
     e = a.charAt(h), f = b[e.toUpperCase()], null != f ? d.append(f) : c || d.append(e);
   }
   return d.toString();
@@ -4064,10 +4070,9 @@ i18n.phonenumbers.PhoneNumberUtil.prototype.formatInOriginalFormat = function(a,
   if (!a.hasCountryCodeSource()) {
     return this.format(a, i18n.phonenumbers.PhoneNumberFormat.NATIONAL);
   }
-  var c;
   switch(a.getCountryCodeSource()) {
     case i18n.phonenumbers.PhoneNumber.CountryCodeSource.FROM_NUMBER_WITH_PLUS_SIGN:
-      c = this.format(a, i18n.phonenumbers.PhoneNumberFormat.INTERNATIONAL);
+      var c = this.format(a, i18n.phonenumbers.PhoneNumberFormat.INTERNATIONAL);
       break;
     case i18n.phonenumbers.PhoneNumber.CountryCodeSource.FROM_NUMBER_WITH_IDD:
       c = this.formatOutOfCountryCallingNumber(a, b);
@@ -4168,7 +4173,7 @@ i18n.phonenumbers.PhoneNumberUtil.prototype.formatNsn_ = function(a, b, c, d) {
   return null == b ? a : this.formatNsnUsingPattern_(a, b, c, d);
 };
 i18n.phonenumbers.PhoneNumberUtil.prototype.chooseFormattingPatternForNumber_ = function(a, b) {
-  for (var c, d = a.length, e = 0;e < d;++e) {
+  for (var c, d = a.length, e = 0; e < d; ++e) {
     c = a[e];
     var f = c.leadingDigitsPatternCount();
     if (0 == f || 0 == b.search(c.getLeadingDigitsPattern(f - 1))) {
@@ -4299,7 +4304,7 @@ i18n.phonenumbers.PhoneNumberUtil.prototype.getRegionCodeForNumber = function(a)
   return null == b ? null : 1 == b.length ? b[0] : this.getRegionCodeForNumberFromRegionList_(a, b);
 };
 i18n.phonenumbers.PhoneNumberUtil.prototype.getRegionCodeForNumberFromRegionList_ = function(a, b) {
-  for (var c = this.getNationalSignificantNumber(a), d, e = b.length, f = 0;f < e;f++) {
+  for (var c = this.getNationalSignificantNumber(a), d, e = b.length, f = 0; f < e; f++) {
     d = b[f];
     var g = this.getMetadataForRegion(d);
     if (g.hasLeadingDigits()) {
@@ -4425,7 +4430,7 @@ i18n.phonenumbers.PhoneNumberUtil.prototype.extractCountryCode = function(a, b) 
   if (0 == c.length || "0" == c.charAt(0)) {
     return 0;
   }
-  for (var d, e = c.length, f = 1;f <= i18n.phonenumbers.PhoneNumberUtil.MAX_LENGTH_COUNTRY_CODE_ && f <= e;++f) {
+  for (var d, e = c.length, f = 1; f <= i18n.phonenumbers.PhoneNumberUtil.MAX_LENGTH_COUNTRY_CODE_ && f <= e; ++f) {
     if (d = parseInt(c.substring(0, f), 10), d in i18n.phonenumbers.metadata.countryCodeToRegionCodeMap) {
       return b.append(c.substring(f)), d;
     }
@@ -4517,7 +4522,7 @@ i18n.phonenumbers.PhoneNumberUtil.prototype.maybeStripNationalPrefixAndCarrierCo
 i18n.phonenumbers.PhoneNumberUtil.prototype.maybeStripExtension = function(a) {
   var b = a.toString(), c = b.search(i18n.phonenumbers.PhoneNumberUtil.EXTN_PATTERN_);
   if (0 <= c && i18n.phonenumbers.PhoneNumberUtil.isViablePhoneNumber(b.substring(0, c))) {
-    for (var d = b.match(i18n.phonenumbers.PhoneNumberUtil.EXTN_PATTERN_), e = d.length, f = 1;f < e;++f) {
+    for (var d = b.match(i18n.phonenumbers.PhoneNumberUtil.EXTN_PATTERN_), e = d.length, f = 1; f < e; ++f) {
       if (null != d[f] && 0 < d[f].length) {
         return a.clear(), a.append(b.substring(0, c)), d[f];
       }
@@ -4540,7 +4545,7 @@ i18n.phonenumbers.PhoneNumberUtil.prototype.parseAndKeepRawInput = function(a, b
 i18n.phonenumbers.PhoneNumberUtil.setItalianLeadingZerosForPhoneNumber_ = function(a, b) {
   if (1 < a.length && "0" == a.charAt(0)) {
     b.setItalianLeadingZero(!0);
-    for (var c = 1;c < a.length - 1 && "0" == a.charAt(c);) {
+    for (var c = 1; c < a.length - 1 && "0" == a.charAt(c);) {
       c++;
     }
     1 != c && b.setNumberOfLeadingZeros(c);
@@ -4597,7 +4602,7 @@ i18n.phonenumbers.PhoneNumberUtil.prototype.parseHelper_ = function(a, b, c, d) 
 };
 i18n.phonenumbers.PhoneNumberUtil.prototype.buildNationalNumberForParsing_ = function(a, b) {
   var c = a.indexOf(i18n.phonenumbers.PhoneNumberUtil.RFC3966_PHONE_CONTEXT_);
-  if (0 < c) {
+  if (0 <= c) {
     var d = c + i18n.phonenumbers.PhoneNumberUtil.RFC3966_PHONE_CONTEXT_.length;
     if (a.charAt(d) == i18n.phonenumbers.PhoneNumberUtil.PLUS_SIGN) {
       var e = a.indexOf(";", d);
@@ -4621,19 +4626,18 @@ i18n.phonenumbers.PhoneNumberUtil.copyCoreFieldsOnly_ = function(a) {
   return b;
 };
 i18n.phonenumbers.PhoneNumberUtil.prototype.isNumberMatch = function(a, b) {
-  var c, d;
   if ("string" == typeof a) {
     try {
-      c = this.parse(a, i18n.phonenumbers.PhoneNumberUtil.UNKNOWN_REGION_);
+      var c = this.parse(a, i18n.phonenumbers.PhoneNumberUtil.UNKNOWN_REGION_);
     } catch (g) {
       if (g.message != i18n.phonenumbers.Error.INVALID_COUNTRY_CODE) {
         return i18n.phonenumbers.PhoneNumberUtil.MatchType.NOT_A_NUMBER;
       }
       if ("string" != typeof b) {
-        var e = this.getRegionCodeForCountryCode(b.getCountryCodeOrDefault());
-        if (e != i18n.phonenumbers.PhoneNumberUtil.UNKNOWN_REGION_) {
+        var d = this.getRegionCodeForCountryCode(b.getCountryCodeOrDefault());
+        if (d != i18n.phonenumbers.PhoneNumberUtil.UNKNOWN_REGION_) {
           try {
-            c = this.parse(a, e);
+            c = this.parse(a, d);
           } catch (h) {
             return i18n.phonenumbers.PhoneNumberUtil.MatchType.NOT_A_NUMBER;
           }
@@ -4652,25 +4656,26 @@ i18n.phonenumbers.PhoneNumberUtil.prototype.isNumberMatch = function(a, b) {
   }
   if ("string" == typeof b) {
     try {
-      return d = this.parse(b, i18n.phonenumbers.PhoneNumberUtil.UNKNOWN_REGION_), this.isNumberMatch(a, d);
+      var e = this.parse(b, i18n.phonenumbers.PhoneNumberUtil.UNKNOWN_REGION_);
+      return this.isNumberMatch(a, e);
     } catch (g) {
       return g.message != i18n.phonenumbers.Error.INVALID_COUNTRY_CODE ? i18n.phonenumbers.PhoneNumberUtil.MatchType.NOT_A_NUMBER : this.isNumberMatch(b, c);
     }
   } else {
-    d = b.clone();
+    e = b.clone();
   }
   c = i18n.phonenumbers.PhoneNumberUtil.copyCoreFieldsOnly_(c);
-  d = i18n.phonenumbers.PhoneNumberUtil.copyCoreFieldsOnly_(d);
-  if (c.hasExtension() && d.hasExtension() && c.getExtension() != d.getExtension()) {
+  e = i18n.phonenumbers.PhoneNumberUtil.copyCoreFieldsOnly_(e);
+  if (c.hasExtension() && e.hasExtension() && c.getExtension() != e.getExtension()) {
     return i18n.phonenumbers.PhoneNumberUtil.MatchType.NO_MATCH;
   }
-  var e = c.getCountryCodeOrDefault(), f = d.getCountryCodeOrDefault();
-  if (0 != e && 0 != f) {
-    return c.equals(d) ? i18n.phonenumbers.PhoneNumberUtil.MatchType.EXACT_MATCH : e == f && this.isNationalNumberSuffixOfTheOther_(c, d) ? i18n.phonenumbers.PhoneNumberUtil.MatchType.SHORT_NSN_MATCH : i18n.phonenumbers.PhoneNumberUtil.MatchType.NO_MATCH;
+  var d = c.getCountryCodeOrDefault(), f = e.getCountryCodeOrDefault();
+  if (0 != d && 0 != f) {
+    return c.equals(e) ? i18n.phonenumbers.PhoneNumberUtil.MatchType.EXACT_MATCH : d == f && this.isNationalNumberSuffixOfTheOther_(c, e) ? i18n.phonenumbers.PhoneNumberUtil.MatchType.SHORT_NSN_MATCH : i18n.phonenumbers.PhoneNumberUtil.MatchType.NO_MATCH;
   }
   c.setCountryCode(0);
-  d.setCountryCode(0);
-  return c.equals(d) ? i18n.phonenumbers.PhoneNumberUtil.MatchType.NSN_MATCH : this.isNationalNumberSuffixOfTheOther_(c, d) ? i18n.phonenumbers.PhoneNumberUtil.MatchType.SHORT_NSN_MATCH : i18n.phonenumbers.PhoneNumberUtil.MatchType.NO_MATCH;
+  e.setCountryCode(0);
+  return c.equals(e) ? i18n.phonenumbers.PhoneNumberUtil.MatchType.NSN_MATCH : this.isNationalNumberSuffixOfTheOther_(c, e) ? i18n.phonenumbers.PhoneNumberUtil.MatchType.SHORT_NSN_MATCH : i18n.phonenumbers.PhoneNumberUtil.MatchType.NO_MATCH;
 };
 i18n.phonenumbers.PhoneNumberUtil.prototype.isNationalNumberSuffixOfTheOther_ = function(a, b) {
   var c = "" + a.getNationalNumber(), d = "" + b.getNationalNumber();
@@ -4723,7 +4728,7 @@ i18n.phonenumbers.AsYouTypeFormatter.prototype.getMetadataForRegion_ = function(
   return null != a ? a : i18n.phonenumbers.AsYouTypeFormatter.EMPTY_METADATA_;
 };
 i18n.phonenumbers.AsYouTypeFormatter.prototype.maybeCreateNewTemplate_ = function() {
-  for (var a = this.possibleFormats_.length, b = 0;b < a;++b) {
+  for (var a = this.possibleFormats_.length, b = 0; b < a; ++b) {
     var c = this.possibleFormats_[b], d = c.getPatternOrDefault();
     if (this.currentFormattingPattern_ == d) {
       return !1;
@@ -4735,7 +4740,7 @@ i18n.phonenumbers.AsYouTypeFormatter.prototype.maybeCreateNewTemplate_ = functio
   return this.ableToFormat_ = !1;
 };
 i18n.phonenumbers.AsYouTypeFormatter.prototype.getAvailableFormats_ = function(a) {
-  for (var b = this.isCompleteNumber_ && 0 < this.currentMetadata_.intlNumberFormatCount() ? this.currentMetadata_.intlNumberFormatArray() : this.currentMetadata_.numberFormatArray(), c = b.length, d = 0;d < c;++d) {
+  for (var b = this.isCompleteNumber_ && 0 < this.currentMetadata_.intlNumberFormatCount() ? this.currentMetadata_.intlNumberFormatArray() : this.currentMetadata_.numberFormatArray(), c = b.length, d = 0; d < c; ++d) {
     var e = b[d];
     (!this.currentMetadata_.hasNationalPrefix() || this.isCompleteNumber_ || e.getNationalPrefixOptionalWhenFormatting() || this.phoneUtil_.formattingRuleHasFirstGroupOnly(e.getNationalPrefixFormattingRuleOrDefault())) && this.isFormatEligible_(e.getFormatOrDefault()) && this.possibleFormats_.push(e);
   }
@@ -4745,7 +4750,7 @@ i18n.phonenumbers.AsYouTypeFormatter.prototype.isFormatEligible_ = function(a) {
   return i18n.phonenumbers.AsYouTypeFormatter.ELIGIBLE_FORMAT_PATTERN_.test(a);
 };
 i18n.phonenumbers.AsYouTypeFormatter.prototype.narrowDownPossibleFormats_ = function(a) {
-  for (var b = [], c = a.length - i18n.phonenumbers.AsYouTypeFormatter.MIN_LEADING_DIGITS_LENGTH_, d = this.possibleFormats_.length, e = 0;e < d;++e) {
+  for (var b = [], c = a.length - i18n.phonenumbers.AsYouTypeFormatter.MIN_LEADING_DIGITS_LENGTH_, d = this.possibleFormats_.length, e = 0; e < d; ++e) {
     var f = this.possibleFormats_[e];
     if (0 == f.leadingDigitsPatternCount()) {
       b.push(this.possibleFormats_[e]);
@@ -4871,7 +4876,7 @@ i18n.phonenumbers.AsYouTypeFormatter.prototype.isDigitOrLeadingPlusSign_ = funct
   return i18n.phonenumbers.PhoneNumberUtil.CAPTURING_DIGIT_PATTERN.test(a) || 1 == this.accruedInput_.getLength() && i18n.phonenumbers.PhoneNumberUtil.PLUS_CHARS_PATTERN.test(a);
 };
 i18n.phonenumbers.AsYouTypeFormatter.prototype.attemptToFormatAccruedDigits_ = function() {
-  for (var a = this.nationalNumber_.toString(), b = this.possibleFormats_.length, c = 0;c < b;++c) {
+  for (var a = this.nationalNumber_.toString(), b = this.possibleFormats_.length, c = 0; c < b; ++c) {
     var d = this.possibleFormats_[c], e = d.getPatternOrDefault();
     if ((new RegExp("^(?:" + e + ")$")).test(a)) {
       return this.shouldAddSpaceAfterNationalPrefix_ = i18n.phonenumbers.AsYouTypeFormatter.NATIONAL_PREFIX_SEPARATORS_PATTERN_.test(d.getNationalPrefixFormattingRule()), a = a.replace(new RegExp(e, "g"), d.getFormat()), this.appendNationalNumber_(a);
@@ -4887,7 +4892,7 @@ i18n.phonenumbers.AsYouTypeFormatter.prototype.getRememberedPosition = function(
   if (!this.ableToFormat_) {
     return this.originalPosition_;
   }
-  for (var a = 0, b = 0, c = this.accruedInputWithoutFormatting_.toString(), d = this.currentOutput_.toString();a < this.positionToRemember_ && b < d.length;) {
+  for (var a = 0, b = 0, c = this.accruedInputWithoutFormatting_.toString(), d = this.currentOutput_.toString(); a < this.positionToRemember_ && b < d.length;) {
     c.charAt(a) == d.charAt(b) && a++, b++;
   }
   return b;
@@ -4899,7 +4904,7 @@ i18n.phonenumbers.AsYouTypeFormatter.prototype.attemptToChooseFormattingPattern_
 i18n.phonenumbers.AsYouTypeFormatter.prototype.inputAccruedNationalNumber_ = function() {
   var a = this.nationalNumber_.toString(), b = a.length;
   if (0 < b) {
-    for (var c = "", d = 0;d < b;d++) {
+    for (var c = "", d = 0; d < b; d++) {
       c = this.inputDigitHelper_(a.charAt(d));
     }
     return this.ableToFormat_ ? this.appendNationalNumber_(c) : this.accruedInput_.toString();
@@ -4948,8 +4953,12 @@ i18n.phonenumbers.AsYouTypeFormatter.prototype.attemptToExtractCountryCallingCod
   return !0;
 };
 i18n.phonenumbers.AsYouTypeFormatter.prototype.normalizeAndAccrueDigitsAndPlusSign_ = function(a, b) {
-  var c;
-  a == i18n.phonenumbers.PhoneNumberUtil.PLUS_SIGN ? (c = a, this.accruedInputWithoutFormatting_.append(a)) : (c = i18n.phonenumbers.PhoneNumberUtil.DIGIT_MAPPINGS[a], this.accruedInputWithoutFormatting_.append(c), this.nationalNumber_.append(c));
+  if (a == i18n.phonenumbers.PhoneNumberUtil.PLUS_SIGN) {
+    var c = a;
+    this.accruedInputWithoutFormatting_.append(a);
+  } else {
+    c = i18n.phonenumbers.PhoneNumberUtil.DIGIT_MAPPINGS[a], this.accruedInputWithoutFormatting_.append(c), this.nationalNumber_.append(c);
+  }
   b && (this.positionToRemember_ = this.accruedInputWithoutFormatting_.getLength());
   return c;
 };
