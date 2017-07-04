@@ -334,19 +334,6 @@ function testIsNumberGeographical() {
   assertTrue(phoneUtil.isNumberGeographical(MX_MOBILE2));
 }
 
-function testIsLeadingZeroPossible() {
-  // Italy
-  assertTrue(phoneUtil.isLeadingZeroPossible(39));
-  // USA
-  assertFalse(phoneUtil.isLeadingZeroPossible(1));
-  // International toll free
-  assertTrue(phoneUtil.isLeadingZeroPossible(800));
-  // International premium-rate
-  assertFalse(phoneUtil.isLeadingZeroPossible(979));
-  // Not in metadata file, just default to false.
-  assertFalse(phoneUtil.isLeadingZeroPossible(888));
-}
-
 function testGetLengthOfGeographicalAreaCode() {
   // Google MTV, which has area code '650'.
   assertEquals(3, phoneUtil.getLengthOfGeographicalAreaCode(US_NUMBER));
@@ -505,6 +492,11 @@ function testGetNationalSignificantNumber() {
 
   assertEquals('12345678',
       phoneUtil.getNationalSignificantNumber(INTERNATIONAL_TOLL_FREE));
+
+  // An empty number.
+  /** @type {i18n.phonenumbers.PhoneNumber} */
+  var emptyNumber = new i18n.phonenumbers.PhoneNumber();
+  assertEquals('', phoneUtil.getNationalSignificantNumber(emptyNumber));
 }
 
 function testGetNationalSignificantNumber_ManyLeadingZeros() {
@@ -2655,6 +2647,12 @@ function testMaybeExtractCountryCode() {
 function testParseNationalNumber() {
   // National prefix attached.
   assertTrue(NZ_NUMBER.equals(phoneUtil.parse('033316005', RegionCode.NZ)));
+  // Some fields are not filled in by parse, but only by parseAndKeepRawInput.
+  assertFalse(NZ_NUMBER.hasCountryCodeSource());
+  assertNull(NZ_NUMBER.getCountryCodeSource());
+  assertEquals(i18n.phonenumbers.PhoneNumber.CountryCodeSource.UNSPECIFIED,
+      NZ_NUMBER.getCountryCodeSourceOrDefault());
+
   assertTrue(NZ_NUMBER.equals(phoneUtil.parse('33316005', RegionCode.NZ)));
   // National prefix attached and some formatting present.
   assertTrue(NZ_NUMBER.equals(phoneUtil.parse('03-331 6005', RegionCode.NZ)));

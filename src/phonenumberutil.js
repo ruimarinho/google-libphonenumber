@@ -1531,9 +1531,9 @@ i18n.phonenumbers.PhoneNumberUtil.prototype.formattingRuleHasFirstGroupOnly =
 
 
 /**
- * Tests whether a phone number has a geographical association. It checks if
- * the number is associated to a certain region in the country where it belongs
- * to. Note that this doesn't verify if the number is actually in use.
+ * Tests whether a phone number has a geographical association. It checks if the
+ * number is associated with a certain region in the country to which it
+ * belongs. Note that this doesn't verify if the number is actually in use.
  *
  * @param {i18n.phonenumbers.PhoneNumber} phoneNumber The phone number to test.
  * @return {boolean} true if the phone number has a geographical association.
@@ -2100,9 +2100,7 @@ i18n.phonenumbers.PhoneNumberUtil.prototype.formatOutOfCountryCallingNumber =
 i18n.phonenumbers.PhoneNumberUtil.prototype.formatInOriginalFormat =
     function(number, regionCallingFrom) {
 
-  if (number.hasRawInput() &&
-      (this.hasUnexpectedItalianLeadingZero_(number) ||
-       !this.hasFormattingPatternForNumber_(number))) {
+  if (number.hasRawInput() && !this.hasFormattingPatternForNumber_(number)) {
     // We check if we have the formatting pattern because without that, we might
     // format the number as a group without national prefix.
     return number.getRawInputOrDefault();
@@ -2255,22 +2253,6 @@ i18n.phonenumbers.PhoneNumberUtil.prototype.rawInputContainsNationalPrefix_ =
     }
   }
   return false;
-};
-
-
-/**
- * Returns true if a number is from a region whose national significant number
- * couldn't contain a leading zero, but has the italian_leading_zero field set
- * to true.
- * @param {i18n.phonenumbers.PhoneNumber} number
- * @return {boolean}
- * @private
- */
-i18n.phonenumbers.PhoneNumberUtil.prototype.hasUnexpectedItalianLeadingZero_ =
-    function(number) {
-
-  return number.hasItalianLeadingZero() &&
-      !this.isLeadingZeroPossible(number.getCountryCodeOrDefault());
 };
 
 
@@ -2448,10 +2430,16 @@ i18n.phonenumbers.PhoneNumberUtil.prototype.
 i18n.phonenumbers.PhoneNumberUtil.prototype.getNationalSignificantNumber =
     function(number) {
 
-  // If leading zero(s) have been set, we prefix this now. Note this is not a
-  // national prefix.
+  if (!number.hasNationalNumber()) {
+    return '';
+  }
   /** @type {string} */
   var nationalNumber = '' + number.getNationalNumber();
+  // If leading zero(s) have been set, we prefix this now. Note that a single
+  // leading zero is not the same as a national prefix; leading zeros should be
+  // dialled no matter whether you are dialling from within or outside the
+  // country, national prefixes are added when formatting nationally if
+  // applicable.
   if (number.hasItalianLeadingZero() && number.getItalianLeadingZero() &&
       number.getNumberOfLeadingZerosOrDefault() > 0) {
     return Array(number.getNumberOfLeadingZerosOrDefault() + 1).join('0') +
@@ -3230,26 +3218,6 @@ i18n.phonenumbers.PhoneNumberUtil.prototype.isNANPACountry =
 
 
 /**
- * Checks whether countryCode represents the country calling code from a region
- * whose national significant number could contain a leading zero. An example of
- * such a region is Italy. Returns false if no metadata for the country is
- * found.
- *
- * @param {number} countryCallingCode the country calling code.
- * @return {boolean}
- */
-i18n.phonenumbers.PhoneNumberUtil.prototype.isLeadingZeroPossible =
-    function(countryCallingCode) {
-  /** @type {i18n.phonenumbers.PhoneMetadata} */
-  var mainMetadataForCallingCode = this.getMetadataForRegionOrCallingCode_(
-      countryCallingCode,
-      this.getRegionCodeForCountryCode(countryCallingCode));
-  return mainMetadataForCallingCode != null &&
-      mainMetadataForCallingCode.getLeadingZeroPossibleOrDefault();
-};
-
-
-/**
  * Checks if the number is a valid vanity (alpha) number such as 800 MICROSOFT.
  * A valid vanity number will start with at least 3 digits and will have three
  * or more alpha characters. This does not do region-specific checks - to work
@@ -4008,6 +3976,12 @@ i18n.phonenumbers.PhoneNumberUtil.prototype.checkRegionForParsing_ = function(
  * it can be interpreted with the defaultRegion supplied. It also attempts to
  * convert any alpha characters into digits if it thinks this is a vanity number
  * of the type "1800 MICROSOFT".
+ *
+ * Note this method canonicalizes the phone number such that different
+ * representations can be easily compared, no matter what form it was originally
+ * entered in (e.g. national, international). If you want to record context
+ * about the number being parsed, such as the raw input that was entered, how
+ * the country code was derived etc. then call parseAndKeepRawInput() instead.
  *
  * This method will throw a {@link i18n.phonenumbers.Error} if the number is not
  * considered to be a possible number. Note that validation of whether the
