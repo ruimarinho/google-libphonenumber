@@ -1,11 +1,10 @@
 {
   "name": "google-libphonenumber",
   "description": "The up-to-date and reliable Google's libphonenumber package for node.js.",
-  "homepage": "http://seegno.github.io/google-libphonenumber/",
+  "homepage": "https://ruimarinho.github.io/google-libphonenumber/",
   "author": {
     "name": "Rui Marinho",
-    "email": "rui.marinho@seegno.com",
-    "url": "http://seegno.com"
+    "email": "ruipmarinho@gmail.com"
   },
   "main": "./dist/libphonenumber.js",
   "license": "MIT",
