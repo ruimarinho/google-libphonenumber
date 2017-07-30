@@ -60,7 +60,7 @@ formatter.clear();
 
 * All classes available from `libphonenumber` are exported as-is. No magic methods.
 * Always based on the latest `google-closure` library version available from Google with performance and bug fixes.
-* Relies on a simplified and [well-documented update process](https://github.com/seegno/google-libphonenumber/blob/master/bin/update.sh) to keep the underlying `libphonenumber` library always up-to-date.
+* Relies on a simplified and [well-documented update process](https://github.com/ruimarinho/google-libphonenumber/blob/master/bin/update.sh) to keep the underlying `libphonenumber` library always up-to-date.
 
 
 ## Tests
@@ -87,5 +87,5 @@ This package is licensed under MIT. The bundled [libphonenumber](https://github.
 
 [npm-image]: https://img.shields.io/npm/v/google-libphonenumber.svg?style=flat-square
 [npm-url]: https://npmjs.org/package/google-libphonenumber
-[travis-image]: https://img.shields.io/travis/seegno/google-libphonenumber.svg?style=flat-square
-[travis-url]: https://travis-ci.org/seegno/google-libphonenumber
+[travis-image]: https://img.shields.io/travis/ruimarinho/google-libphonenumber.svg?style=flat-square
+[travis-url]: https://travis-ci.org/ruimarinho/google-libphonenumber
