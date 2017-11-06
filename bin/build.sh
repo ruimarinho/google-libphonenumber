@@ -10,12 +10,11 @@ if [ "${ONLINE:-true}" == "true" ]; then
   echo "Compiling using Google Closure Service..."
 
   curl --silent \
-    --request POST \
-    --data-ascii output_format=text \
-    --data-ascii output_info=compiled_code \
-    --data-ascii use_closure_library=true \
-    --data-ascii compilation_level=SIMPLE_OPTIMIZATIONS \
-    --data-ascii formatting=PRETTY_PRINT \
+    --data output_format=text \
+    --data output_info=compiled_code \
+    --data use_closure_library=true \
+    --data compilation_level=SIMPLE_OPTIMIZATIONS \
+    --data formatting=PRETTY_PRINT \
     --data-urlencode js_code@src/index.js \
     --data-urlencode js_code@src/asyoutypeformatter.js \
     --data-urlencode js_code@src/phonenumberutil.js \
@@ -23,7 +22,7 @@ if [ "${ONLINE:-true}" == "true" ]; then
     --data-urlencode js_code@src/metadata.js \
     --data-urlencode js_code@src/phonenumber.pb.js \
     --output dist/libphonenumber.original.js \
-    http://closure-compiler.appspot.com/compile
+    https://closure-compiler.appspot.com/compile
 else
   echo "Compiling locally..."
 
