@@ -1,14 +1,14 @@
 {
-  "name": "google-libphonenumber",
-  "version": "3.0.9",
+  "name": "@iflix/google-libphonenumber",
+  "version": "3.1.0",
   "description": "The up-to-date and reliable Google's libphonenumber package for node.js.",
   "author": {
-    "name": "Rui Marinho",
-    "email": "ruipmarinho@gmail.com"
+    "name": "Mohammad Haseeb",
+    "email": "mhaqs@live.com"
   },
   "license": "SEE LICENSE IN LICENSE",
-  "homepage": "https://ruimarinho.github.io/google-libphonenumber/",
-  "bugs": "https://github.com/ruimarinho/google-libphonenumber/issues",
+  "homepage": "https://mhaqs.github.io/google-libphonenumber/",
+  "bugs": "https://github.com/mhaqs/google-libphonenumber/issues",
   "repository": {
     "type": "git",
     "url": "https://github.com/ruimarinho/google-libphonenumber.git"
