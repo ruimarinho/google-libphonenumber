@@ -5,6 +5,7 @@
  */
 
 goog.require('i18n.phonenumbers.PhoneNumberUtil');
+goog.require('i18n.phonenumbers.ShortNumberInfo');
 goog.require('i18n.phonenumbers.AsYouTypeFormatter');
 
 /**
