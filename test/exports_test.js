@@ -23,7 +23,9 @@ describe('Exports', function() {
       'PhoneNumberFormat',
       'PhoneNumberType',
       'PhoneNumberUtil',
-      'metadata'
+      'ShortNumberInfo',
+      'metadata',
+      'shortnumbermetadata'
     ]);
   });
 

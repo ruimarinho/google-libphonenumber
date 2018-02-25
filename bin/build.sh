@@ -15,12 +15,14 @@ if [ "${ONLINE:-true}" == "true" ]; then
     --data use_closure_library=true \
     --data compilation_level=SIMPLE_OPTIMIZATIONS \
     --data formatting=PRETTY_PRINT \
-    --data-urlencode js_code@src/index.js \
     --data-urlencode js_code@src/asyoutypeformatter.js \
-    --data-urlencode js_code@src/phonenumberutil.js \
-    --data-urlencode js_code@src/phonemetadata.pb.js \
+    --data-urlencode js_code@src/index.js \
     --data-urlencode js_code@src/metadata.js \
+    --data-urlencode js_code@src/phonemetadata.pb.js \
     --data-urlencode js_code@src/phonenumber.pb.js \
+    --data-urlencode js_code@src/phonenumberutil.js \
+    --data-urlencode js_code@src/shortnumberinfo.js \
+    --data-urlencode js_code@src/shortnumbermetadata.js \
     --output dist/libphonenumber.original.js \
     https://closure-compiler.appspot.com/compile
 else

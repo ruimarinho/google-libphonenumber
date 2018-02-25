@@ -204,6 +204,36 @@ Lists the following enums in order to compare them with the output of `PhoneNumb
 * `PhoneNumberType.VOICEMAIL`
 * `PhoneNumberType.UNKNOWN`
 
+### i18n.phonenumbers.ShortNumberInfo
+
+Highlights:
+
+* **connectsToEmergencyNumber(number, regionCode)** - tests whether the short number can be used to connect to emergency services when dialed from the given region.
+* **isPossibleShortNumber(number)** - tests whether a short number is a possible number.
+* **isPossibleShortNumberForRegion(number, regionDialingFrom)** - tests whether a short number is a possible number when dialed from the given region.
+* **isValidShortNumber(number)** - tests whether a short number is a possible number.
+* **isValidShortNumberForRegion(number, regionDialingFrom)** - tests whether a short number matches a valid pattern in a region.
+
+```js
+// Get an instance of `ShortNumberInfo`.
+const shortInfo = require('google-libphonenumber').ShortNumberInfo.getInstance();
+
+// Get an instance of `PhoneNumberUtil`.
+const phoneUtil = require('google-libphonenumber').PhoneNumberUtil.getInstance();
+
+// Result from connectsToEmergencyNumber().
+console.log(shortInfo.connectsToEmergencyNumber('911', 'US'));
+// => true
+
+// Result from isPossibleShortNumber().
+console.log(shortInfo.isPossibleShortNumber(phoneUtil.parse('123456', 'FR')));
+// => true
+
+// Result from isPossibleShortNumberForRegion().
+console.log(shortInfo.isPossibleShortNumberForRegion(phoneUtil.parse('123456', 'FR'), 'FR'));
+// => true
+```
+
 ### Unavailable methods and classes
 
 The following methods or classes are unavailable on the original JS port of Google's libphonenumber:
@@ -212,7 +242,6 @@ The following methods or classes are unavailable on the original JS port of Goog
 * PhoneNumberOfflineGeocoder - provides geographical information related to a phone number.
 * PhoneNumberToCarrierMapper - provides carrier information related to a phone number.
 * PhoneNumberToTimeZonesMapper - provides timezone information related to a phone number.
-* ShortNumberInfo - enables short number informatio such as detecting if a number is an emergency number or if it connects to emergency services.
 
 ## Notes
 
