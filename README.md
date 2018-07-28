@@ -72,7 +72,7 @@ console.log(phoneUtil.isValidNumber(number));
 // => true
 
 // Result from isValidNumberForRegion().
-console.log(phoneUtil.isValidNumberForRegion(number));
+console.log(phoneUtil.isValidNumberForRegion(number, 'US'));
 // => true
 
 // Result from getRegionCodeForNumber().
