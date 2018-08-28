@@ -1,5 +1,13 @@
 # Changelog
 
+## [v3.1.12](https://github.com/ruimarinho/google-libphonenumber/tree/v3.1.12) (2018-08-28)
+[Full Changelog](https://github.com/ruimarinho/google-libphonenumber/compare/v3.1.11...v3.1.12)
+
+**Merged pull requests:**
+
+- Update libphonenumber@8.9.12 [\#170](https://github.com/ruimarinho/google-libphonenumber/pull/170) ([ruimarinho](https://github.com/ruimarinho))
+- Add missing region to isValidNumberForRegion call [\#168](https://github.com/ruimarinho/google-libphonenumber/pull/168) ([ruimarinho](https://github.com/ruimarinho))
+
 ## [v3.1.11](https://github.com/ruimarinho/google-libphonenumber/tree/v3.1.11) (2018-07-28)
 [Full Changelog](https://github.com/ruimarinho/google-libphonenumber/compare/v3.1.10...v3.1.11)
 
