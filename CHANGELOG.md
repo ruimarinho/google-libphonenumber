@@ -1,5 +1,13 @@
 # Changelog
 
+## [v3.1.13](https://github.com/ruimarinho/google-libphonenumber/tree/v3.1.13) (2018-09-15)
+[Full Changelog](https://github.com/ruimarinho/google-libphonenumber/compare/v3.1.12...v3.1.13)
+
+**Merged pull requests:**
+
+- Add badge for install size & use badgen.net [\#174](https://github.com/ruimarinho/google-libphonenumber/pull/174) ([styfle](https://github.com/styfle))
+- Update libphonenumber@8.9.13 [\#172](https://github.com/ruimarinho/google-libphonenumber/pull/172) ([ruimarinho](https://github.com/ruimarinho))
+
 ## [v3.1.12](https://github.com/ruimarinho/google-libphonenumber/tree/v3.1.12) (2018-08-28)
 [Full Changelog](https://github.com/ruimarinho/google-libphonenumber/compare/v3.1.11...v3.1.12)
 
