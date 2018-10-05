@@ -271,7 +271,7 @@ function testGetExpectedCostForSharedCountryCallingCode() {
 }
 
 function testGetExampleShortNumber() {
-  assertEquals('8711', shortInfo.getExampleShortNumber(RegionCode.AM));
+  assertEquals('110', shortInfo.getExampleShortNumber(RegionCode.AD));
   assertEquals('1010', shortInfo.getExampleShortNumber(RegionCode.FR));
   assertEquals('', shortInfo.getExampleShortNumber(RegionCode.UN001));
   assertEquals('', shortInfo.getExampleShortNumber(null));
@@ -465,3 +465,4 @@ function testCountryCallingCodeIsNotIgnored() {
           phoneUtil.parse('+4640404', RegionCode.SE),
           RegionCode.US));
 }
+

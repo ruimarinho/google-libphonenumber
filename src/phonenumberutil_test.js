@@ -1537,7 +1537,6 @@ function testIsPremiumRate() {
 
   /** @type {i18n.phonenumbers.PhoneNumber} */
   var premiumRateNumber = new i18n.phonenumbers.PhoneNumber();
-  premiumRateNumber = new i18n.phonenumbers.PhoneNumber();
   premiumRateNumber.setCountryCode(39);
   premiumRateNumber.setNationalNumber(892123);
   assertEquals(PNT.PREMIUM_RATE, phoneUtil.getNumberType(premiumRateNumber));
@@ -3925,4 +3924,6 @@ function testIsAlphaNumber() {
   assertFalse(phoneUtil.isAlphaNumber('18 six-flags'));
   assertFalse(phoneUtil.isAlphaNumber('1800 123-1234 extension: 1234'));
   assertFalse(phoneUtil.isAlphaNumber('+800 1234-1234'));
+}
+ assertFalse(phoneUtil.isAlphaNumber('+800 1234-1234'));
 }
