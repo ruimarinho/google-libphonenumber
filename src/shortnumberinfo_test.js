@@ -465,4 +465,3 @@ function testCountryCallingCodeIsNotIgnored() {
           phoneUtil.parse('+4640404', RegionCode.SE),
           RegionCode.US));
 }
-
