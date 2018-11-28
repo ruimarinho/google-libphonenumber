@@ -1,5 +1,12 @@
 # Changelog
 
+## [v3.1.16](https://github.com/ruimarinho/google-libphonenumber/tree/v3.1.16) (2018-11-28)
+[Full Changelog](https://github.com/ruimarinho/google-libphonenumber/compare/v3.1.15...v3.1.16)
+
+**Merged pull requests:**
+
+- Update libphonenumber@8.9.16 [\#181](https://github.com/ruimarinho/google-libphonenumber/pull/181) ([ruimarinho](https://github.com/ruimarinho))
+
 ## [v3.1.15](https://github.com/ruimarinho/google-libphonenumber/tree/v3.1.15) (2018-10-06)
 [Full Changelog](https://github.com/ruimarinho/google-libphonenumber/compare/v3.1.14...v3.1.15)
 
