@@ -1,5 +1,13 @@
 # Changelog
 
+## [v3.2.2](https://github.com/ruimarinho/google-libphonenumber/tree/v3.2.2) (2018-12-31)
+[Full Changelog](https://github.com/ruimarinho/google-libphonenumber/compare/v3.2.1...v3.2.2)
+
+**Merged pull requests:**
+
+- Update package.json to use SPDX license expression [\#186](https://github.com/ruimarinho/google-libphonenumber/pull/186) ([maxdumas](https://github.com/maxdumas))
+- Update libphonenumber@8.10.2 [\#185](https://github.com/ruimarinho/google-libphonenumber/pull/185) ([ruimarinho](https://github.com/ruimarinho))
+
 ## [v3.2.1](https://github.com/ruimarinho/google-libphonenumber/tree/v3.2.1) (2018-11-28)
 [Full Changelog](https://github.com/ruimarinho/google-libphonenumber/compare/v3.2.0...v3.2.1)
 
