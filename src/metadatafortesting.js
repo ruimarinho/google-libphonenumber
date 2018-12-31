@@ -1117,5 +1117,3 @@ i18n.phonenumbers.metadata.countryToMetadata = {
 ]
 ]
 };
-]
-};
