@@ -6,7 +6,7 @@
     "name": "Rui Marinho",
     "email": "ruipmarinho@gmail.com"
   },
-  "license": "SEE LICENSE IN LICENSE",
+  "license": "(MIT AND Apache-2.0)",
   "homepage": "https://ruimarinho.github.io/google-libphonenumber/",
   "bugs": "https://github.com/ruimarinho/google-libphonenumber/issues",
   "repository": {
