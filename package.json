@@ -8,7 +8,7 @@
   },
   "license": "(MIT AND Apache-2.0)",
   "homepage": "https://ruimarinho.github.io/google-libphonenumber/",
-  "bugs": "https://github.com/ruimarinho/google-libphonenumber/issues",
+  "bugs": "https://github.com/fedapay/google-libphonenumber/issues",
   "repository": {
     "type": "git",
     "url": "https://github.com/fedapay/google-libphonenumber.git"
