@@ -97,5 +97,20 @@ describe('PhoneUtil', function() {
       phoneUtil.isPossibleNumber(phoneNumber).should.be.false();
       phoneUtil.isPossibleNumberWithReason(phoneNumber).should.equal(PhoneNumberUtil.ValidationResult.TOO_SHORT);
     });
+
+    it('should validate phone number starting with 91 or 92', function() {
+      var phonesNumbers = [
+        '(229) 91234569',
+        '(229) 92123456'
+      ];
+
+      phonesNumbers.forEach(function(value) {
+        var phoneNumber = phoneUtil.parseAndKeepRawInput(value, 'BJ');
+
+        phoneUtil.isPossibleNumber(phoneNumber).should.be.true();
+        phoneUtil.isValidNumber(phoneNumber).should.be.true();
+        phoneUtil.isValidNumberForRegion(phoneNumber, 'BJ').should.be.true();
+      });
+    });
   });
 });
