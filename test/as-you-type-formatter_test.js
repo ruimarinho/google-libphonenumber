@@ -4,7 +4,7 @@
  * Module dependencies.
  */
 
-var AsYouTypeFormatter = require('..').default.AsYouTypeFormatter;
+var AsYouTypeFormatter = require('..').AsYouTypeFormatter;
 
 /**
  * Test `AsYouTypeFormatter`.
