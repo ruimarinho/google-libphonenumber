@@ -1075,8 +1075,6 @@ i18n.phonenumbers.AsYouTypeFormatter.prototype.inputDigitHelper_ =
     return this.accruedInput_.toString();
   }
 };
-malizedChar;
-};
 
 
 /**
