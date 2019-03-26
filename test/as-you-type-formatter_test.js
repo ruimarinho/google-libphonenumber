@@ -4,7 +4,7 @@
  * Module dependencies.
  */
 
-var AsYouTypeFormatter = require('..').AsYouTypeFormatter;
+var AsYouTypeFormatter = require('google-libphonenumber').AsYouTypeFormatter;
 
 /**
  * Test `AsYouTypeFormatter`.
