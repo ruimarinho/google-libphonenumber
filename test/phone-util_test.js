@@ -4,7 +4,7 @@
  * Module dependencies.
  */
 
-var PhoneNumberUtil = require('.').PhoneNumberUtil;
+var PhoneNumberUtil = require('..').default.PhoneNumberUtil;
 var PNF = require('.').PhoneNumberFormat;
 var PNT = require('.').PhoneNumberType;
 var should = require('should');
