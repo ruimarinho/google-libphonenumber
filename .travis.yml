@@ -9,3 +9,5 @@ node_js:
   - 7
 
 sudo: false
+
+script: travis_retry npm test
