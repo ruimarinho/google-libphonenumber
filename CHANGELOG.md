@@ -1,5 +1,13 @@
 # Changelog
 
+## [v3.2.4](https://github.com/ruimarinho/google-libphonenumber/tree/v3.2.4) (2019-08-29)
+[Full Changelog](https://github.com/ruimarinho/google-libphonenumber/compare/v3.2.3...v3.2.4)
+
+**Merged pull requests:**
+
+- Add patch \#2380 for AYTF for MX [\#209](https://github.com/ruimarinho/google-libphonenumber/pull/209) ([ruimarinho](https://github.com/ruimarinho))
+- Update libphonenumber@8.10.17 [\#208](https://github.com/ruimarinho/google-libphonenumber/pull/208) ([ruimarinho](https://github.com/ruimarinho))
+
 ## [v3.2.3](https://github.com/ruimarinho/google-libphonenumber/tree/v3.2.3) (2019-06-28)
 [Full Changelog](https://github.com/ruimarinho/google-libphonenumber/compare/v3.2.2...v3.2.3)
 
