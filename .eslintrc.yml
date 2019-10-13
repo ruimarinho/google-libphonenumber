@@ -1,11 +1,9 @@
-extends: seegno
+extends: eslint:recommended
 
-globals: {
-  goog: true,
+env:
+  node: true
+  mocha: true
+
+globals:
+  goog: true
   i18n: true
-}
-
-rules:
-  no-var: 0
-  vars-on-top: 0
-  prefer-arrow-callback: 0
