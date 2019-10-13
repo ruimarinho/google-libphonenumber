@@ -272,6 +272,33 @@ If you're looking for a slightly simpler API, you should try [awesome-phonenumbe
 
 There have been some users reporting successful but also unsuccessful usage with Webpack. While I don't personally use it, I'm 100% supportive of pull requests adding modifications that allow this package to better interact with it.
 
+### Chrome Extensions
+
+Google Closure Compiler API, a serviced provided by Google to compile code online via its Closure library, may not always return fully compliant UTF-8-encoded output.
+
+Loading extensions using this library on Google Chrome and other Chromium-based browsers may result in the following error when compiled with webpack:
+
+`Could not load file 'file.js' for content script. It isn't UTF-8 encoded.`
+
+While the local Java-based version supports a parameter which would let us workaround this issue at the source using `--charset=US-ASCII`, the online API version, which is a lot more convenient to use, does not offer support for an equivalent parameter (e.g. `output_charset=US-ASCII`).
+
+In order to workaround this issue when using webpack, make sure to output US-ASCII characters only when defining `TerserPlugin` options, as demonstrated below:
+
+```
+optimization: {
+  minimize: process.env.NODE_ENV !== 'development',
+  minimizer: [
+    new TerserPlugin({
+      terserOptions: {
+        output: {
+          ascii_only: true
+        }
+      },
+    }),
+  ]
+}
+```
+
 ## Tests
 
 A small subset of tests guarantees that the main library functions are working as expected and are correctly exported. The actual heavy lifting is done by `libphonenumber`'s extensive test suite.
