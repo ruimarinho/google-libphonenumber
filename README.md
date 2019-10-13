@@ -284,7 +284,7 @@ While the local Java-based version supports a parameter which would let us worka
 
 In order to workaround this issue when using webpack, make sure to output US-ASCII characters only when defining `TerserPlugin` options, as demonstrated below:
 
-```
+```js
 optimization: {
   minimize: process.env.NODE_ENV !== 'development',
   minimizer: [
