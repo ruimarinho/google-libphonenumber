@@ -43,7 +43,7 @@
   },
   "devDependencies": {
     "browserify": "^13.1.0",
-    "eslint": "^3.5.0",
+    "eslint": "^6.6.0",
     "eslint-config-seegno": "^6.0.0",
     "mocha": "^3.0.2",
     "should": "^11.1.0"
