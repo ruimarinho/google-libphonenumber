@@ -73,6 +73,10 @@ console.log(phoneUtil.isValidNumber(number));
 // => true
 
 // Result from isValidNumberForRegion().
+
+// `number` needs to be instance of `libphonenumber.PhoneNumber`
+const number = phoneUtil.parse('202-456-1414', 'US');
+
 console.log(phoneUtil.isValidNumberForRegion(number, 'US'));
 // => true
 
