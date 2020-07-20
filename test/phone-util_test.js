@@ -98,10 +98,11 @@ describe('PhoneUtil', function() {
       phoneUtil.isPossibleNumberWithReason(phoneNumber).should.equal(PhoneNumberUtil.ValidationResult.TOO_SHORT);
     });
 
-    it('should validate phone number starting with 91 or 92', function() {
+    it('should validate phone number starting with 91, 92, 51', function() {
       var phonesNumbers = [
         '(229) 91234569',
-        '(229) 92123456'
+        '(229) 92123456',
+        '(229) 51123456'
       ];
 
       phonesNumbers.forEach(function(value) {
