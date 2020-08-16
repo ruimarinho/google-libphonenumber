@@ -30,6 +30,22 @@ npm install --save-prod google-libphonenumber
 
 The following is a simple phone information extraction example similar to what can be viewed on the official demo page.
 
+⚠️ _Most libphonenumber functions expect to receive an instance of `libphonenumber.PhoneNumber` which can be obtained by calling `phoneUtil.parse` or `phoneUtil.parseAndKeepRawInput` on a raw (string) number, otherwise it will throw errors like `TypeError: a.getCountryCodeOrDefault is not a function`._
+
+This **will** work:
+
+```js
+phoneUtil.isValidNumberForRegion(phoneUtil.parse('202-456-1414', 'US'), 'US');
+```
+
+This **will not** work:
+
+```js
+phoneUtil.isValidNumberForRegion('202-456-1414', 'US');
+```
+
+More API examples after parsing the raw string:
+
 ```js
 // Require `PhoneNumberFormat`.
 const PNF = require('google-libphonenumber').PhoneNumberFormat;
