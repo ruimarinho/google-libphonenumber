@@ -1,16 +1,5 @@
 #!/bin/bash
 
-ls -la
-
-echo "++++++++++++++++"
-
-ls -la ./node_modules/
-
-echo "----------------"
-
-ls -la ./node_modules/.bin
-
-
 rm -rf dist/* \
 && echo "Compiling using Google Closure Compiler..." \
 && ./node_modules/.bin/google-closure-compiler \
