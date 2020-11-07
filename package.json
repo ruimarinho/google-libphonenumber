@@ -45,7 +45,7 @@
     "eslint": "^7.13.0",
     "google-closure-compiler": "^20200719.0.0",
     "google-closure-library": "^20200719.0.0",
-    "mocha": "^3.0.2",
+    "mocha": "^8.2.1",
     "should": "^11.1.0"
   },
   "engines": {
