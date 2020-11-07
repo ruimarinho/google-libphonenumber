@@ -50,5 +50,6 @@
   },
   "engines": {
     "node": ">=0.10"
-  }
+  },
+  "sideEffects": false
 }
