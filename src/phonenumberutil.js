@@ -167,6 +167,7 @@ i18n.phonenumbers.PhoneNumberUtil.COLOMBIA_MOBILE_TO_FIXED_LINE_PREFIX_ = '3';
  * @private
  */
 i18n.phonenumbers.PhoneNumberUtil.MOBILE_TOKEN_MAPPINGS_ = {
+  52: '1',
   54: '9'
 };
 
@@ -597,9 +598,9 @@ i18n.phonenumbers.PhoneNumberUtil.PLUS_CHARS_PATTERN =
 /**
  * @const
  * @type {!RegExp}
- * @package
+ * @private
  */
-i18n.phonenumbers.PhoneNumberUtil.LEADING_PLUS_CHARS_PATTERN =
+i18n.phonenumbers.PhoneNumberUtil.LEADING_PLUS_CHARS_PATTERN_ =
     new RegExp('^[' + i18n.phonenumbers.PhoneNumberUtil.PLUS_CHARS_ + ']+');
 
 
@@ -779,7 +780,6 @@ i18n.phonenumbers.PhoneNumberUtil.EXTN_PATTERNS_FOR_PARSING_ =
     i18n.phonenumbers.PhoneNumberUtil.CAPTURING_EXTN_DIGITS_ + '|' +
     '[ \u00A0\\t,]*' +
     '(?:e?xt(?:ensi(?:o\u0301?|\u00F3))?n?|\uFF45?\uFF58\uFF54\uFF4E?|' +
-    '\u0434\u043E\u0431|' +
     '[;,x\uFF58#\uFF03~\uFF5E]|int|anexo|\uFF49\uFF4E\uFF54)' +
     '[:\\.\uFF0E]?[ \u00A0\\t,-]*' +
     i18n.phonenumbers.PhoneNumberUtil.CAPTURING_EXTN_DIGITS_ + '#?|' +
@@ -1049,7 +1049,7 @@ i18n.phonenumbers.PhoneNumberUtil.isViablePhoneNumber = function(number) {
   if (number.length < i18n.phonenumbers.PhoneNumberUtil.MIN_LENGTH_FOR_NSN_) {
     return false;
   }
-  return i18n.phonenumbers.PhoneNumberUtil.matchesEntirely(
+  return i18n.phonenumbers.PhoneNumberUtil.matchesEntirely_(
       i18n.phonenumbers.PhoneNumberUtil.VALID_PHONE_NUMBER_PATTERN_, number);
 };
 
@@ -1072,7 +1072,7 @@ i18n.phonenumbers.PhoneNumberUtil.isViablePhoneNumber = function(number) {
  * @return {string} the normalized string version of the phone number.
  */
 i18n.phonenumbers.PhoneNumberUtil.normalize = function(number) {
-  if (i18n.phonenumbers.PhoneNumberUtil.matchesEntirely(
+  if (i18n.phonenumbers.PhoneNumberUtil.matchesEntirely_(
       i18n.phonenumbers.PhoneNumberUtil.VALID_ALPHA_PHONE_PATTERN_, number)) {
     return i18n.phonenumbers.PhoneNumberUtil.normalizeHelper_(number,
         i18n.phonenumbers.PhoneNumberUtil.ALL_NORMALIZATION_MAPPINGS_, true);
@@ -1221,11 +1221,7 @@ i18n.phonenumbers.PhoneNumberUtil.prototype.getLengthOfGeographicalAreaCode =
  * significant number into NDC and subscriber number. The NDC of a phone number
  * is normally the first group of digit(s) right after the country calling code
  * when the number is formatted in the international format, if there is a
- * subscriber number part that follows.
- *
- * N.B.: similar to an area code, not all numbers have an NDC!
- *
- * An example of how this could be used:
+ * subscriber number part that follows. An example of how this could be used:
  *
  * <pre>
  * var phoneUtil = i18n.phonenumbers.PhoneNumberUtil.getInstance();
@@ -1253,8 +1249,7 @@ i18n.phonenumbers.PhoneNumberUtil.prototype.getLengthOfGeographicalAreaCode =
  *
  * @param {i18n.phonenumbers.PhoneNumber} number the PhoneNumber object for
  *     which clients want to know the length of the NDC.
- * @return {number} the length of NDC of the PhoneNumber object passed in, which
- *     could be zero.
+ * @return {number} the length of NDC of the PhoneNumber object passed in.
  */
 i18n.phonenumbers.PhoneNumberUtil.prototype.getLengthOfNationalDestinationCode =
     function(number) {
@@ -1935,6 +1930,16 @@ i18n.phonenumbers.PhoneNumberUtil.prototype.formatNumberForMobileDialing =
           // carriers won't connect the call. Because of that, we return an
           // empty string here.
           '';
+    } else if (isValidNumber && regionCode == 'HU') {
+      // The national format for HU numbers doesn't contain the national prefix,
+      // because that is how numbers are normally written down. However, the
+      // national prefix is obligatory when dialing from a mobile phone. As a
+      // result, we add it back here if it is a valid regular length phone
+      // number.
+      formattedNumber =
+          this.getNddPrefixForRegion(regionCode, true /* strip non-digits */) +
+          ' ' + this.format(numberNoExt,
+              i18n.phonenumbers.PhoneNumberFormat.NATIONAL);
     } else if (countryCallingCode ==
                i18n.phonenumbers.PhoneNumberUtil.NANPA_COUNTRY_CODE_) {
       // For NANPA countries, we output international format for numbers that
@@ -1954,9 +1959,9 @@ i18n.phonenumbers.PhoneNumberUtil.prototype.formatNumberForMobileDialing =
             numberNoExt, i18n.phonenumbers.PhoneNumberFormat.NATIONAL);
       }
     } else {
-      // For non-geographical countries, and Mexican, Chilean and Uzbek fixed
-      // line and mobile numbers, we output international format for numbers
-      // that can be dialed internationally as that always works.
+      // For non-geographical countries, Mexican and Chilean fixed line and
+      // mobile numbers, we output international format for numbers that can be
+      // dialed internationally, as that always works.
       if ((regionCode ==
            i18n.phonenumbers.PhoneNumberUtil.REGION_CODE_FOR_NON_GEO_ENTITY ||
           // MX fixed line and mobile numbers should always be formatted in
@@ -1970,13 +1975,7 @@ i18n.phonenumbers.PhoneNumberUtil.prototype.formatNumberForMobileDialing =
           // national format, but don't have it when used for display. The
           // reverse is true for mobile numbers. As a result, we output them in
           // the international format to make it work.
-          // UZ mobile and fixed-line numbers have to be formatted in
-          // international format or prefixed with special codes like 03, 04
-          // (for fixed-line) and 05 (for mobile) for dialling successfully
-          // from mobile devices. As we do not have complete information on
-          // special codes and to be consistent with formatting across all
-          // phone types we return the number in international format here.
-          ((regionCode == 'MX' || regionCode == 'CL' || regionCode == 'UZ') &&
+          ((regionCode == 'MX' || regionCode == 'CL') &&
               isFixedLineOrMobile)) &&
           this.canBeInternationallyDialled(numberNoExt)) {
         formattedNumber = this.format(
@@ -2071,7 +2070,7 @@ i18n.phonenumbers.PhoneNumberUtil.prototype.formatOutOfCountryCallingNumber =
   // prefix.
   /** @type {string} */
   var internationalPrefixForFormatting = '';
-  if (i18n.phonenumbers.PhoneNumberUtil.matchesEntirely(
+  if (i18n.phonenumbers.PhoneNumberUtil.matchesEntirely_(
       i18n.phonenumbers.PhoneNumberUtil.SINGLE_INTERNATIONAL_PREFIX_,
       internationalPrefix)) {
     internationalPrefixForFormatting = internationalPrefix;
@@ -2411,7 +2410,7 @@ i18n.phonenumbers.PhoneNumberUtil.prototype.
     var internationalPrefix =
         metadataForRegionCallingFrom.getInternationalPrefixOrDefault();
     internationalPrefixForFormatting =
-        i18n.phonenumbers.PhoneNumberUtil.matchesEntirely(
+        i18n.phonenumbers.PhoneNumberUtil.matchesEntirely_(
             i18n.phonenumbers.PhoneNumberUtil.SINGLE_INTERNATIONAL_PREFIX_,
             internationalPrefix) ?
         internationalPrefix :
@@ -2571,8 +2570,8 @@ i18n.phonenumbers.PhoneNumberUtil.prototype.chooseFormattingPatternForNumber_ =
             .search(numFormat.getLeadingDigitsPattern(size - 1)) == 0) {
       /** @type {!RegExp} */
       var patternToMatch = new RegExp(numFormat.getPattern());
-      if (i18n.phonenumbers.PhoneNumberUtil.matchesEntirely(patternToMatch,
-                                                            nationalNumber)) {
+      if (i18n.phonenumbers.PhoneNumberUtil.matchesEntirely_(patternToMatch,
+                                                             nationalNumber)) {
         return numFormat;
       }
     }
@@ -2904,7 +2903,7 @@ i18n.phonenumbers.PhoneNumberUtil.prototype.getNumberTypeHelper_ =
  * code is invalid or unknown.
  *
  * @param {?string} regionCode
- * @return {?i18n.phonenumbers.PhoneMetadata}
+ * @return {i18n.phonenumbers.PhoneMetadata}
  */
 i18n.phonenumbers.PhoneNumberUtil.prototype.getMetadataForRegion =
     function(regionCode) {
@@ -2935,7 +2934,7 @@ i18n.phonenumbers.PhoneNumberUtil.prototype.getMetadataForRegion =
 
 /**
  * @param {number} countryCallingCode
- * @return {?i18n.phonenumbers.PhoneMetadata}
+ * @return {i18n.phonenumbers.PhoneMetadata}
  */
 i18n.phonenumbers.PhoneNumberUtil.prototype.
     getMetadataForNonGeographicalRegion = function(countryCallingCode) {
@@ -2962,7 +2961,7 @@ i18n.phonenumbers.PhoneNumberUtil.prototype.isNumberMatchingDesc_ =
           actualLength) == -1) {
     return false;
   }
-  return i18n.phonenumbers.PhoneNumberUtil.matchesEntirely(
+  return i18n.phonenumbers.PhoneNumberUtil.matchesEntirely_(
       numberDesc.getNationalNumberPatternOrDefault(), nationalNumber);
 };
 
@@ -2978,7 +2977,7 @@ i18n.phonenumbers.PhoneNumberUtil.prototype.isNumberMatchingDesc_ =
  * number "789272696". This is valid, while the original string is not
  * diallable.
  *
- * @param {!i18n.phonenumbers.PhoneNumber} number the phone number that we want
+ * @param {i18n.phonenumbers.PhoneNumber} number the phone number that we want
  *     to validate.
  * @return {boolean} a boolean that indicates whether the number is of a valid
  *     pattern.
@@ -3003,7 +3002,7 @@ i18n.phonenumbers.PhoneNumberUtil.prototype.isValidNumber = function(number) {
  * as the Isle of Man as invalid for the region "GB" (United Kingdom), since it
  * has its own region code, "IM", which may be undesirable.
  *
- * @param {!i18n.phonenumbers.PhoneNumber} number the phone number that we want
+ * @param {i18n.phonenumbers.PhoneNumber} number the phone number that we want
  *     to validate.
  * @param {?string} regionCode the region that we want to validate the phone
  *     number for.
@@ -3039,7 +3038,7 @@ i18n.phonenumbers.PhoneNumberUtil.prototype.isValidNumberForRegion =
  * geocoding at the region level. Only guarantees correct results for valid,
  * full numbers (not short-codes, or invalid numbers).
  *
- * @param {?i18n.phonenumbers.PhoneNumber} number the phone number whose origin
+ * @param {i18n.phonenumbers.PhoneNumber} number the phone number whose origin
  *     we want to know.
  * @return {?string} the region where the phone number is from, or null
  *     if no region matches this calling code.
@@ -3067,7 +3066,7 @@ i18n.phonenumbers.PhoneNumberUtil.prototype.getRegionCodeForNumber =
 
 
 /**
- * @param {!i18n.phonenumbers.PhoneNumber} number
+ * @param {i18n.phonenumbers.PhoneNumber} number
  * @param {Array.<string>} regionCodes
  * @return {?string}
  * @private
@@ -3128,7 +3127,7 @@ i18n.phonenumbers.PhoneNumberUtil.prototype.getRegionCodeForCountryCode =
  * returned.
  *
  * @param {number} countryCallingCode the country calling code.
- * @return {!Array.<string>}
+ * @return {Array.<string>}
  */
 i18n.phonenumbers.PhoneNumberUtil.prototype.getRegionCodesForCountryCode =
     function(countryCallingCode) {
@@ -3260,7 +3259,7 @@ i18n.phonenumbers.PhoneNumberUtil.prototype.isAlphaNumber = function(number) {
   /** @type {!goog.string.StringBuffer} */
   var strippedNumber = new goog.string.StringBuffer(number);
   this.maybeStripExtension(strippedNumber);
-  return i18n.phonenumbers.PhoneNumberUtil.matchesEntirely(
+  return i18n.phonenumbers.PhoneNumberUtil.matchesEntirely_(
       i18n.phonenumbers.PhoneNumberUtil.VALID_ALPHA_PHONE_PATTERN_,
       strippedNumber.toString());
 };
@@ -3496,7 +3495,7 @@ i18n.phonenumbers.PhoneNumberUtil.prototype.isPossibleNumberForTypeWithReason =
   // getRegionCodeForNumber will not work if the number is possible but not
   // valid. There is in fact one country calling code (290) where the possible
   // number pattern differs between various regions (Saint Helena and Tristan
-  // da Cunha), but this is handled by putting all possible lengths for any
+  // da Cuñha), but this is handled by putting all possible lengths for any
   // country with this country calling code in the metadata for the default
   // region in this case.
   if (!this.hasValidCountryCallingCode_(countryCode)) {
@@ -3552,7 +3551,7 @@ i18n.phonenumbers.PhoneNumberUtil.prototype.isPossibleNumberString =
  * valid, and resets the PhoneNumber object passed in to that valid version. If
  * no valid number could be extracted, the PhoneNumber object passed in will not
  * be modified.
- * @param {!i18n.phonenumbers.PhoneNumber} number a PhoneNumber object which
+ * @param {i18n.phonenumbers.PhoneNumber} number a PhoneNumber object which
  *     contains a number that is too long to be valid.
  * @return {boolean} true if a valid phone number can be successfully extracted.
  */
@@ -3726,9 +3725,9 @@ i18n.phonenumbers.PhoneNumberUtil.prototype.maybeExtractCountryCode =
       // If the number was not valid before but is valid now, or if it was too
       // long before, we consider the number with the country calling code
       // stripped to be a better result and keep that instead.
-      if ((!i18n.phonenumbers.PhoneNumberUtil.matchesEntirely(
+      if ((!i18n.phonenumbers.PhoneNumberUtil.matchesEntirely_(
                 validNumberPattern, fullNumber.toString()) &&
-          i18n.phonenumbers.PhoneNumberUtil.matchesEntirely(
+          i18n.phonenumbers.PhoneNumberUtil.matchesEntirely_(
               validNumberPattern, potentialNationalNumberStr)) ||
           this.testNumberLength_(
               fullNumber.toString(), defaultRegionMetadata) ==
@@ -3813,10 +3812,10 @@ i18n.phonenumbers.PhoneNumberUtil.prototype.
     return i18n.phonenumbers.PhoneNumber.CountryCodeSource.FROM_DEFAULT_COUNTRY;
   }
   // Check to see if the number begins with one or more plus signs.
-  if (i18n.phonenumbers.PhoneNumberUtil.LEADING_PLUS_CHARS_PATTERN
+  if (i18n.phonenumbers.PhoneNumberUtil.LEADING_PLUS_CHARS_PATTERN_
       .test(numberStr)) {
     numberStr = numberStr.replace(
-        i18n.phonenumbers.PhoneNumberUtil.LEADING_PLUS_CHARS_PATTERN, '');
+        i18n.phonenumbers.PhoneNumberUtil.LEADING_PLUS_CHARS_PATTERN_, '');
     // Can now normalize the rest of the number since we've consumed the '+'
     // sign at the start.
     number.clear();
@@ -3872,7 +3871,7 @@ i18n.phonenumbers.PhoneNumberUtil.prototype.
     // Check if the original number is viable.
     /** @type {boolean} */
     var isViableOriginalNumber =
-        i18n.phonenumbers.PhoneNumberUtil.matchesEntirely(
+        i18n.phonenumbers.PhoneNumberUtil.matchesEntirely_(
             nationalNumberRule, numberStr);
     // prefixMatcher[numOfGroups] == null implies nothing was captured by the
     // capturing groups in possibleNationalPrefix; therefore, no transformation
@@ -3889,7 +3888,7 @@ i18n.phonenumbers.PhoneNumberUtil.prototype.
       // If the original number was viable, and the resultant number is not,
       // we return.
       if (isViableOriginalNumber &&
-          !i18n.phonenumbers.PhoneNumberUtil.matchesEntirely(
+          !i18n.phonenumbers.PhoneNumberUtil.matchesEntirely_(
               nationalNumberRule,
               numberStr.substring(prefixMatcher[0].length))) {
         return false;
@@ -3908,7 +3907,7 @@ i18n.phonenumbers.PhoneNumberUtil.prototype.
       var transformedNumber;
       transformedNumber = numberStr.replace(prefixPattern, transformRule);
       if (isViableOriginalNumber &&
-          !i18n.phonenumbers.PhoneNumberUtil.matchesEntirely(
+          !i18n.phonenumbers.PhoneNumberUtil.matchesEntirely_(
               nationalNumberRule, transformedNumber)) {
         return false;
       }
@@ -3980,7 +3979,7 @@ i18n.phonenumbers.PhoneNumberUtil.prototype.checkRegionForParsing_ = function(
   // If the number is null or empty, we can't infer the region.
   return this.isValidRegionCode_(defaultRegion) ||
       (numberToParse != null && numberToParse.length > 0 &&
-          i18n.phonenumbers.PhoneNumberUtil.LEADING_PLUS_CHARS_PATTERN.test(
+          i18n.phonenumbers.PhoneNumberUtil.LEADING_PLUS_CHARS_PATTERN_.test(
               numberToParse));
 };
 
@@ -3990,7 +3989,7 @@ i18n.phonenumbers.PhoneNumberUtil.prototype.checkRegionForParsing_ = function(
  * method is quite lenient and looks for a number in the input text (raw input)
  * and does not check whether the string is definitely only a phone number. To
  * do this, it ignores punctuation and white-space, as well as any text before
- * the number (e.g. a leading "Tel: ") and trims the non-number bits.  It will
+ * the number (e.g. a leading “Tel: ”) and trims the non-number bits.  It will
  * accept a number in any format (E164, national, international etc), assuming
  * it can be interpreted with the defaultRegion supplied. It also attempts to
  * convert any alpha characters into digits if it thinks this is a vanity number
@@ -4016,7 +4015,7 @@ i18n.phonenumbers.PhoneNumberUtil.prototype.checkRegionForParsing_ = function(
  *     be stored as that of the default region supplied. If the number is
  *     guaranteed to start with a '+' followed by the country calling code, then
  *     'ZZ' or null can be supplied.
- * @return {!i18n.phonenumbers.PhoneNumber} a phone number proto buffer filled
+ * @return {i18n.phonenumbers.PhoneNumber} a phone number proto buffer filled
  *     with the parsed number.
  * @throws {Error} if the string is not considered to be a
  *     viable phone number (e.g. too few or too many digits) or if no default
@@ -4041,7 +4040,7 @@ i18n.phonenumbers.PhoneNumberUtil.prototype.parse = function(numberToParse,
  *     from. This is only used if the number being parsed is not written in
  *     international format. The country calling code for the number in this
  *     case would be stored as that of the default region supplied.
- * @return {!i18n.phonenumbers.PhoneNumber} a phone number proto buffer filled
+ * @return {i18n.phonenumbers.PhoneNumber} a phone number proto buffer filled
  *     with the parsed number.
  * @throws {Error} if the string is not considered to be a
  *     viable phone number or if no default region was supplied.
@@ -4106,7 +4105,7 @@ i18n.phonenumbers.PhoneNumberUtil.setItalianLeadingZerosForPhoneNumber_ =
  *     phoneNumber with numberToParse.
  * @param {boolean} checkRegion should be set to false if it is permitted for
  *     the default coregion to be null or unknown ('ZZ').
- * @return {!i18n.phonenumbers.PhoneNumber} a phone number proto buffer filled
+ * @return {i18n.phonenumbers.PhoneNumber} a phone number proto buffer filled
  *     with the parsed number.
  * @throws {Error}
  * @private
@@ -4165,11 +4164,11 @@ i18n.phonenumbers.PhoneNumberUtil.prototype.parseHelper_ =
         regionMetadata, normalizedNationalNumber, keepRawInput, phoneNumber);
   } catch (e) {
     if (e.message == i18n.phonenumbers.Error.INVALID_COUNTRY_CODE &&
-        i18n.phonenumbers.PhoneNumberUtil.LEADING_PLUS_CHARS_PATTERN
+        i18n.phonenumbers.PhoneNumberUtil.LEADING_PLUS_CHARS_PATTERN_
             .test(nationalNumberStr)) {
       // Strip the plus-char, and try again.
       nationalNumberStr = nationalNumberStr.replace(
-          i18n.phonenumbers.PhoneNumberUtil.LEADING_PLUS_CHARS_PATTERN, '');
+          i18n.phonenumbers.PhoneNumberUtil.LEADING_PLUS_CHARS_PATTERN_, '');
       countryCode = this.maybeExtractCountryCode(nationalNumberStr,
           regionMetadata, normalizedNationalNumber, keepRawInput, phoneNumber);
       if (countryCode == 0) {
@@ -4219,10 +4218,12 @@ i18n.phonenumbers.PhoneNumberUtil.prototype.parseHelper_ =
     // a valid short number.
     var validationResult = this.testNumberLength_(
         potentialNationalNumber.toString(), regionMetadata);
-    var validationResults = i18n.phonenumbers.PhoneNumberUtil.ValidationResult;
-    if (validationResult != validationResults.TOO_SHORT &&
-        validationResult != validationResults.IS_POSSIBLE_LOCAL_ONLY &&
-        validationResult != validationResults.INVALID_LENGTH) {
+    if (validationResult !=
+        i18n.phonenumbers.PhoneNumberUtil.ValidationResult.TOO_SHORT &&
+	validationResult !=
+        i18n.phonenumbers.PhoneNumberUtil.ValidationResult.IS_POSSIBLE_LOCAL_ONLY &&
+	validationResult !=
+        i18n.phonenumbers.PhoneNumberUtil.ValidationResult.INVALID_LENGTH) {
       normalizedNationalNumber = potentialNationalNumber;
       if (keepRawInput && carrierCode.toString().length > 0) {
         phoneNumber.setPreferredDomesticCarrierCode(carrierCode.toString());
@@ -4334,7 +4335,7 @@ i18n.phonenumbers.PhoneNumberUtil.prototype.buildNationalNumberForParsing_ =
  *
  * @param {i18n.phonenumbers.PhoneNumber} numberIn number that we want to copy
  *     fields from.
- * @return {!i18n.phonenumbers.PhoneNumber} number with core fields only.
+ * @return {i18n.phonenumbers.PhoneNumber} number with core fields only.
  * @private
  */
 i18n.phonenumbers.PhoneNumberUtil.copyCoreFieldsOnly_ = function(numberIn) {
@@ -4557,34 +4558,13 @@ i18n.phonenumbers.PhoneNumberUtil.prototype.canBeInternationallyDialled =
  * @param {!RegExp|string} regex the regular expression to match against.
  * @param {string} str the string to test.
  * @return {boolean} true if str can be matched entirely against regex.
- * @package
+ * @private
  */
-i18n.phonenumbers.PhoneNumberUtil.matchesEntirely = function(regex, str) {
+i18n.phonenumbers.PhoneNumberUtil.matchesEntirely_ = function(regex, str) {
   /** @type {Array.<string>} */
   var matchedGroups = (typeof regex == 'string') ?
       str.match('^(?:' + regex + ')$') : str.match(regex);
   if (matchedGroups && matchedGroups[0].length == str.length) {
-    return true;
-  }
-  return false;
-};
-
-
-/**
- * Check whether the input sequence can be prefix-matched against the regular
- * expression.
- *
- * @param {!RegExp|string} regex the regular expression to match against.
- * @param {string} str the string to test
- * @return {boolean} true if a prefix of the string can be matched with this
- *     regex.
- * @package
- */
-i18n.phonenumbers.PhoneNumberUtil.matchesPrefix = function(regex, str) {
-  /** @type {Array.<string>} */
-  var matchedGroups = (typeof regex == 'string') ?
-      str.match('^(?:' + regex + ')') : str.match(regex);
-  if (matchedGroups && goog.string.startsWith(str, matchedGroups[0])) {
     return true;
   }
   return false;
