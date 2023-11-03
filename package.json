@@ -13,9 +13,6 @@
     "type": "git",
     "url": "git://github.com/JumiaMDS/google-libphonenumber.git"
   },
-  "publishConfig": {
-    "registry": "https://npm.pkg.github.com/JumiaMDS/"
-  },
   "main": "dist/libphonenumber.js",
   "keywords": [
     "browserify",
