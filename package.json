@@ -1,5 +1,5 @@
 {
-  "name": "google-libphonenumber",
+  "name": "@jumiamds/google-libphonenumber",
   "version": "3.2.35",
   "description": "The up-to-date and reliable Google's libphonenumber package for node.js.",
   "author": {
@@ -11,7 +11,10 @@
   "bugs": "https://github.com/ruimarinho/google-libphonenumber/issues",
   "repository": {
     "type": "git",
-    "url": "https://github.com/ruimarinho/google-libphonenumber.git"
+    "url": "git://github.com/JumiaMDS/google-libphonenumber.git"
+  },
+  "publishConfig": {
+    "registry": "https://npm.pkg.github.com"
   },
   "main": "dist/libphonenumber.js",
   "keywords": [
@@ -38,7 +41,8 @@
     "test": "npm run build && npm run testonly",
     "testonly": "mocha $npm_package_options_mocha",
     "update": "bin/update.sh",
-    "version": "npm run build && git add -A dist"
+    "version": "npm run build && git add -A dist",
+    "login": "npm login --scope=jumiamds --auth-type=legacy --registry=https://npm.pkg.github.com"
   },
   "devDependencies": {
     "browserify": "^13.1.0",
