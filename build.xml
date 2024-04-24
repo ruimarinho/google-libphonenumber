@@ -56,20 +56,45 @@
         <arg line='-f "--jscomp_error=unknownDefines"' />
         <arg line='-f "--jscomp_error=uselessCode"' />
         <arg line='-f "--jscomp_error=visibility"' />
+        <arg line='-f "--language_in=ECMASCRIPT5_STRICT"' />
+        <arg line='-f "--language_out=ECMASCRIPT5_STRICT"' />
+        <arg line='-f "--process_common_js_modules"' />
+        <arg line='-f "--module_resolution=NODE"' />
+        <arg line='-f "--common_js_entry_module=src/index.js"' />
+        <arg line='-f "--module_output_path_prefix=dist/"' />
         <extraflags />
       </exec>
     </sequential>
   </macrodef>
 
-  <target name="build"
-          description="generates libphonenumber.js">
+  <target name="build" description="generates libphonenumber.js">
+    <!-- CommonJS build -->
     <closure-compile inputfile="src/index.js"
-                     outputfile="dist/libphonenumber.js">
+                     outputfile="dist/libphonenumber.cjs.js"
+                     outputwrapper="module.exports = (function() {%output%})();">
       <extraflags>
         <arg line='-p "src"' />
         <arg line='-e "src/metadatafortesting.js"' />
         <arg line='-e "src/metadatalite.js"' />
         <arg line='-e "src/regioncodefortesting.js"' />
+        <arg line='-f "--process_common_js_modules"' />
+        <arg line='-f "--module_resolution=NODE"' />
+        <arg line='-f "--common_js_entry_module=src/index.js"' />
+        <arg line='-f "--module_output_path_prefix=dist/"' />
+        <arg line='-f "--create_source_map=%outname%.map"' />
+      </extraflags>
+    </closure-compile>
+
+    <!-- AMD build -->
+    <closure-compile inputfile="src/index.js"
+                     outputfile="dist/libphonenumber.amd.js"
+                     outputwrapper="define(function() {%output%});">
+      <extraflags>
+        <arg line='-p "src"' />
+        <arg line='-e "src/metadatafortesting.js"' />
+        <arg line='-e "src/metadatalite.js"' />
+        <arg line='-e "src/regioncodefortesting.js"' />
+        <arg line='-f "--create_source_map=%outname%.map"' />
       </extraflags>
     </closure-compile>
   </target>
