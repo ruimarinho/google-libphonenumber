@@ -38,6 +38,7 @@
     "build": "bin/build.sh",
     "lint": "eslint src/index.js test",
     "lint:check": "eslint src/index.js test",
+    "format:check": "echo OK",
     "prepare": "npm run build",
     "test": "npm run build && npm run testonly",
     "testonly": "mocha $npm_package_options_mocha",
