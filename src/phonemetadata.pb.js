@@ -21,13 +21,13 @@
  * @fileoverview Generated Protocol Buffer code for file
  * phonemetadata.proto.
  */
+
 goog.provide('i18n.phonenumbers.NumberFormat');
-goog.provide('i18n.phonenumbers.PhoneNumberDesc');
 goog.provide('i18n.phonenumbers.PhoneMetadata');
 goog.provide('i18n.phonenumbers.PhoneMetadataCollection');
+goog.provide('i18n.phonenumbers.PhoneNumberDesc');
 
 goog.require('goog.proto2.Message');
-goog.require('goog.proto2.Descriptor');
 
 
 
@@ -1270,210 +1270,6 @@ i18n.phonenumbers.PhoneMetadata.prototype.clearVoicemail = function() {
 
 
 /**
- * Gets the value of the short_code field.
- * @return {?i18n.phonenumbers.PhoneNumberDesc} The value.
- */
-i18n.phonenumbers.PhoneMetadata.prototype.getShortCode = function() {
-  return /** @type {?i18n.phonenumbers.PhoneNumberDesc} */ (this.get$Value(29));
-};
-
-
-/**
- * Gets the value of the short_code field or the default value if not set.
- * @return {!i18n.phonenumbers.PhoneNumberDesc} The value.
- */
-i18n.phonenumbers.PhoneMetadata.prototype.getShortCodeOrDefault = function() {
-  return /** @type {!i18n.phonenumbers.PhoneNumberDesc} */ (this.get$ValueOrDefault(29));
-};
-
-
-/**
- * Sets the value of the short_code field.
- * @param {!i18n.phonenumbers.PhoneNumberDesc} value The value.
- */
-i18n.phonenumbers.PhoneMetadata.prototype.setShortCode = function(value) {
-  this.set$Value(29, value);
-};
-
-
-/**
- * @return {boolean} Whether the short_code field has a value.
- */
-i18n.phonenumbers.PhoneMetadata.prototype.hasShortCode = function() {
-  return this.has$Value(29);
-};
-
-
-/**
- * @return {number} The number of values in the short_code field.
- */
-i18n.phonenumbers.PhoneMetadata.prototype.shortCodeCount = function() {
-  return this.count$Values(29);
-};
-
-
-/**
- * Clears the values in the short_code field.
- */
-i18n.phonenumbers.PhoneMetadata.prototype.clearShortCode = function() {
-  this.clear$Field(29);
-};
-
-
-/**
- * Gets the value of the standard_rate field.
- * @return {?i18n.phonenumbers.PhoneNumberDesc} The value.
- */
-i18n.phonenumbers.PhoneMetadata.prototype.getStandardRate = function() {
-  return /** @type {?i18n.phonenumbers.PhoneNumberDesc} */ (this.get$Value(30));
-};
-
-
-/**
- * Gets the value of the standard_rate field or the default value if not set.
- * @return {!i18n.phonenumbers.PhoneNumberDesc} The value.
- */
-i18n.phonenumbers.PhoneMetadata.prototype.getStandardRateOrDefault = function() {
-  return /** @type {!i18n.phonenumbers.PhoneNumberDesc} */ (this.get$ValueOrDefault(30));
-};
-
-
-/**
- * Sets the value of the standard_rate field.
- * @param {!i18n.phonenumbers.PhoneNumberDesc} value The value.
- */
-i18n.phonenumbers.PhoneMetadata.prototype.setStandardRate = function(value) {
-  this.set$Value(30, value);
-};
-
-
-/**
- * @return {boolean} Whether the standard_rate field has a value.
- */
-i18n.phonenumbers.PhoneMetadata.prototype.hasStandardRate = function() {
-  return this.has$Value(30);
-};
-
-
-/**
- * @return {number} The number of values in the standard_rate field.
- */
-i18n.phonenumbers.PhoneMetadata.prototype.standardRateCount = function() {
-  return this.count$Values(30);
-};
-
-
-/**
- * Clears the values in the standard_rate field.
- */
-i18n.phonenumbers.PhoneMetadata.prototype.clearStandardRate = function() {
-  this.clear$Field(30);
-};
-
-
-/**
- * Gets the value of the carrier_specific field.
- * @return {?i18n.phonenumbers.PhoneNumberDesc} The value.
- */
-i18n.phonenumbers.PhoneMetadata.prototype.getCarrierSpecific = function() {
-  return /** @type {?i18n.phonenumbers.PhoneNumberDesc} */ (this.get$Value(31));
-};
-
-
-/**
- * Gets the value of the carrier_specific field or the default value if not set.
- * @return {!i18n.phonenumbers.PhoneNumberDesc} The value.
- */
-i18n.phonenumbers.PhoneMetadata.prototype.getCarrierSpecificOrDefault = function() {
-  return /** @type {!i18n.phonenumbers.PhoneNumberDesc} */ (this.get$ValueOrDefault(31));
-};
-
-
-/**
- * Sets the value of the carrier_specific field.
- * @param {!i18n.phonenumbers.PhoneNumberDesc} value The value.
- */
-i18n.phonenumbers.PhoneMetadata.prototype.setCarrierSpecific = function(value) {
-  this.set$Value(31, value);
-};
-
-
-/**
- * @return {boolean} Whether the carrier_specific field has a value.
- */
-i18n.phonenumbers.PhoneMetadata.prototype.hasCarrierSpecific = function() {
-  return this.has$Value(31);
-};
-
-
-/**
- * @return {number} The number of values in the carrier_specific field.
- */
-i18n.phonenumbers.PhoneMetadata.prototype.carrierSpecificCount = function() {
-  return this.count$Values(31);
-};
-
-
-/**
- * Clears the values in the carrier_specific field.
- */
-i18n.phonenumbers.PhoneMetadata.prototype.clearCarrierSpecific = function() {
-  this.clear$Field(31);
-};
-
-
-/**
- * Gets the value of the sms_services field.
- * @return {?i18n.phonenumbers.PhoneNumberDesc} The value.
- */
-i18n.phonenumbers.PhoneMetadata.prototype.getSmsServices = function() {
-  return /** @type {?i18n.phonenumbers.PhoneNumberDesc} */ (this.get$Value(33));
-};
-
-
-/**
- * Gets the value of the sms_services field or the default value if not set.
- * @return {!i18n.phonenumbers.PhoneNumberDesc} The value.
- */
-i18n.phonenumbers.PhoneMetadata.prototype.getSmsServicesOrDefault = function() {
-  return /** @type {!i18n.phonenumbers.PhoneNumberDesc} */ (this.get$ValueOrDefault(33));
-};
-
-
-/**
- * Sets the value of the sms_services field.
- * @param {!i18n.phonenumbers.PhoneNumberDesc} value The value.
- */
-i18n.phonenumbers.PhoneMetadata.prototype.setSmsServices = function(value) {
-  this.set$Value(33, value);
-};
-
-
-/**
- * @return {boolean} Whether the sms_services field has a value.
- */
-i18n.phonenumbers.PhoneMetadata.prototype.hasSmsServices = function() {
-  return this.has$Value(33);
-};
-
-
-/**
- * @return {number} The number of values in the sms_services field.
- */
-i18n.phonenumbers.PhoneMetadata.prototype.smsServicesCount = function() {
-  return this.count$Values(33);
-};
-
-
-/**
- * Clears the values in the sms_services field.
- */
-i18n.phonenumbers.PhoneMetadata.prototype.clearSmsServices = function() {
-  this.clear$Field(33);
-};
-
-
-/**
  * Gets the value of the no_international_dialling field.
  * @return {?i18n.phonenumbers.PhoneNumberDesc} The value.
  */
@@ -2210,6 +2006,57 @@ i18n.phonenumbers.PhoneMetadata.prototype.clearLeadingDigits = function() {
 
 
 /**
+ * Gets the value of the leading_zero_possible field.
+ * @return {?boolean} The value.
+ */
+i18n.phonenumbers.PhoneMetadata.prototype.getLeadingZeroPossible = function() {
+  return /** @type {?boolean} */ (this.get$Value(26));
+};
+
+
+/**
+ * Gets the value of the leading_zero_possible field or the default value if not set.
+ * @return {boolean} The value.
+ */
+i18n.phonenumbers.PhoneMetadata.prototype.getLeadingZeroPossibleOrDefault = function() {
+  return /** @type {boolean} */ (this.get$ValueOrDefault(26));
+};
+
+
+/**
+ * Sets the value of the leading_zero_possible field.
+ * @param {boolean} value The value.
+ */
+i18n.phonenumbers.PhoneMetadata.prototype.setLeadingZeroPossible = function(value) {
+  this.set$Value(26, value);
+};
+
+
+/**
+ * @return {boolean} Whether the leading_zero_possible field has a value.
+ */
+i18n.phonenumbers.PhoneMetadata.prototype.hasLeadingZeroPossible = function() {
+  return this.has$Value(26);
+};
+
+
+/**
+ * @return {number} The number of values in the leading_zero_possible field.
+ */
+i18n.phonenumbers.PhoneMetadata.prototype.leadingZeroPossibleCount = function() {
+  return this.count$Values(26);
+};
+
+
+/**
+ * Clears the values in the leading_zero_possible field.
+ */
+i18n.phonenumbers.PhoneMetadata.prototype.clearLeadingZeroPossible = function() {
+  this.clear$Field(26);
+};
+
+
+/**
  * Message PhoneMetadataCollection.
  * @constructor
  * @extends {goog.proto2.Message}
@@ -2472,26 +2319,6 @@ i18n.phonenumbers.PhoneMetadata.prototype.getDescriptor = function() {
         fieldType: goog.proto2.Message.FieldType.MESSAGE,
         type: i18n.phonenumbers.PhoneNumberDesc
       },
-      29: {
-        name: 'short_code',
-        fieldType: goog.proto2.Message.FieldType.MESSAGE,
-        type: i18n.phonenumbers.PhoneNumberDesc
-      },
-      30: {
-        name: 'standard_rate',
-        fieldType: goog.proto2.Message.FieldType.MESSAGE,
-        type: i18n.phonenumbers.PhoneNumberDesc
-      },
-      31: {
-        name: 'carrier_specific',
-        fieldType: goog.proto2.Message.FieldType.MESSAGE,
-        type: i18n.phonenumbers.PhoneNumberDesc
-      },
-      33: {
-        name: 'sms_services',
-        fieldType: goog.proto2.Message.FieldType.MESSAGE,
-        type: i18n.phonenumbers.PhoneNumberDesc
-      },
       24: {
         name: 'no_international_dialling',
         fieldType: goog.proto2.Message.FieldType.MESSAGE,
@@ -2566,6 +2393,12 @@ i18n.phonenumbers.PhoneMetadata.prototype.getDescriptor = function() {
         name: 'leading_digits',
         fieldType: goog.proto2.Message.FieldType.STRING,
         type: String
+      },
+      26: {
+        name: 'leading_zero_possible',
+        fieldType: goog.proto2.Message.FieldType.BOOL,
+        defaultValue: false,
+        type: Boolean
       }
     };
     i18n.phonenumbers.PhoneMetadata.descriptor_ = descriptor =
@@ -2609,4 +2442,3 @@ i18n.phonenumbers.PhoneMetadataCollection.prototype.getDescriptor = function() {
 /** @nocollapse */
 i18n.phonenumbers.PhoneMetadataCollection.getDescriptor =
     i18n.phonenumbers.PhoneMetadataCollection.prototype.getDescriptor;
-
