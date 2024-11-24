@@ -1,6 +1,6 @@
 {
   "name": "google-libphonenumber",
-  "version": "3.2.37",
+  "version": "3.2.38",
   "description": "The up-to-date and reliable Google's libphonenumber package for node.js.",
   "author": {
     "name": "Rui Marinho",
