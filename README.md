@@ -290,7 +290,7 @@ There have been some users reporting successful but also unsuccessful usage with
 
 ### Chrome Extensions
 
-Google Closure Compiler API, a serviced provided by Google to compile code online via its Closure library, may not always return fully compliant UTF-8-encoded output.
+Google Closure Compiler API, a service provided by Google to compile code online via its Closure library, may not always return fully compliant UTF-8-encoded output.
 
 Loading extensions using this library on Google Chrome and other Chromium-based browsers may result in the following error when compiled with webpack:
 
