@@ -1,6 +1,6 @@
 #!/bin/bash
 
-rm -rf dist/* \
+BUILD_DIR=$(mktemp -d) \
 && echo "Compiling using Google Closure Compiler..." \
 && ./node_modules/.bin/google-closure-compiler \
 --compilation_level=SIMPLE \
@@ -48,9 +48,12 @@ rm -rf dist/* \
 --js=src/shortnumberinfo.js \
 --js=src/shortnumbermetadata.js \
 --js=src/asyoutypeformatter.js \
---js_output_file=dist/libphonenumber.original.js \
-&& ./node_modules/.bin/browserify dist/libphonenumber.original.js --standalone libphonenumber --no-browser-field --outfile dist/libphonenumber.js \
-&& rm dist/libphonenumber.original.js \
+--js_output_file=$BUILD_DIR/libphonenumber.original.js \
+&& ./node_modules/.bin/browserify $BUILD_DIR/libphonenumber.original.js --standalone libphonenumber --no-browser-field --outfile $BUILD_DIR/libphonenumber.js \
+&& rm -rf dist \
+&& mkdir dist \
+&& mv $BUILD_DIR/libphonenumber.js dist/libphonenumber.js \
+&& rm -rf $BUILD_DIR \
 && echo "Build completed!"
 
 
