@@ -4,11 +4,11 @@ The up-to-date and reliable Google's libphonenumber package for node.js. Zero de
 
 ## Introduction
 
-Google's [libphonenumber](https://github.com/googlei18n/libphonenumber) is a library that parses, formats, stores and validates international phone numbers. It is used by Android since version 4.0 and is a phenomenal repository of carrier metadata.
+Google's [libphonenumber](https://github.com/google/libphonenumber) is a library that parses, formats, stores and validates international phone numbers. It has been used by Android since version 4.0 and is a phenomenal repository of carrier metadata.
 
 Although it compiles down to Java, C++ and JS, its JS port is tightly coupled to the Google Closure library. This makes it more difficult to directly require and use the code on a node.js project.
 
-Google eventually started publishing [google-closure-library](https://www.npmjs.com/package/google-closure-library) directly to NPM, ending years of ill-maintained community packages. However, running the original library on node.js [remains a cumbersome process](https://github.com/googlei18n/libphonenumber/tree/master/javascript).
+Google eventually started publishing [google-closure-library](https://www.npmjs.com/package/google-closure-library) directly to NPM, ending years of ill-maintained community packages. However, running the original library on node.js [remains a cumbersome process](https://github.com/google/libphonenumber/tree/master/javascript).
 
 After all these years, Google's libphonenumber is still not officially available on NPM. What is the best way to use Google's libphonenumber on node.js then? If you're looking for a convenient and easy method, that's what this package is all about.
 
@@ -18,6 +18,14 @@ Install the package via `npm`:
 
 ```sh
 npm install --save-prod google-libphonenumber
+```
+
+### TypeScript
+
+This package ships without type definitions, but the community maintains them as [`@types/google-libphonenumber`](https://www.npmjs.com/package/@types/google-libphonenumber):
+
+```sh
+npm install --save-dev @types/google-libphonenumber
 ```
 
 ## Usage
@@ -119,9 +127,9 @@ console.log(phoneUtil.formatOutOfCountryCallingNumber(number, 'CH'));
 // => 00 1 202-456-1414
 ```
 
-#### Using the "As You Type" Formatter
+### Using the "As You Type" Formatter
 
-The "As You Type" formatter is a specialized tool that show the formatting *progress* as it attempts to discover the right format for the given number. It requires registering every keystroke (input digit) on a new instance of the `AsYouTypeFormatter` as shown below.
+The "As You Type" formatter is a specialized tool that shows the formatting *progress* as it attempts to discover the right format for the given number. It requires registering every keystroke (input digit) on a new instance of the `AsYouTypeFormatter` as shown below.
 
 ```js
 // Require `AsYouTypeFormatter`.
@@ -179,7 +187,7 @@ Highlights:
 * **getNationalNumber()**
 * **getRawInput()**
 
-## i18n.phonenumbers.CountryCodeSource
+### i18n.phonenumbers.CountryCodeSource
 
 Lists the following enums in order to compare them with the output of `Phone.getCountryCodeSource()`:
 
@@ -189,7 +197,7 @@ Lists the following enums in order to compare them with the output of `Phone.get
 * `CountryCodeSource.FROM_NUMBER_WITHOUT_PLUS_SIGN`
 * `CountryCodeSource.FROM_DEFAULT_COUNTRY`
 
-## i18n.phonenumbers.PhoneNumberFormat
+### i18n.phonenumbers.PhoneNumberFormat
 
 Lists the following enums in order to pass them to `PhoneNumberUtil.format()`:
 
@@ -198,7 +206,7 @@ Lists the following enums in order to pass them to `PhoneNumberUtil.format()`:
 * `PhoneNumberFormat.NATIONAL`
 * `PhoneNumberFormat.RFC3966`
 
-## i18n.phonenumbers.PhoneNumberType
+### i18n.phonenumbers.PhoneNumberType
 
 Lists the following enums in order to compare them with the output of `PhoneNumberUtil.getNumberType()`:
 
@@ -260,7 +268,7 @@ The following methods or classes are unavailable on the original JS port of Goog
 
 Most of the issues submitted to this repository are related to carrier metadata - things like unexpected phone validations, errors in formatting numbers, unknown carriers and so on.
 
-First, try the same input using the [official demo page](http://libphonenumber.appspot.com). If the result is different, then it might mean that a metadata update is due on this package, as the demo page always runs on the latest and official metadata version.
+First, try the same input using the [official demo page](https://libphonenumber.appspot.com). If the result is different, then it might mean that a metadata update is due on this package, as the demo page always runs on the latest and official metadata version.
 
 If the result is the same, it means there might be an issue with the currently available metadata. In that case, you should report your issue in the original project's [issue tracker](https://issuetracker.google.com/issues?q=componentid:192347) ([moved out of GitHub on 05/12/2017](https://groups.google.com/forum/#!topic/libphonenumber-discuss/bcCh0175LME)).
 
@@ -274,7 +282,7 @@ This note will be posted on every issue regarding metadata troubles and it will 
 * Always based on the latest `google-closure` library version available from Google with performance and bug fixes.
 * Relies on a simplified and [well-documented update process](https://github.com/ruimarinho/google-libphonenumber/blob/master/bin/update.sh) to keep the underlying `libphonenumber` library always up-to-date.
 
-If you're looking for a slightly simpler API, you should try [awesome-phonenumber](https://www.npmjs.com/package/awesome-phonenumber). It is based on the same concepts of this package but changes the API in order to make it more user friendly. You run the risk of bumping into [other](https://github.com/grantila/awesome-phonenumber/issues/14) [bugs](https://github.com/grantila/awesome-phonenumber/issues/17) and you'll have to [learn new API types](https://github.com/grantila/awesome-phonenumber#api-types), but that's the necessary trade-off that the author made for achieving a generally better looking API.
+If you're looking for a slightly simpler API, you should try [awesome-phonenumber](https://www.npmjs.com/package/awesome-phonenumber). It is based on the same concepts of this package but changes the API in order to make it more user friendly. You run the risk of bumping into other bugs and you'll have to [learn new API types](https://github.com/grantila/awesome-phonenumber#api-types), but that's the necessary trade-off that the author made for achieving a generally better looking API.
 
 [libphonenumber-js](https://www.npmjs.com/package/libphonenumber-js) is a much more radical approach to Google's libphonenumber. It is a rewrite of the original library based on its source phone metadata but implemented without depending on the Google Closure library. It also offers a tool to reduce the metadata to a set of countries which might be useful for frontend projects. It has several [caveats](https://github.com/catamphetamine/libphonenumber-js#difference-from-googles-libphonenumber), many of which make a lot of sense depending on the project, but you will have to ascertain those yourself.
 
@@ -284,7 +292,7 @@ There have been some users reporting successful but also unsuccessful usage with
 
 ### Chrome Extensions
 
-Google Closure Compiler API, a serviced provided by Google to compile code online via its Closure library, may not always return fully compliant UTF-8-encoded output.
+Google Closure Compiler API, a service provided by Google to compile code online via its Closure library, may not always return fully compliant UTF-8-encoded output.
 
 Loading extensions using this library on Google Chrome and other Chromium-based browsers may result in the following error when compiled with webpack:
 
@@ -320,13 +328,16 @@ npm test
 ## Release
 
 ```sh
-npm version [<newversion> | major | minor | patch] -m "Release %s"
+npm version [<newversion> | major | minor | patch] --ignore-scripts -m "Release %s"
+git push --follow-tags
 ```
+
+Pushing the tag triggers the publish workflow, which rebuilds `dist` from `src` and publishes to npm via [trusted publishing](https://docs.npmjs.com/trusted-publishers) — no npm tokens or one-time passwords involved. The `--ignore-scripts` flag skips the local `dist` rebuild, which requires a toolchain that no longer runs on modern machines; the CI-built artifact is what ships, so the committed `dist` may lag behind `src` between releases.
 
 ## Acknowledgments
 
-The exceptional work on `libphonenumber` was made possible by these [committers and contributors](https://github.com/googlei18n/libphonenumber/graphs/contributors).
+The exceptional work on `libphonenumber` was made possible by these [committers and contributors](https://github.com/google/libphonenumber/graphs/contributors).
 
 ## Licenses
 
-This package is licensed under MIT. The bundled [libphonenumber](https://github.com/googlei18n/libphonenumber/blob/master/LICENSE) library is licensed under Apache 2.0.
+This package is licensed under MIT. The bundled [libphonenumber](https://github.com/google/libphonenumber/blob/master/LICENSE) library is licensed under Apache 2.0.
