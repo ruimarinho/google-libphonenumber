@@ -2,12 +2,6 @@
 
 The up-to-date and reliable Google's libphonenumber package for node.js. Zero dependencies.
 
-## Status
-
-[![npm version][npm-image]][npm-url]
-[![build status][travis-image]][travis-url]
-[![install size][packagephobia-image]][packagephobia-url]
-
 ## Introduction
 
 Google's [libphonenumber](https://github.com/googlei18n/libphonenumber) is a library that parses, formats, stores and validates international phone numbers. It is used by Android since version 4.0 and is a phenomenal repository of carrier metadata.
@@ -336,10 +330,3 @@ The exceptional work on `libphonenumber` was made possible by these [committers 
 ## Licenses
 
 This package is licensed under MIT. The bundled [libphonenumber](https://github.com/googlei18n/libphonenumber/blob/master/LICENSE) library is licensed under Apache 2.0.
-
-[npm-image]: https://flat.badgen.net/npm/v/google-libphonenumber
-[npm-url]: https://npmjs.org/package/google-libphonenumber
-[travis-image]: https://flat.badgen.net/travis/ruimarinho/google-libphonenumber
-[travis-url]: https://travis-ci.org/ruimarinho/google-libphonenumber
-[packagephobia-image]: https://flat.badgen.net/packagephobia/install/google-libphonenumber
-[packagephobia-url]: https://packagephobia.now.sh/result?p=google-libphonenumber
