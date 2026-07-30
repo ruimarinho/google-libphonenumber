@@ -14,6 +14,9 @@
     "url": "https://github.com/ruimarinho/google-libphonenumber.git"
   },
   "main": "dist/libphonenumber.js",
+  "files": [
+    "dist"
+  ],
   "keywords": [
     "browserify",
     "e164",
