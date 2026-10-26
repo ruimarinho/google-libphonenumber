@@ -45,7 +45,6 @@
   },
   "devDependencies": {
     "@eslint/js": "^10.0.1",
-    "browserify": "^13.1.0",
     "eslint": "^10.13.0",
     "globals": "^17.13.0",
     "google-closure-compiler": "^20201102.0.1",

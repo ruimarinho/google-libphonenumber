@@ -48,8 +48,8 @@ BUILD_DIR=$(mktemp -d) \
 --js=src/shortnumberinfo.js \
 --js=src/shortnumbermetadata.js \
 --js=src/asyoutypeformatter.js \
---js_output_file=$BUILD_DIR/libphonenumber.original.js \
-&& ./node_modules/.bin/browserify $BUILD_DIR/libphonenumber.original.js --standalone libphonenumber --no-browser-field --outfile $BUILD_DIR/libphonenumber.js \
+--output_wrapper_file=bin/umd-wrapper.js \
+--js_output_file=$BUILD_DIR/libphonenumber.js \
 && rm -rf dist \
 && mkdir dist \
 && mv $BUILD_DIR/libphonenumber.js dist/libphonenumber.js \

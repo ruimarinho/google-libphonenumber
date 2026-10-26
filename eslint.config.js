@@ -13,7 +13,7 @@ const js = require('@eslint/js');
 
 module.exports = [
   {
-    ignores: ['dist/', 'src/*', '!src/index.js']
+    ignores: ['bin/umd-wrapper.js', 'dist/', 'src/*', '!src/index.js']
   },
   js.configs.recommended,
   {
