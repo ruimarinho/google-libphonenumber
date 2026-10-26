@@ -4,6 +4,7 @@ BUILD_DIR=$(mktemp -d) \
 && echo "Compiling using Google Closure Compiler..." \
 && ./node_modules/.bin/google-closure-compiler \
 --compilation_level=SIMPLE \
+--language_out=ECMASCRIPT5 \
 --js=node_modules/google-closure-library/closure/goog/array/array.js \
 --js=node_modules/google-closure-library/closure/goog/asserts/asserts.js \
 --js=node_modules/google-closure-library/closure/goog/base.js \
