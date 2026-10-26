@@ -279,7 +279,7 @@ This note will be posted on every issue regarding metadata troubles and it will 
 `google-libphonenumber` does not try to be more than what it really is - a pre-compiled Google libphonenumber bundle that works on node.js. It is a **1:1 mirror** of the original library without any further simplifications or optimizations.
 
 * All classes available from `libphonenumber` are exported as-is. No magic methods.
-* Always based on the latest `google-closure` library version available from Google with performance and bug fixes.
+* Built against the same Closure Library version that upstream `libphonenumber` uses.
 * Relies on a simplified and [well-documented update process](https://github.com/ruimarinho/google-libphonenumber/blob/master/bin/update.sh) to keep the underlying `libphonenumber` library always up-to-date.
 
 If you're looking for a slightly simpler API, you should try [awesome-phonenumber](https://www.npmjs.com/package/awesome-phonenumber). It is based on the same concepts of this package but changes the API in order to make it more user friendly. You run the risk of bumping into other bugs and you'll have to [learn new API types](https://github.com/grantila/awesome-phonenumber#api-types), but that's the necessary trade-off that the author made for achieving a generally better looking API.
@@ -319,20 +319,32 @@ optimization: {
 
 ## Tests
 
-A small subset of tests guarantees that the main library functions are working as expected and are correctly exported. The actual heavy lifting is done by `libphonenumber`'s extensive test suite.
+A small subset of tests guarantees that the main library functions are working as expected and are correctly exported for CommonJS, AMD and browser globals. The actual heavy lifting is done by `libphonenumber`'s extensive test suite.
 
 ```sh
 npm test
 ```
 
+`npm test` rebuilds `dist` from `src` before testing. To test the committed `dist` without rebuilding, use `npm run testonly`.
+
 ## Release
+
+Updating to a new `libphonenumber` version releases automatically:
+
+```sh
+npm run update -- <version>
+```
+
+This replaces `src` with the upstream release and commits it as `Update libphonenumber@<version>`. Once that commit lands on `master`, the release workflow bumps the patch version and pushes a tag. The tag triggers the publish workflow, which rebuilds `dist` from `src` and publishes to npm via [trusted publishing](https://docs.npmjs.com/trusted-publishers) — no npm tokens or one-time passwords involved.
+
+Any other change is released by tagging it manually:
 
 ```sh
 npm version [<newversion> | major | minor | patch] --ignore-scripts -m "Release %s"
 git push --follow-tags
 ```
 
-Pushing the tag triggers the publish workflow, which rebuilds `dist` from `src` and publishes to npm via [trusted publishing](https://docs.npmjs.com/trusted-publishers) — no npm tokens or one-time passwords involved. The `--ignore-scripts` flag skips the local `dist` rebuild, which requires a toolchain that no longer runs on modern machines; the CI-built artifact is what ships, so the committed `dist` may lag behind `src` between releases.
+The `--ignore-scripts` flag skips the local `dist` rebuild; the CI-built artifact is what ships, so the committed `dist` may lag behind `src` between releases.
 
 ## Acknowledgments
 
